@@ -3,11 +3,25 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon server.js"
+    "test": "nodemon server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "ejs": "~2.5.5",
     "express": "~4.14.1",
     "nodemon": "^1.11.0"
-  }
+  },
+  "description": "Matcha",
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Remaii/Matcha.git"
+  },
+  "author": "rthidet",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Remaii/Matcha/issues"
+  },
+  "homepage": "https://github.com/Remaii/Matcha#readme"
 }

@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><%= title %></title>
+    <title>Matcha</title>
     <link rel='stylesheet' href='/asset/css/semantic.min.css' />
     <style>
         .main.container
         {
-            margin-top: 4%;
+            margin-top: 80px;
         }
     </style>
 </head>
 <body>
-<div class="ui fixed inverted blue menu">
+<div class="ui fixed inverted container menu">
     <a class="header item" href="/">Accueil</a>
+    <a class="header item" href="/login">Login</a>
 </div>
-
 <div class="ui main container">
+
+    <% if(locals.flash && locals.flash.error) { %>
+    <div class="ui negative message">
+        <%= flash.error %>
+    </div>
+    <% } %>
+    <% if(locals.flash && locals.flash.mess) { %>
+    <div class="ui positive message">
+        <%= flash.mess %>
+    </div>
+    <% } %>

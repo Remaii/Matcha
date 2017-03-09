@@ -22,6 +22,7 @@ var logUsr = {
 				if (ok == 1) {
 					collec.updateOne({name: login}, { $set:{last_co: new Date()}});
 				}
+				db.close();
 			});
 
 		});

@@ -9,7 +9,7 @@ var addUsr = {
 			var newUser = {name: login, pwd: passwd, mail: mail, created: new Date()};
 			db.collection('user').insertOne(newUser, function (err, result) {
 				if (err) return err;
-				if (result.ok == 1) {
+				if (result.result['ok']) {
 					console.log('User add success');
 				}
 			});

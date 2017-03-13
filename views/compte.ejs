@@ -1,0 +1,28 @@
+<% include header %>
+
+	<form class="ui form" action="/compte" method="post">
+
+		<label>Sexe</label>
+		<select name="sexe" size="1">
+			<option>
+			<option>Homme
+			<option>Femme
+		</select>
+
+        <label class="">Orientation sexuel</label>
+		<select name="orient" size="1">
+			<option>
+			<option>Hetero
+			<option>Gay
+			<option>Bi-sex
+		</select>
+        <label class="">Petite Bio</label>
+        <textarea name="bio"></textarea>
+
+        <label class="">Liste d'interêt</label>
+        <input type="text" name="interet">
+
+        <input type="submit" name="submit" value="Update">
+    </form>
+
+<% include footer %>

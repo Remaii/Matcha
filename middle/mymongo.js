@@ -1,6 +1,38 @@
 var crypto = require('crypto');
 var cookie = require('cookie');
 
+//checker de mot de passe
+var checkerPwd = function(password) {
+    var maj = 0;
+    var num = 0;
+    var i = 0;
+
+    while (password[i]) {
+        if (password.charCodeAt(i) >= 65 && password.charCodeAt(i) <= 90)
+            maj++;
+        else if (password.charCodeAt(i) >= 48 && password.charCodeAt(i) <= 57)
+            num++;
+        i++;
+    }
+    if (i >= 5 && maj > 0 && num > 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+var checkerBio = function(str, nb) {
+    var i = 0;
+    while (str[i]){
+        i++;
+    }
+    if (i >= nb){
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
 //deloguer l'utilisateur
 var deLog = function(req, res) {
     console.log(req.session['login'] + ' se delog');
@@ -12,7 +44,7 @@ var deLog = function(req, res) {
 // Si le nom d'utilisateur et/ou mail n'existe pas dans la base
 var addUser = function(req, res) {
 	var MongoClient = require('mongodb').MongoClient;
-	var url = "mongodb://localhost:27017/matcha";
+	var url = "mongodb://localhost:28000/matcha";
     var logre = req.body.login1;
     var passwd = req.body.pwd1;
     var cfpwd = req.body.cfpwd;
@@ -21,46 +53,52 @@ var addUser = function(req, res) {
 
 
     if (logre != '' && passwd != '' && cfpwd != '' && mail != '') {
-        passwd = crypto.createHmac('whirlpool', passwd).digest('hex');
-        cfpwd = crypto.createHmac('whirlpool', cfpwd).digest('hex');
-        if (passwd === cfpwd) {
-        	MongoClient.connect(url, function (err, db) {
-        		if (err) {
-                    req.flash('error', 'Connection to DataBase Failed');
-                    res.redirect('login');
-                }
-        		var newUser = {name: logre, pwd: passwd, mail: mail, created: new Date()};
-                db.collection('user').find({}).toArray(function(err, docs) {
-                    var i = 0;
-                    var ok = 0;
-                    while (docs[i]) {
-                        if (docs[i]['name'] === logre || docs[i]['mail'] === mail) {
-                            console.log('User: ' + logre + ' are already register');
-                            ok = -1;
-                            break;
-                        }
-                        ok++;
-                        i++;
+        if (checkerPwd(passwd) == 1) {
+            passwd = crypto.createHmac('whirlpool', passwd).digest('hex');
+            cfpwd = crypto.createHmac('whirlpool', cfpwd).digest('hex');
+            if (passwd === cfpwd) {
+            	MongoClient.connect(url, function (err, db) {
+            		if (err) {
+                        req.flash('error', 'Connection to DataBase Failed');
+                        res.redirect('login');
                     }
-                    if (ok != -1) {
-                        req.session['login'] = logre;
-                        req.flash('mess', 'Utilisateur ajouté avec succes');
-                        db.collection('user').insertOne(newUser, function (err, result) {
-                            if (result.result['ok']) {
-                                console.log('User ' + logre + ' add success');
+            		var newUser = {name: logre, pwd: passwd, mail: mail, created: new Date()};
+                    db.collection('user').find({}).toArray(function(err, docs) {
+                        var i = 0;
+                        var ok = 0;
+                        while (docs[i]) {
+                            if (docs[i]['name'] === logre || docs[i]['mail'] === mail) {
+                                console.log('User: ' + logre + ' are already register');
+                                ok = -1;
+                                break;
                             }
+                            ok++;
+                            i++;
+                        }
+                        if (ok != -1) {
+                            req.session['login'] = logre;
+                            req.flash('mess', 'Utilisateur ajouté avec succes');
+                            db.collection('user').insertOne(newUser, function (err, result) {
+                                if (result.result['ok']) {
+                                    console.log('User ' + logre + ' add success');
+                                }
 
-                        });
-        			} else {
-                        req.flash('error', 'Utilisateur / Mail, déjà utilisé');
-                    }
-        			db.close();
-                    res.redirect('compte');
-                });
-        	});
+                            });
+            			} else {
+                            req.flash('error', 'Utilisateur / Mail, déjà utilisé');
+                        }
+            			db.close();
+                        res.redirect('compte');
+                    });
+            	});
+            }
+            else {
+                req.flash('error', 'Les mots de passes ne sont pas identiques');
+                res.redirect('login');
+            }
         }
         else {
-            req.flash('error', 'Les mots de passes ne sont pas identiques');
+            req.flash('error', 'Le mot de passe doit contenir au minimum 1 Majuscules, 1 chiffre et faire 5 caracteres minimum');
             res.redirect('login');
         }
     } else {
@@ -74,7 +112,7 @@ var addUser = function(req, res) {
 // le connecter au site
 var logUser = function(req, res) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:27017/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var i = 0;
     var ok = 0;
     var log = req.body.login;
@@ -100,7 +138,7 @@ var logUser = function(req, res) {
                     collec.updateOne({name: log}, { $set:{last_co: new Date()}});
                     req.session['login'] = log;
                     req.flash('mess', 'Connection Success');
-                    db.close();
+                    db.close(); 
                     res.redirect('/');
                 }
                 else {
@@ -118,47 +156,24 @@ var logUser = function(req, res) {
     }
 };
 
-function updater(loger, toUp, value) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:27017/matcha";
-// {$set: tocoll}
-    if (value != '') {
-        MongoClient.connect(url, function(err, db) {
-            var collec = db.collection('user');
-            console.log(loger);
-            collec.updateOne({name: loger}, {$set:{: value}});
-        });
-    }
-}
-
 var updateUser = function(req, res) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:27017/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var loger = req.session['login'];
     var sexe = req.body.sexe;
     var orient = req.body.orient;
     var bio = req.body.bio;
     var interet = req.body.interet;
 
-//    if (bio != '' || interet != '' || sexe != '' || orient != '' || loger != undefined) {
-    if (bio != '') {
-        updater(loger, 'bio', bio);
+    if (bio != '' && sexe != '' && interet != '' && orient != '' && loger != undefined) {
+        if (checkerBio(bio, '500') == 1) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({name: req.session['login']}, { $set:{bio: bio, sexe: sexe, interet: interet, orient: orient}});
+            });
+        }
+        console.log('User: ' + loger + ' info update');
     }
-    else if (sexe != '') {
-        updater(loger, 'sexe', sexe);
-    }
-    else if (orient != '') {
-        updater(loger, 'orient', orient);
-    }
-    else if (orient != '') {
-        updater(loger, 'interet', interet);
-    
-        // MongoClient.connect(url, function(err, db) {
-            // db.collection('user').updateOne({name: req.session['login']}, { $set:{sexe: sexe, orient: orient, bio: bio, interet: interet}});
-        // });
-        // req.flash('mess', 'User update success');
-        console.log('User: ' + loger + ' profile update');
-    } else {
+    else {
         req.flash('error', 'Un ou Plusieurs champ(s) vide');
     }
 }

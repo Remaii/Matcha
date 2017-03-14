@@ -50,7 +50,7 @@ app.post('/login', function(req, res) {
 //__________________Page Compte________________
 app.get('/compte', function(request, response) {
     response.locals.userlog = request.session['login'];
-    response.render('compte');
+    response.render('compte/compte');
 });
 
 app.post('/compte', function(req, res) {
@@ -68,6 +68,22 @@ app.get('/delog', function(request, response) {
 });
 
 
+
+
+//__________________Page test________________
+app.get('/test', function(request, response) {
+    response.render('test', {
+    	input:
+    		['profile',
+    		'modifie',
+    		'option'] });
+});
+
+app.get('/compte/:page', function(req, res) {
+	if (req.url == '/compte/profile') {
+		res.render('compte/profile');
+	}
+})
 
 //_______Server, Ecoute sur le port: 3000_____
 app.listen(3000);

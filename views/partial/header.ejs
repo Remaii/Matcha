@@ -16,9 +16,10 @@
     <% if (!locals.userlog) { %>
         <a class="header item" href="/login">Login</a>
     <% } else { %>
-        <a class="header item" href="/compte"><%=locals.userlog %> ton compte</a>
+        <a class="header item" href="../compte"><%=locals.userlog %> ton compte</a>
         <a class="header item" href="/delog">Log-out</a>
     <% } %>
+    <a class="header item" href="/test">test</a>
 </div>
 <div class="ui main container">
 

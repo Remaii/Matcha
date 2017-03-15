@@ -13,13 +13,24 @@
 <body>
 <div class="ui fixed inverted container menu">
     <a class="header item" href="/">Accueil</a>
+    <a class="header item" href="/test">test</a>
     <% if (!locals.userlog) { %>
         <a class="header item" href="/login">Login</a>
     <% } else { %>
-        <a class="header item" href="../compte"><%=locals.userlog %> ton compte</a>
-        <a class="header item" href="/delog">Log-out</a>
-    <% } %>
-    <a class="header item" href="/test">test</a>
+        
+        <div class="right menu">
+
+            <div id="compte" class="ui dropdown item">
+                Ton compte<i class="dropdown icon"></i>
+                <div class="dropdown menu">
+                    <a class="item" href="../compte">Voir mon profile</a>
+                    <a class="item" href="../compte">Mes Options</a>
+                </div>
+            </div>
+            <a class="header small primary button item" href="/delog">Log-out</a>
+        </div>
+    
+    <% } %>   
 </div>
 <div class="ui main container">
 

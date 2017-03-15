@@ -24,18 +24,23 @@ app.use(session({
 }));
 app.use(require('./middle/flash'));
 
+
 ////__________________Routes__________________
 //__________________Page Index________________
-app.get('/', function(request, response) {
-	response.locals.userlog = request.session['login'];
-	response.render('index');
+app.get('/', function(req, res) {
+	res.locals.userlog = req.session['login'];
+	res.render('index');
 });
 
 
+var test = function() {
+	console.log('test');
+}
+
 //__________________Page Login________________
-app.get('/login', function(request, response) {
-    response.locals.userlog = request.session['login'];
-    response.render('login');
+app.get('/login', function(req, res) {
+    res.locals.userlog = req.session['login'];
+    res.render('login');
 });
 
 app.post('/login', function(req, res) {
@@ -48,9 +53,9 @@ app.post('/login', function(req, res) {
 });
 
 //__________________Page Compte________________
-app.get('/compte', function(request, response) {
-    response.locals.userlog = request.session['login'];
-    response.render('compte/compte');
+app.get('/compte', function(req, res) {
+    res.locals.userlog = req.session['login'];
+    res.render('compte/compte');
 });
 
 app.post('/compte', function(req, res) {
@@ -62,8 +67,8 @@ app.post('/compte', function(req, res) {
 
 
 //__________________Page Delog________________
-app.get('/delog', function(request, response) {
-    mymongo.delog(request, response);
+app.get('/delog', function(req, res) {
+    mymongo.delog(req, res);
     // response.render('index');
 });
 
@@ -71,8 +76,8 @@ app.get('/delog', function(request, response) {
 
 
 //__________________Page test________________
-app.get('/test', function(request, response) {
-    response.render('test', {
+app.get('/test', function(req, res) {
+    res.render('test', {
     	input:
     		['profile',
     		'modifie',
@@ -80,6 +85,7 @@ app.get('/test', function(request, response) {
 });
 
 app.get('/compte/:page', function(req, res) {
+	res.locals.userlog = req.session['login'];
 	if (req.url == '/compte/profile') {
 		res.render('compte/profile');
 	}

@@ -1,13 +1,9 @@
 <% include partial/header %>
 
-
-<div class="ui secondary vertical menu">
-
-
-<% for(var i = 0; i < input.length; i++){ %>
-    <a class="item" href="compte/<%= input[i] %>"> <%= input[i] %></a><br>
+<% profile.forEach(function(value){
+		value.forEach(function(data) { %>
+			<%= data %>
+		<% }) %>
+	<% }) %>
 <% } %>
-</div>
-
-
 <% include partial/footer %>

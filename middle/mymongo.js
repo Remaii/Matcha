@@ -178,6 +178,29 @@ var updateUser = function(req, res) {
     }
 }
 
+var getProfile = function(req, res) {
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb://localhost:28000/matcha";
+    var j = 0;
+    var arr = {}
+    var tmp = {}
+
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find().toArray(function(err, docs) {
+            for (var i = 0; docs[i]; i++){
+                tmp[0] = docs[i]['name'];
+                tmp[1] = docs[i]['sexe'];
+                tmp[2] = docs[i]['orient'];
+                arr[i] = tmp;
+                tmp = {};
+            }
+            req.session.profileTab = arr;
+            console.log(req.session.profileTab);
+        });   
+    });
+}
+
+exports.getProfile = getProfile;
 exports.updateUser = updateUser;
 exports.logUser = logUser;
 exports.addUser = addUser;

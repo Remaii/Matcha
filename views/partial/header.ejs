@@ -19,12 +19,14 @@
     <% } else { %>
         
         <div class="right menu">
-
-            <select id="compte" class="ui dropdown item" name="Mon Compte">
-                <option class="item" href="../compte">Voir mon profil</option>
-                <option class="item" href="../compte/compte">Mes informations</option>
-            </select>
-            <a class="header small primary button item" href="/delog">Log-out</a>
+            <div class="ui dropdown item">
+                Mon compte <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a class="item" href="../compte">Voir mon profil</a>
+                    <a class="item" href="../compte/compte">Mes informations</a>
+                </div>
+                <a class="header small primary button item" href="/delog">Log-out</a>
+            </div>
         </div>
     
     <% } %>   

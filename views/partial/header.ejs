@@ -17,7 +17,6 @@
     <% if (!locals.userlog) { %>
         <a class="header item" href="/login">Login</a>
     <% } else { %>
-        
         <div class="right menu">
             <div class="ui dropdown item">
                 Mon compte <i class="dropdown icon"></i>
@@ -28,18 +27,16 @@
                 <a class="header small primary button item" href="/delog">Log-out</a>
             </div>
         </div>
-    
-    <% } %>   
+    <% } %>
 </div>
 <div class="ui main container">
-
     <% if(locals.flash && locals.flash.error) { %>
-    <div class="ui negative message">
-        <%= flash.error %>
-    </div>
+        <div class="ui negative message">
+            <%= flash.error %>
+        </div>
     <% } %>
     <% if(locals.flash && locals.flash.mess) { %>
-    <div class="ui positive message">
-        <%= flash.mess %>
-    </div>
+        <div class="ui positive message">
+          <%= flash.mess %>
+        </div>
     <% } %>

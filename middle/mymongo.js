@@ -194,8 +194,8 @@ var getProfile = function(req, res) {
                 arr[i] = tmp;
                 tmp = {};
             }
-            req.session.profileTab = arr;
-            console.log(req.session.profileTab);
+            req.body.profileTab = arr;
+            //console.log(req.session.profileTab);
         });   
     });
 }

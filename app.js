@@ -2,7 +2,7 @@ var express = require('express')
 var bodyParser = require('body-parser')
 var session = require('express-session')
 var mymongo = require('./middle/mymongo')
-
+var jQuery = require('jquery')
 var index = require('./routes/index')
 var compte = require('./routes/compte')
 var login = require('./routes/login')
@@ -17,6 +17,7 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 app.use('/asset', express.static('public'));
+
 app.use(session({
 	secret: 'matcharthidet',
 	resave: false,

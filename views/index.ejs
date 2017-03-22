@@ -1,42 +1,21 @@
 <% include partial/header %>
 
-<div class="ui three grid column container">
-    <div class="item">
-        <div class="ui circular image">
-            <img src="http://loremflickr.com/g/200/200/cats">
-        </div>
-        <div class="content">
-            <a class="header">Header</a>
-            <div class="meta">
-                <span>Description</span>
+<div class="row">
+<% if (locals.session['login'] != undefined) {
+        for (var i = 0; locals.session['test'][i]; i++) { %>
+        
+            <div class="col-lg-4">
+                <img class="img-circle" src="http://loremflickr.com/g/200/200/cats">
+                <h4><%= locals.session['test'][i][0] %></h4>
+                <p><%= locals.session['test'][i][1] %></p>
+                <p><%= locals.session['test'][i][2] %></p>
+                <p><%= locals.session['test'][i][3] %></p>
             </div>
-            <div class="description">
-                <p></p>
-            </div>
-            <div class="extra">
-                Additional Details
-            </div>
-        </div>
+        <% } 
+} else { %> 
+    <div>
+        <a href="/register">Inscrit-toi !</a>
     </div>
-    <div class="item">
-        <div class="ui circular image">
-            <img src="http://loremflickr.com/g/200/200/dogs">
-        </div>
-        <div class="content">
-            <a class="header">Header</a>
-            <div class="meta">
-                <span>Description</span>
-            </div>
-            <div class="description">
-                <p></p>
-            </div>
-            <div class="extra">
-                Additional Details
-            </div>
-        </div>
-    </div>
+<% } %>
 </div>
-
 <% include partial/footer %>
-
-<!-- http://loremflickr.com/g/200/200/dogs -->

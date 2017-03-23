@@ -3,12 +3,14 @@ var bodyParser = require('body-parser')
 var session = require('express-session')
 var mymongo = require('./middle/mymongo')
 var jQuery = require('jquery')
+var app = express()
+
+
 var index = require('./routes/index')
 var compte = require('./routes/compte')
 var login = require('./routes/login')
 var profile = require('./routes/profile')
-var app = express()
-
+var register = require('./routes/register')
 
 //__________________Moteur de template________
 app.set('view engine', 'ejs');
@@ -32,6 +34,7 @@ app.use('/', index)
 app.use('/compte', compte)
 app.use('/login', login)
 app.use('/profile', profile)
+app.use('/register', register)
 
 //__________________Page Delog________________
 app.get('/delog', function(req, res) {

@@ -45,8 +45,8 @@ var deLog = function(req, res) {
 var addUser = function(req, res) {
 	var MongoClient = require('mongodb').MongoClient;
 	var url = "mongodb://localhost:28000/matcha";
-    var logre = req.body.login1;
-    var passwd = req.body.pwd1;
+    var logre = req.body.login;
+    var passwd = req.body.pwd;
     var cfpwd = req.body.cfpwd;
     var mail = req.body.mail; 
 
@@ -94,16 +94,16 @@ var addUser = function(req, res) {
             }
             else {
                 req.flash('error', 'Les mots de passes ne sont pas identiques');
-                res.redirect('login');
+                res.redirect('register');
             }
         }
         else {
             req.flash('error', 'Le mot de passe doit contenir au minimum 1 Majuscules, 1 chiffre et faire 5 caracteres minimum');
-            res.redirect('login');
+            res.redirect('register');
         }
     } else {
         req.flash('error', 'Un ou Plusieurs champ(s) vide');
-        res.redirect('login');
+        res.redirect('register');
     }
 }
 

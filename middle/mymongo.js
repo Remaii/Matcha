@@ -274,13 +274,15 @@ function getMyTag(req, res, call) {
     var mytag = {}
     var log = req.session['login'];
 
-    MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({login: log}).toArray(function(err, doc) {
-            mytag = doc[0]['tag'];
-            call(mytag);
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: log}).toArray(function(err, doc) {
+                mytag = doc[0]['tag'];
+                call(mytag);
+            });
+            db.close();
         });
-        db.close();
-    });
+    }// else error 404 ? no avaible ?
 }
 
 var getInterest = function(req, res, call) {
@@ -306,17 +308,42 @@ var upMyTag = function(req, res) {
     var log = req.session['login'];
     var toadd = {};
     var ok = 0;
-    
+
     if (Array.isArray(interet)) {
         for (var i = 0; interet[i]; i++) {
+            console.log(i + "_interet_" + interet[i])
             toadd[i] = interet[i];
-            if (!interet[i + 1]) {
+            if (!interet[i + 1] && (req.session['mytag'] != undefined || req.session['mytag'] != '')) {
+                for (var u = 0; req.session['mytag'][u];u++) {
+                    console.log(req.session['mytag'][u]);
+                    toadd[i + u + 1] = req.session['mytag'][u];
+                    if (!req.session['mytag'][u + 1]) {
+                        ok = 1;
+                    }
+                }                
+            } else if (!interet[i + 1]) {
                 ok = 1;
             }
         }
+        // for (var u = 0; req.session['mytag'][u];u++) {
+        //     console.log(req.session['mytag'][u]);
+        //     // if (!req.session['mytag'][u + 1]) {
+        //         // ok = 1;
+        //     // }
+        // }
     } else {
         toadd[0] = interet;
-        ok = 1;
+        if (req.session['mytag']) {
+            for (var u = 0; req.session['mytag'][u];u++) {
+                console.log(req.session['mytag'][u]);
+                toadd[u + 1] = req.session['mytag'][u];
+                if (!req.session['mytag'][u + 1]) {
+                    ok = 1;
+                }
+            }
+        } else {
+            ok = 1;
+        }
     }
     if ((log != undefined || log != '') && ok == 1) {
         MongoClient.connect(url, function(err, db) {

@@ -7,24 +7,26 @@ router.get('/', function(req, res) {
     res.render('test');
 });
 
-function resInfo(req, res, call) {
+router.get('/info', function(req, res, next) {
 	mymongo.getMyTag(req, res, function(mytag) {
-		console.log('callback mytag');
 		req.session['mytag'] = mytag;
+		next();
 	});
+}, function(req, res, next) {
 	mymongo.getInterest(req, res, function(tag) {
-		console.log('callback tag');
 		req.session['interet'] = tag;
+		next();
 	});
-	call()
-}
-
-router.get('/info', function(req, res) {
-	resInfo(req, res, function(tag, mytag) {
-		console.log('mytag' + mytag);
-		console.log('tag' + tag);
-		res.render('compte/info');
-	});
+}, function(req, res, next) {
+	res.locals.session = req.session;
+	res.render('compte/info');
+});
+	// function(req, res) {
+	// resInfo(req, res, function(tag, mytag) {
+	// 	console.log('mytag' + mytag);
+	// 	console.log('tag' + tag);
+	// 	// res.render('compte/info');
+	// });
 	// mymongo.getMyTag(req, res, function(mytag) {
 	// 	console.log('callback mytag');
 	// 	req.session['mytag'] = mytag;
@@ -34,7 +36,7 @@ router.get('/info', function(req, res) {
 	// 	req.session['interet'] = tag;
 	// 	res.render('compte/info');
 	// });
-});
+// });
 
 router.post('/info', function(req, res) {
 	var sub = req.body.submit;

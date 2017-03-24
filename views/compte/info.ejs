@@ -27,6 +27,18 @@
 	    </form>
 	</div>
 	<div class="col-md-6"><!-- Ajouter des centres d'interet a ton profile -->
+		<div>
+		<% if (!locals.session['mytag']) { %>
+			<label class="col-md-offset-4 text-center">Tu n'a pas encore de #TAG :(</label>
+		<%  } else { %>
+			<label class="col-md-offset-4 text-center">Tu à c'est #TAG:</label>
+			<p class="text-center" name="mytag">
+			<% for (var nbt = 0; locals.session['mytag'][nbt];nbt++) { %>
+				<%= '#' + locals.session['mytag'][nbt] %>
+			<% } %>
+		<% } %>
+			</p>
+		</div>
 		<form method="post" action="/compte/info">
     		<label class="col-md-offset-4 text-center">Choisis tes centres d'interets</label>
 			<div>

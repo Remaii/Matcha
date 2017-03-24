@@ -1,27 +1,31 @@
 <% include partial/header %>
 
-<div class="ui stackable two column divided grid container">
+<div class="">
     <div class="row">
-        <div class="column">
-            <form class="ui form" action="/login" method="post">
+        <div class="col-md-5 col-md-offset-1">
+            <form class="form" action="/login" method="post">
                 <label class="">Ton petit nom :)</label>
-                <input type="text" name="login">
+                <input class="form-control input-sm" type="text" name="login">
                 <label class="">Ton mot de passe</label>
-                <input type="password" name="pwd">
-                <input type="submit" name="submit" value="Logon">
+                <input class="form-control input-sm" type="password" name="pwd">
+                <div class="col-md-3 col-md-offset-5">
+                    <input class="btn btn-default" type="submit" name="submit" value="Logon">
+                </div>
             </form>
         </div>
-        <div class="column">
+        <div class="col-md-5">
             <form class="ui form" action="/login" method="post">
                 <label class="">Nom d'utilisateur</label>
-                <input type="text" name="login1">
+                <input class="form-control input-sm" type="text" name="login1">
                 <label class="">Mot de passe</label>
-                <input type="password" name="pwd1">
+                <input class="form-control input-sm" type="password" name="pwd1">
                 <label class="">T'es sur de remettre le même ?</label>
-                <input type="password" name="cfpwd">
+                <input class="form-control input-sm" type="password" name="cfpwd">
                 <label class="">Une petit adresse email :)</label>
-                <input type="email" name="mail">
-                <input type="submit" name="submit" value="Register">
+                <input class="form-control input-sm" type="email" name="mail">
+                <div class="col-md-3 col-md-offset-5">
+                    <input class="btn btn-default" type="submit" name="submit" value="Register">
+                </div>
             </form>
         </div>
     </div>

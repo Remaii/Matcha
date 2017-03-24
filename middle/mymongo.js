@@ -33,6 +33,28 @@ var checkerBio = function(str, nb) {
     }
 }
 
+var getMyProfil = function(req, res, call) {
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb://localhost:28000/matcha";
+    var log = req.session['login'];
+    
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({login: log}).toArray(function(err, doc) {
+            var result = {
+                name: doc[0]['name'],
+                sexe: doc[0]['sexe'],
+                orient: doc[0]['orient'],
+                bio: doc[0]['bio'],
+                interet: doc[0]['interet']
+            };
+            call(result);
+        });
+        db.close();
+    });
+}
+
+exports.getMyProfil = getMyProfil;
+
 //deloguer l'utilisateur
 var deLog = function(req, res) {
     console.log(req.session['login'] + ' se delog');
@@ -62,12 +84,12 @@ var addUser = function(req, res) {
                         req.flash('error', 'Connection to DataBase Failed');
                         res.redirect('login');
                     }
-            		var newUser = {name: logre, pwd: passwd, mail: mail, created: new Date()};
+            		var newUser = {login: logre, name: logre, pwd: passwd, mail: mail, created: new Date()};
                     db.collection('user').find({}).toArray(function(err, docs) {
                         var i = 0;
                         var ok = 0;
                         while (docs[i]) {
-                            if (docs[i]['name'] === logre || docs[i]['mail'] === mail) {
+                            if (docs[i]['login'] === logre || docs[i]['mail'] === mail) {
                                 console.log('User: ' + logre + ' are already register');
                                 ok = -1;
                                 break;
@@ -128,7 +150,7 @@ var logUser = function(req, res) {
             }
             collec.find({}).toArray(function(err, docs){
                 while (docs[i]) {
-                    if (docs[i]['name'] === log && docs[i]['pwd'] === pwd) {
+                    if (docs[i]['login'] === log && docs[i]['pwd'] === pwd) {
                         console.log('User: ' + log + ' is Connected');
                         ok = 1;
                     }
@@ -160,15 +182,16 @@ var updateUser = function(req, res) {
     var MongoClient = require('mongodb').MongoClient;
     var url = "mongodb://localhost:28000/matcha";
     var loger = req.session['login'];
+    var name = req.body.name;
     var sexe = req.body.sexe;
     var orient = req.body.orient;
     var bio = req.body.bio;
     var interet = req.body.interet;
 
-    if (bio != '' && sexe != '' && interet != '' && orient != '' && loger != undefined) {
+    if (name != '' && bio != '' && sexe != '' && interet != '' && orient != '' && loger != undefined) {
         if (checkerBio(bio, '500') == 1) {
             MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({name: req.session['login']}, { $set:{bio: bio, sexe: sexe, interet: interet, orient: orient}});
+                db.collection('user').updateOne({login: req.session['login']}, { $set:{name: name, bio: bio, sexe: sexe, interet: interet, orient: orient}});
             });
         }
         console.log('User: ' + loger + ' info update');

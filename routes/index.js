@@ -13,7 +13,7 @@ function getTest(name, callback) {
                 tmp[0] = docs[i]['name'];
                 tmp[1] = docs[i]['sexe'];
                 tmp[2] = docs[i]['orient'];
-                tmp[3] = docs[i]['bio'];
+                tmp[3] = docs[i]['interet'];
                 result[i] = tmp;
                 tmp = {};
             }
@@ -24,7 +24,7 @@ function getTest(name, callback) {
 
 router.get('/', function(req, res) {
 	var test = getTest(req.session['login'], function(result){ 
-		req.session['test'] = result;
+		req.session['allprof'] = result;
 		res.locals.session = req.session;
 		res.render('index');
 	});

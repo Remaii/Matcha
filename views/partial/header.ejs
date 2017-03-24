@@ -7,7 +7,7 @@
     <script type="text/javascript" src="/asset/bootstrap/js/bootstrap.js"></script>
     <link rel="stylesheet" type="text/css" href="/asset/bootstrap/css/bootstrap.css">
     <link rel='stylesheet' href='https://bootswatch.com/slate/bootstrap.css' />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         .main.container
         {
@@ -20,121 +20,55 @@
     </style>
 </head>
 <body>
-
-
-
-
-
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="/">Matcha</a>
-    </div>
-
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      
-      <ul class="nav navbar-nav">
-        
-        <li><a href="/profile">Test</a></li>
-      
-      </ul>
-      
-      <form class="navbar-form navbar-left" role="search">
-        <div class="form-group">
-          <input class="form-control" placeholder="Search" type="text">
-        </div>
-        <button type="submit" class="btn btn-default">Submit</button>
-      </form>
-      
-      <ul class="nav navbar-nav navbar-right">
-      
-
-    <% if (!locals.session['login']) { %>
-        <li><a href="/login">Login</a></li>
-    <% } else { %>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Mon compte <span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-      
-            <li><a href="/compte/profile">Mon profile</a></li>
-      
-            <li class="divider"></li>
-      
-            <li><a href="/compte/info">Mes infos</a></li>
-          </ul>
-        </li>
-
-        <li><a href="/delog">Logout</a></li>
-    <% } %>
-      </ul>
-    </div>
-  
-  </div>
-</nav>
-<% if(locals.flash && locals.flash.error) { %>
-    <div class="alert alert-dismissible alert-warning">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <%= flash.error %>
-    </div>
-<% } %>
-<% if(locals.flash && locals.flash.mess) { %>
-    <div class="alert alert-dismissible alert-success">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <%= flash.mess %>
-    </div>
-<% } %>
-
-
-
-
-
-<!-- 
-<div class="ui fixed inverted container menu">
-    <a class="header item" href="/">Accueil</a>
-    <a class="header item" href="/profile">profile</a>
-    <% if (!locals.userlog) { %>
-        <a class="header item" href="/login">Login</a>
-    <% } else { %>
-        <div class="right menu">
-
-            <div class="ui selection dropdown">
-                <input type="hidden" name="mon_compte">
-                <i class="dropdown icon"></i>
-                <div class="default text">Mon compte</div>
-                <div class="menu">
-        
-                    <div class="item" data-value="/compte/profile">
-                        <a href="/compte/profile">Voir mon profil</a>
-                    </div>
-                    <div class="item" data-value="/compte/compte">
-                        <a href="/compte/compte">Mes informations</a>
-                    </div>
-
-                </div>
-        
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Matcha</a>
             </div>
-        
-
-
-
-            <a class="header small primary button item" href="/delog">Log-out</a>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="/profile">Test</a></li>
+                </ul>
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input class="form-control" placeholder="Search" type="text">
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+                <ul class="nav navbar-nav navbar-right">
+            <% if (!locals.session['login']) { %>
+                    <li><a href="/login">Login</a></li>
+            <% } else { %>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Mon compte <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="/compte/profile">Mon profile</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/compte/info">Mes infos</a></li>
+                        </ul>
+                            <li><a href="/delog">Logout</a></li>
+                    </li>
+            <% } %>
+                </ul>
+            </div>
         </div>
-    <% } %>
-</div>
-<div class="ui main container">
+    </nav>
     <% if(locals.flash && locals.flash.error) { %>
-        <div class="ui negative message">
-            <%= flash.error %>
+        <div class="alert alert-dismissible alert-warning">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <%= flash.error %>
         </div>
     <% } %>
     <% if(locals.flash && locals.flash.mess) { %>
-        <div class="ui positive message">
-          <%= flash.mess %>
+        <div class="alert alert-dismissible alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <%= flash.mess %>
         </div>
-    <% } %> -->
+    <% } %>
+    <div class="container-fluid">

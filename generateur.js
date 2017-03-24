@@ -52,13 +52,32 @@ var prenoms = {
 	16: "Yannick"
 }
 
+var interet = {
+	0: "INFORMATIQUE",
+	1: "CINEMA",
+	2: "MUSIQUE",
+	3: "NATURE",
+	4: "SKATE",
+	5: "ROBOT",
+	6: "APPLE",
+	7: "MODE",
+	8: "VELO"
+}
+
 var setUsers = function(nb) {
 	var MongoClient = require('mongodb').MongoClient;
 	var url = "mongodb://localhost:28000/matcha";
 	var passwd = crypto.createHmac('whirlpool', "AutoUser42").digest('hex');
 	var mail = "AutoUser42@matcha.fr";
 	
-
+	MongoClient.connect(url, function(err, db){
+		db.collection('interet').insertOne(interet, function(err, result){
+			if (result.result.ok){
+				console.log("Interet ajouter");
+			}
+		});
+		db.close();
+	});
 	MongoClient.connect(url, function(err, db) {
 		if (err) return console.log(err);
 		var randName = Math.floor((Math.random() * 16) + 0);
@@ -87,11 +106,9 @@ var setUsers = function(nb) {
 				mail: mail,
 				sexe: sex,
 				orient: sexua,
-				bio: "J'ai été généré pour la correction",
-				interet: {
-					0: "Informatique",
-					1: "Cinema",
-					2: "Musique"
+				bio: "J'ai été généré pour la de façon aléatoire",
+				tag: {
+					0: "ROBOT"
 				},
 				created: new Date()
 			};

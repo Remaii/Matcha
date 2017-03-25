@@ -1,5 +1,5 @@
 <h1>Matcha</h1>
-lancer `mongod --db-path --port 28000`,<br>
-lancer `node generateur.js [nombre d'utilisateur voulu]` ex: `node generateur.js 10`,<br>
-lancer `npm run start`,<br>
-rendez-vous sûr `http://localhost:3000`<br>
+lancer <span>`mongod --db-path --port 28000`</span>,<br>
+lancer <span>`node generateur.js [nombre d'utilisateur voulu]` ex: `node generateur.js 10`</span>,<br>
+lancer <span>`npm run start`</span>,<br>
+rendez-vous sûr <span>`http://localhost:3000`</span><br>

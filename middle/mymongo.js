@@ -301,29 +301,29 @@ var getInterest = function(req, res, call) {
     });
 }
 
-function removeDouble(toadd) {
-    var tmp = toadd;
-    var res = {};
-    var nb_res = 0;
-    var count = 0;
-    for (var a = 0; tmp[a]; a++) {
-        count = 0;
-        for (var b = 0; toadd[b]; b++) {
-            if (toadd[b] == tmp[a] && count != 1) {
-                // for (var c = 0; res[c]; c++) {
-                    
-                // }
-                res[nb_res] = toadd[b];
-                nb_res++;
-                count = 1;
-                console.log(toadd[b] + ' ' + tmp[a] + ' ' + a + ' ' + b);
-            }
-            if (count == 1) {
-                break;
-            }
+function alreadySet(tab, value) {
+    console.log(tab);
+    console.log(value);
+    for (var i = 0; tab[i]; i++) {
+        if (tab[i] == value)
+            return 1;
+        if (i == tab.length) {
+            return 0;
         }
     }
-    console.log(res);
+}
+
+function removeDouble(toadd, call) {
+    var tmp = {};
+    var nb = 0;
+
+    for (var a = 0; toadd[a]; a++) {
+        if (!alreadySet(tmp, toadd[a])) {
+            tmp[nb] = toadd[a];
+            nb++;
+        }
+    }
+    call(tmp);
 }
 
 var upMyTag = function(req, res) {
@@ -334,33 +334,27 @@ var upMyTag = function(req, res) {
     var toadd = {};
     var ok = 0;
 
-    if (interet != '' || interet != null || interet != undefined) { // && (log != undefined || log != '')
-console.log('coucou')
+    if (interet != '' || interet != null || interet != undefined && (log != undefined || log != '')) {
         if (Array.isArray(interet)) {
-console.log('coucou1.1')
             for (var i = 0; interet[i]; i++) {
                 toadd[i] = interet[i];
                 if (!interet[i + 1] && (req.session['mytag'] != undefined || req.session['mytag'] != '')) {
                     for (var u = 0; req.session['mytag'][u];u++) {
                         toadd[i + u + 1] = req.session['mytag'][u];
                         if (!req.session['mytag'][u + 1]) {
-                            console.log('ok = 1 !interet[i + 1]!req.session[u + 1]');
                             ok = 1;
                         }
                     }                
                 } else if (!interet[i + 1]) {
-                    console.log('ok = 1 !interet[i+1]');
                     ok = 1;
                 }
             }
         } else {
-console.log('coucou1.2' + interet + ': ' + req.session['mytag'][0] + ' :')
             if ((req.session['mytag'] != undefined || req.session['mytag'] != '') && req.session['mytag']) {
                 for (var u = 0; req.session['mytag'][u];u++) {
                     toadd[u] = req.session['mytag'][u];
                     if (!req.session['mytag'][u + 1]) {
                         toadd[u + 1] = interet;
-                        console.log('ok=1 !req.session[u+1]');
                         ok = 1;
                     }
                 }
@@ -368,20 +362,17 @@ console.log('coucou1.2' + interet + ': ' + req.session['mytag'][0] + ' :')
                 if (interet != null) {
                     toadd[0] = interet;
                 }
-                console.log('toadd[0] = interet');
                 ok = 1;
             }
-console.log('coucou2 ' + ok)
         }
-console.log('coucou3 ' + ok)
-        if ((log != undefined || log != '') && ok == 1) {
-            // removeDouble(toadd);
-console.log('coucou4')
-            MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: log}, { $set:{tag: toadd}});
-                db.close();
+        if (ok == 1) { // (log != undefined || log != '') && 
+            removeDouble(toadd, function(resultat) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({login: log}, { $set:{tag: resultat}});
+                    db.close();
+                });
+                res.redirect('info');
             });
-            res.redirect('info');
         }
     } else {
         res.redirect('info');

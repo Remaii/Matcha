@@ -44,10 +44,10 @@
 <p>--Tchatter avec un autre utilisateur:❌</p>
 
 <h4>Recherche</h4>
-<p>-Par intervalle d'âge:</p>
-<p>-Par intervalle de score de popularité:</p>
-<p>-Par tags:</p>
-<p>-Localisation:</p>
+<p>-Par intervalle d'âge:❌</p>
+<p>-Par intervalle de score de popularité:❌</p>
+<p>-Par tags:❌</p>
+<p>-Localisation:❌</p>
 <p>-Résultat triable comme le parcours:❌</p>
 
 <h4>Profil des Autres</h4>

@@ -21,22 +21,6 @@ router.get('/info', function(req, res, next) {
 	res.locals.session = req.session;
 	res.render('compte/info');
 });
-	// function(req, res) {
-	// resInfo(req, res, function(tag, mytag) {
-	// 	console.log('mytag' + mytag);
-	// 	console.log('tag' + tag);
-	// 	// res.render('compte/info');
-	// });
-	// mymongo.getMyTag(req, res, function(mytag) {
-	// 	console.log('callback mytag');
-	// 	req.session['mytag'] = mytag;
-	// });
-	// mymongo.getInterest(req, res, function(tag) {
-	// 	console.log('callback tag');
-	// 	req.session['interet'] = tag;
-	// 	res.render('compte/info');
-	// });
-// });
 
 router.post('/info', function(req, res) {
 	var sub = req.body.submit;

@@ -7,7 +7,13 @@ router.get('/', function(req, res) {
     res.render('test');
 });
 
-router.get('/info', function(req, res, next) {
+router.get('/info', function(req, res, next){
+	if (req.session['login'] == undefined || req.session['login'] == '' || !req.session['login']) {
+		res.redirect('../');
+	} else {
+		next();
+	}
+}, function(req, res, next) {
 	mymongo.getMyTag(req, res, function(mytag) {
 		req.session['mytag'] = mytag;
 		next();

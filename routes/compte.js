@@ -33,6 +33,9 @@ router.post('/info', function(req, res) {
 	else if (sub === 'Ajouter') {
 		mymongo.upMyTag(req, res);
 	}
+	else if (sub === 'Supprimer') {
+		mymongo.downMyTag(req, res);
+	}
 });
 
 router.get('/profile', function(req, res) {

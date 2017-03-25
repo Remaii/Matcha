@@ -302,8 +302,6 @@ var getInterest = function(req, res, call) {
 }
 
 function alreadySet(tab, value) {
-    console.log(tab);
-    console.log(value);
     for (var i = 0; tab[i]; i++) {
         if (tab[i] == value)
             return 1;
@@ -365,12 +363,13 @@ var upMyTag = function(req, res) {
                 ok = 1;
             }
         }
-        if (ok == 1) { // (log != undefined || log != '') && 
+        if (ok == 1) {
             removeDouble(toadd, function(resultat) {
                 MongoClient.connect(url, function(err, db) {
                     db.collection('user').updateOne({login: log}, { $set:{tag: resultat}});
                     db.close();
                 });
+                console.log(log + ' ajout tag: ' + interet);
                 res.redirect('info');
             });
         }
@@ -379,10 +378,60 @@ var upMyTag = function(req, res) {
     }
 }
 
+var downMyTag = function(req, res) {
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb://localhost:28000/matcha";
+    var interet = req.body.select;
+    var log = req.session['login'];
+    var toadd = {};
+    var nb = 0;
+    var ok = 0;
+    var count = 0;
+
+    if ((log != undefined || log != '') && (req.session['mytag'] != undefined || req.session['mytag'] != '') && req.session['mytag']) {
+        
+        for (var i = 0; req.session['mytag'][i]; i++) {
+            if (Array.isArray(interet)) {
+                count = 0;
+                for (var a = 0; interet[a]; a++) {
+                    if (req.session['mytag'][i] == interet[a]) {
+                        count = -100;
+                    } else {
+                        count++;
+                    }    
+                }
+                if (count > 0){
+                    toadd[nb] = req.session['mytag'][i];
+                    nb++;
+                }
+            } else {
+                if (req.session['mytag'][i] != interet) {
+                    toadd[nb] = req.session['mytag'][i];
+                    nb++;
+                }
+            }
+        }
+        ok = 1;
+        if (ok == 1) {
+            removeDouble(toadd, function(resultat) {
+                console.log(resultat);
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({login: log}, { $set:{tag: resultat}});
+                    db.close();
+                });
+                console.log(log + ' suppression tag: ' + interet);
+                res.redirect('info');
+            });
+        }
+    } else {
+        res.redirect('info');
+    }
+}
 
 exports.getMyTag = getMyTag;
 exports.getAllProf = getAllProf;
 exports.upMyTag = upMyTag;
+exports.downMyTag = downMyTag;
 exports.getInterest = getInterest;
 exports.addInterest = addInterest;
 exports.updateUser = updateUser;

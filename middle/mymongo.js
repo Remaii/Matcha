@@ -35,7 +35,7 @@ var checkerBio = function(str, nb) {
 
 var getAllProf = function (name, callback) {
     var mongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://192.168.0.12:28000/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var result = {};
     var tmp = {};
 
@@ -56,7 +56,7 @@ var getAllProf = function (name, callback) {
 
 var getMyProfil = function(req, res, call) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://192.168.0.12:28000/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var log = req.session['login'];
     
     MongoClient.connect(url, function(err, db) {
@@ -85,7 +85,7 @@ var deLog = function(req, res) {
 // Si le nom d'utilisateur et/ou mail n'existe pas dans la base
 var addUser = function(req, res) {
 	var MongoClient = require('mongodb').MongoClient;
-	var url = "mongodb://192.168.0.12:28000/matcha";
+	var url = "mongodb://localhost:28000/matcha";
     var logre = req.body.login;
     var passwd = req.body.pwd;
     var cfpwd = req.body.cfpwd;
@@ -151,7 +151,7 @@ var addUser = function(req, res) {
 // le connecter au site
 var logUser = function(req, res) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://192.168.0.12:28000/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var i = 0;
     var ok = 0;
     var log = req.body.login;
@@ -195,7 +195,7 @@ var logUser = function(req, res) {
 
 var updateUser = function(req, res) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://192.168.0.12:28000/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var loger = req.session['login'];
     var name = req.body.name;
     var sexe = req.body.sexe;
@@ -220,7 +220,7 @@ var updateUser = function(req, res) {
 
 function insertThis(tab) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://192.168.0.12:28000/matcha";
+    var url = "mongodb://localhost:28000/matcha";
 
     MongoClient.connect(url, function(err, db) {
         db.collection('interet').updateOne({}, tab, function(err, result) {
@@ -233,7 +233,7 @@ function insertThis(tab) {
 
 var addInterest = function(req, res) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://192.168.0.12:28000/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var toadd = req.body.interet.toUpperCase();
 
     if (toadd == '' || toadd == undefined) {
@@ -270,7 +270,7 @@ var addInterest = function(req, res) {
 
 function getMyTag(req, res, call) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://192.168.0.12:28000/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var mytag = {}
     var log = req.session['login'];
 
@@ -287,7 +287,7 @@ function getMyTag(req, res, call) {
 
 var getInterest = function(req, res, call) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://192.168.0.12:28000/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var tag = {};
 
     MongoClient.connect(url, function(err, db) {
@@ -326,7 +326,7 @@ function removeDouble(toadd, call) {
 
 var upMyTag = function(req, res) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://192.168.0.12:28000/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var interet = req.body.select;
     var log = req.session['login'];
     var toadd = {};
@@ -380,7 +380,7 @@ var upMyTag = function(req, res) {
 
 var downMyTag = function(req, res) {
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://192.168.0.12:28000/matcha";
+    var url = "mongodb://localhost:28000/matcha";
     var interet = req.body.select;
     var log = req.session['login'];
     var toadd = {};

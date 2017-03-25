@@ -342,7 +342,7 @@ var upMyTag = function(req, res) {
                         if (!req.session['mytag'][u + 1]) {
                             ok = 1;
                         }
-                    }                
+                    }
                 } else if (!interet[i + 1]) {
                     ok = 1;
                 }
@@ -389,7 +389,6 @@ var downMyTag = function(req, res) {
     var count = 0;
 
     if ((log != undefined || log != '') && (req.session['mytag'] != undefined || req.session['mytag'] != '') && req.session['mytag']) {
-        
         for (var i = 0; req.session['mytag'][i]; i++) {
             if (Array.isArray(interet)) {
                 count = 0;
@@ -398,7 +397,7 @@ var downMyTag = function(req, res) {
                         count = -100;
                     } else {
                         count++;
-                    }    
+                    }
                 }
                 if (count > 0){
                     toadd[nb] = req.session['mytag'][i];
@@ -411,10 +410,14 @@ var downMyTag = function(req, res) {
                 }
             }
         }
+		console.log(toadd);
+		console.log(toadd[0]);
+		if (toadd[0] == undefined) {
+			toadd[0] = " ";
+		}
         ok = 1;
         if (ok == 1) {
             removeDouble(toadd, function(resultat) {
-                console.log(resultat);
                 MongoClient.connect(url, function(err, db) {
                     db.collection('user').updateOne({login: log}, { $set:{tag: resultat}});
                     db.close();

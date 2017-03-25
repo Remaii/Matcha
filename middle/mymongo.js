@@ -301,6 +301,31 @@ var getInterest = function(req, res, call) {
     });
 }
 
+function removeDouble(toadd) {
+    var tmp = toadd;
+    var res = {};
+    var nb_res = 0;
+    var count = 0;
+    for (var a = 0; tmp[a]; a++) {
+        count = 0;
+        for (var b = 0; toadd[b]; b++) {
+            if (toadd[b] == tmp[a] && count != 1) {
+                // for (var c = 0; res[c]; c++) {
+                    
+                // }
+                res[nb_res] = toadd[b];
+                nb_res++;
+                count = 1;
+                console.log(toadd[b] + ' ' + tmp[a] + ' ' + a + ' ' + b);
+            }
+            if (count == 1) {
+                break;
+            }
+        }
+    }
+    console.log(res);
+}
+
 var upMyTag = function(req, res) {
     var MongoClient = require('mongodb').MongoClient;
     var url = "mongodb://localhost:28000/matcha";
@@ -309,14 +334,14 @@ var upMyTag = function(req, res) {
     var toadd = {};
     var ok = 0;
 
-    if (interet != '') {
+    if (interet != '' || interet != null || interet != undefined) { // && (log != undefined || log != '')
+console.log('coucou')
         if (Array.isArray(interet)) {
+console.log('coucou1.1')
             for (var i = 0; interet[i]; i++) {
-                console.log(i + "_interet_" + interet[i])
                 toadd[i] = interet[i];
                 if (!interet[i + 1] && (req.session['mytag'] != undefined || req.session['mytag'] != '')) {
                     for (var u = 0; req.session['mytag'][u];u++) {
-                        console.log(req.session['mytag'][u]);
                         toadd[i + u + 1] = req.session['mytag'][u];
                         if (!req.session['mytag'][u + 1]) {
                             console.log('ok = 1 !interet[i + 1]!req.session[u + 1]');
@@ -329,9 +354,9 @@ var upMyTag = function(req, res) {
                 }
             }
         } else {
-            if (req.session['mytag'] != undefined || req.session['mytag'] != '') {    //req.session['mytag']) {
+console.log('coucou1.2' + interet + ': ' + req.session['mytag'][0] + ' :')
+            if ((req.session['mytag'] != undefined || req.session['mytag'] != '') && req.session['mytag']) {
                 for (var u = 0; req.session['mytag'][u];u++) {
-                    console.log(req.session['mytag'][u]);
                     toadd[u] = req.session['mytag'][u];
                     if (!req.session['mytag'][u + 1]) {
                         toadd[u + 1] = interet;
@@ -340,12 +365,18 @@ var upMyTag = function(req, res) {
                     }
                 }
             } else {
-                toadd[0] = interet;
+                if (interet != null) {
+                    toadd[0] = interet;
+                }
                 console.log('toadd[0] = interet');
                 ok = 1;
             }
+console.log('coucou2 ' + ok)
         }
+console.log('coucou3 ' + ok)
         if ((log != undefined || log != '') && ok == 1) {
+            // removeDouble(toadd);
+console.log('coucou4')
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: log}, { $set:{tag: toadd}});
                 db.close();

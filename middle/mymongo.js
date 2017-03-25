@@ -309,49 +309,52 @@ var upMyTag = function(req, res) {
     var toadd = {};
     var ok = 0;
 
-    if (Array.isArray(interet)) {
-        for (var i = 0; interet[i]; i++) {
-            console.log(i + "_interet_" + interet[i])
-            toadd[i] = interet[i];
-            if (!interet[i + 1] && (req.session['mytag'] != undefined || req.session['mytag'] != '')) {
-                for (var u = 0; req.session['mytag'][u];u++) {
-                    console.log(req.session['mytag'][u]);
-                    toadd[i + u + 1] = req.session['mytag'][u];
-                    if (!req.session['mytag'][u + 1]) {
-                        ok = 1;
-                    }
-                }                
-            } else if (!interet[i + 1]) {
-                ok = 1;
-            }
-        }
-        // for (var u = 0; req.session['mytag'][u];u++) {
-        //     console.log(req.session['mytag'][u]);
-        //     // if (!req.session['mytag'][u + 1]) {
-        //         // ok = 1;
-        //     // }
-        // }
-    } else {
-        toadd[0] = interet;
-        if (req.session['mytag']) {
-            for (var u = 0; req.session['mytag'][u];u++) {
-                console.log(req.session['mytag'][u]);
-                toadd[u + 1] = req.session['mytag'][u];
-                if (!req.session['mytag'][u + 1]) {
+    if (interet != '') {
+        if (Array.isArray(interet)) {
+            for (var i = 0; interet[i]; i++) {
+                console.log(i + "_interet_" + interet[i])
+                toadd[i] = interet[i];
+                if (!interet[i + 1] && (req.session['mytag'] != undefined || req.session['mytag'] != '')) {
+                    for (var u = 0; req.session['mytag'][u];u++) {
+                        console.log(req.session['mytag'][u]);
+                        toadd[i + u + 1] = req.session['mytag'][u];
+                        if (!req.session['mytag'][u + 1]) {
+                            console.log('ok = 1 !interet[i + 1]!req.session[u + 1]');
+                            ok = 1;
+                        }
+                    }                
+                } else if (!interet[i + 1]) {
+                    console.log('ok = 1 !interet[i+1]');
                     ok = 1;
                 }
             }
         } else {
-            ok = 1;
+            if (req.session['mytag'] != undefined || req.session['mytag'] != '') {    //req.session['mytag']) {
+                for (var u = 0; req.session['mytag'][u];u++) {
+                    console.log(req.session['mytag'][u]);
+                    toadd[u] = req.session['mytag'][u];
+                    if (!req.session['mytag'][u + 1]) {
+                        toadd[u + 1] = interet;
+                        console.log('ok=1 !req.session[u+1]');
+                        ok = 1;
+                    }
+                }
+            } else {
+                toadd[0] = interet;
+                console.log('toadd[0] = interet');
+                ok = 1;
+            }
         }
+        if ((log != undefined || log != '') && ok == 1) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({login: log}, { $set:{tag: toadd}});
+                db.close();
+            });
+            res.redirect('info');
+        }
+    } else {
+        res.redirect('info');
     }
-    if ((log != undefined || log != '') && ok == 1) {
-        MongoClient.connect(url, function(err, db) {
-            db.collection('user').updateOne({login: log}, { $set:{tag: toadd}});
-            db.close();
-        });
-    }
-    res.redirect('info');
 }
 
 

@@ -20,7 +20,7 @@
 
 ## Status:🚧
 
-###Inscription / Connection
+### Inscription / Connection
 
 * avec Mail, nom d'Utilisateur, Mot de Passe sécurisé✅
 
@@ -31,7 +31,7 @@
 * Reinitialisé son Mot de Passe:❌
 
 
-###Profil de l'utilisateur
+### Profil de l'utilisateur
 
 * Modifier son Prénom:✅
 
@@ -56,7 +56,7 @@
 * Score de popularité:❌
 
 
-###Parcours
+### Parcours
 
 * Affiche uniquement les profils "interessant" suivant la sexualité:❌, par défaut trie par localisation:❌
 
@@ -73,7 +73,7 @@
 * Tchatter avec un autre utilisateur:❌
 
 
-###Recherche
+### Recherche
 
 * Par intervalle d'âge:❌
 
@@ -86,11 +86,11 @@
 * Résultat triable comme le parcours:❌
 
 
-###Profil des Autres
+### Profil des Autres
 
 * Rendu des informations:❌
 
-Quand un utilisateur regarde le profil d'un autre:
+#### Quand un utilisateur regarde le profil d'un autre:
 
 * Si il possède minimum 1 photo, Liker:❌, Engager le Tchat(*):❌
 
@@ -103,14 +103,14 @@ Quand un utilisateur regarde le profil d'un autre:
 * Voir si l'utilisateur Like en retour:❌
 
 
-###Tchat
+### Tchat
 
 * (*) "Connecter" 2 profils par les likes:❌
 
 * (*2)
 
 
-###Notifications en cas de
+### Notifications en cas de
 
 * Like reçu:❌
 
@@ -125,7 +125,7 @@ Quand un utilisateur regarde le profil d'un autre:
 * (*2)Les notifications sont visible partout:❌
 
 
-###Bonus
+### Bonus
 
 * Charger les images a partir de facebook/google+:❌
 
@@ -134,7 +134,7 @@ Quand un utilisateur regarde le profil d'un autre:
 * Ajout de tags à la base de donnée:✅
 
 
-###Consignes éliminatoires
+### Consignes éliminatoires
 
 * Injection SQL:✅(MongoDB)
 

@@ -13,7 +13,7 @@
 * Entrer: <code>cd Matcha</code> ⏎
 * Entrer: <code>npm install</code> ⏎
 * Entrer dans un autre terminal: <code>mongod [--db-path] --port 28000</code> ⏎
-* Entrer: <code>node générateur.js [nombre d'utilisateur voulu]</code> ⏎
+* Entrer: <code>node gen.js [nombre d'utilisateur voulu]</code> ⏎
 * Entrer: <code>npm run start</code> ⏎
 * Rendez-vous sur: <http://localhost:3000>, créer un utilisateur, enjoy!
 

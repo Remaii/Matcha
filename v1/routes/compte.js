@@ -14,6 +14,11 @@ router.get('/info', function(req, res, next){
 		next();
 	}
 }, function(req, res, next) {
+	mymongo.getMyInfo(req, res, function(myinfo){
+		req.session['myinfo'] = myinfo;
+		next();
+	});
+}, function(req, res, next) {
 	mymongo.getMyTag(req, res, function(mytag) {
 		req.session['mytag'] = mytag;
 		next();

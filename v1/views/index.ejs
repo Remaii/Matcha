@@ -7,11 +7,11 @@
                 <div class="col-md-offset-3">
                     <img class="img-circle" src="http://loremflickr.com/g/200/200/cats">
                 </div>
-                <h4 class="text-center"><%= locals.session['allprof'][i][0] %></h4>
-                <p class="text-center"><%= locals.session['allprof'][i][1] %></p>
-                <p class="text-center"><%= locals.session['allprof'][i][2] %></p>
-                <p class="text-center"><% if (locals.session['allprof'][i][3]) { for(var j = 0; locals.session['allprof'][i][3][j]; j++) { %>
-                        <%= '#' + locals.session['allprof'][i][3][j] %>
+                <h4 class="text-center"><%= locals.session['allprof'][i][0] %> <%= locals.session['allprof'][i][1]%> <%= locals.session['allprof'][i][2] %> ans</h4>
+                <p class="text-center"><%= locals.session['allprof'][i][3] %></p>
+                <p class="text-center"><%= locals.session['allprof'][i][4] %></p>
+                <p class="text-center"><% if (locals.session['allprof'][i][5]) { for(var j = 0; locals.session['allprof'][i][5][j]; j++) { %>
+                        <%= '#' + locals.session['allprof'][i][5][j] %>
                    <% }} %></p>
             </div>
         <% } 

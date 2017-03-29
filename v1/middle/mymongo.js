@@ -33,6 +33,47 @@ var checkerBio = function(str, nb) {
     }
 }
 
+function getMyInfo(req, res, call) {
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb://localhost:28000/matcha";
+    var mytag = {};
+    var arr = {};
+    var log = req.session['login'];
+
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: log}).toArray(function(err, doc) {
+                arr[0] = doc[0]['firstname'];
+                arr[1] = doc[0]['lastname'];
+                arr[2] = doc[0]['age'];
+                arr[3] = doc[0]['sexe'];
+                arr[4] = doc[0]['orient'];
+                arr[5] = doc[0]['bio'];
+                call(arr);
+            });
+            db.close();
+        });
+    }
+}
+
+function getMyTag(req, res, call) {
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb://localhost:28000/matcha";
+    var mytag = {};
+    var arr = {};
+    var log = req.session['login'];
+
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: log}).toArray(function(err, doc) {
+                mytag = doc[0]['tag'];
+                call(mytag);
+            });
+            db.close();
+        });
+    }
+}
+
 var getAllProf = function (name, callback) {
     var mongoClient = require('mongodb').MongoClient;
     var url = "mongodb://localhost:28000/matcha";
@@ -42,10 +83,12 @@ var getAllProf = function (name, callback) {
     mongoClient.connect(url, function(err, db) {
         db.collection('user').find().toArray(function(err, docs) {
             for (var i = 0; docs[i]; i++){
-                tmp[0] = docs[i]['name'];
-                tmp[1] = docs[i]['sexe'];
-                tmp[2] = docs[i]['orient'];
-                tmp[3] = docs[i]['tag'];
+                tmp[0] = docs[i]['firstname'];
+                tmp[1] = docs[i]['lastname'];
+                tmp[2] = docs[i]['age'];
+                tmp[3] = docs[i]['sexe'];
+                tmp[4] = docs[i]['orient'];
+                tmp[5] = docs[i]['tag'];
                 result[i] = tmp;
                 tmp = {};
             }
@@ -62,7 +105,9 @@ var getMyProfil = function(req, res, call) {
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({login: log}).toArray(function(err, doc) {
             var result = {
-                name: doc[0]['name'],
+                firstname: doc[0]['firstname'],
+                lastname: doc[0]['firstname'],
+                age: doc[0]['age'],
                 sexe: doc[0]['sexe'],
                 orient: doc[0]['orient'],
                 bio: doc[0]['bio'],
@@ -197,16 +242,18 @@ var updateUser = function(req, res) {
     var MongoClient = require('mongodb').MongoClient;
     var url = "mongodb://localhost:28000/matcha";
     var loger = req.session['login'];
-    var name = req.body.name;
+    var firstname = req.body.firstname;
+    var lastname = req.body.lastname;
+    var age = req.body.age;
     var sexe = req.body.sexe;
     var orient = req.body.orient;
     var bio = req.body.bio;
     
 
-    if (name != '' && bio != '' && sexe != '' && orient != '' && loger != undefined) {
+    if (lastname != '' && firstname != '' && bio != '' && sexe != '' && orient != '' && loger != undefined) {
         if (checkerBio(bio, '500') == 1) {
             MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: req.session['login']}, { $set:{name: name, bio: bio, sexe: sexe, orient: orient}});
+                db.collection('user').updateOne({login: req.session['login']}, { $set:{firstname: firstname, lastname: lastname, age: age, bio: bio, sexe: sexe, orient: orient}});
                 db.close();
                 res.redirect('info');
             });
@@ -268,23 +315,6 @@ var addInterest = function(req, res) {
     }
 }
 
-function getMyTag(req, res, call) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
-    var mytag = {}
-    var log = req.session['login'];
-
-    if (log != '' || log != undefined) {
-        MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: log}).toArray(function(err, doc) {
-                mytag = doc[0]['tag'];
-                call(mytag);
-            });
-            db.close();
-        });
-    }// else error 404 ? no avaible ?
-}
-
 var getInterest = function(req, res, call) {
     var MongoClient = require('mongodb').MongoClient;
     var url = "mongodb://localhost:28000/matcha";
@@ -330,15 +360,20 @@ var upMyTag = function(req, res) {
     var interet = req.body.select;
     var log = req.session['login'];
     var toadd = {};
+    var decal = 0;
     var ok = 0;
 
-    if (interet != '' || interet != null || interet != undefined && (log != undefined || log != '')) {
+    if ((interet != '' || interet != null || interet != undefined) && (log != undefined || log != '')) {
         if (Array.isArray(interet)) {
             for (var i = 0; interet[i]; i++) {
                 toadd[i] = interet[i];
                 if (!interet[i + 1] && (req.session['mytag'] != undefined || req.session['mytag'] != '') && req.session['mytag']) {
                     for (var u = 0; req.session['mytag'][u];u++) {
-                        toadd[i + u + 1] = req.session['mytag'][u];
+                        if (req.session['mytag'][u] != ' ') {
+                            toadd[i + u + 1 + decal] = req.session['mytag'][u];
+                        } else {
+                            decal++;
+                        }
                         if (!req.session['mytag'][u + 1]) {
                             ok = 1;
                         }
@@ -432,6 +467,7 @@ var downMyTag = function(req, res) {
 }
 
 exports.getMyTag = getMyTag;
+exports.getMyInfo = getMyInfo;
 exports.getAllProf = getAllProf;
 exports.upMyTag = upMyTag;
 exports.downMyTag = downMyTag;

@@ -1,5 +1,6 @@
 var crypto = require('crypto')
 var uniqid = require('uniqid')
+
 var sexe = {
 	0: "Homme",
 	1: "Femme",
@@ -10,6 +11,26 @@ var sexual = {
 	0: "Hetero",
 	1: "Bi-Sex",
 	2: "Gay"
+}
+
+var lastName = {
+	0: "DELAGE",
+	1: "PETIT",
+	2: "MOREAU",
+	3: "RICHARD",
+	4: "BERNARD",
+	5: "GAILLARD",
+	6: "NICOLAS",
+	7: "FOUQUET",
+	8: "MARQUET",
+	9: "BERTRAND",
+	10: "FAURE",
+	11: "CLEMENT",
+	12: "CAILLAUD",
+	13: "MARTIN",
+	14: "DUPOND",
+	15: "BONNET",
+	16: "BERTHET"
 }
 
 var prenomH = {
@@ -81,18 +102,24 @@ var setUsers = function(nb) {
 	MongoClient.connect(url, function(err, db) {
 		if (err) return console.log(err);
 		var randName = Math.floor((Math.random() * 16) + 0);
+		var randLast = Math.floor((Math.random() * 16) + 0);
+		var age = Math.floor((Math.random() * (80 - 18)) + 18);
 		var randSexe = Math.floor((Math.random() * 3) + 0);
 		var randSexual = Math.floor((Math.random() * 3) + 0);
 		var login = uniqid();
+		var last = lastName[randLast];
 		var logauto = prenoms[randName];
 		var sex = sexe[randSexe];
 		var sexua = sexual[randSexual];
 		for (var i = 0; i < nb; i++) {
 			randSexual = Math.floor((Math.random() * 3) + 0);
 			randSexe = Math.floor((Math.random() * 3) + 0);
-			sex = sexe[randSexe];
-			sexua = sexual[randSexual];
+			randLast = Math.floor((Math.random() * 16) + 0);
 			randName = Math.floor((Math.random() * 16) + 0);
+			sex = sexe[randSexe];
+			age = Math.floor((Math.random() * (80 - 18)) + 18);
+			last = lastName[randLast];
+			sexua = sexual[randSexual];
 			if (sex == "Homme") {
 				logauto = prenomH[randName];
 			} else {
@@ -101,12 +128,14 @@ var setUsers = function(nb) {
 			login = uniqid();
 			var newUser = {
 				login: login,
-				name: logauto,
+				firstname: logauto,
+				lastname: last,
+				age: age,
 				pwd: passwd,
 				mail: mail,
 				sexe: sex,
 				orient: sexua,
-				bio: "J'ai été généré pour la de façon aléatoire",
+				bio: "J'ai été généré de façon aléatoire",
 				tag: {
 					0: "ROBOT"
 				},

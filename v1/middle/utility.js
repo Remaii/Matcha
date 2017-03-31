@@ -19,6 +19,15 @@ var getImage = function(req, res, callback) {
         return callback(null, null);
     }
 }
+
+var rmImage = function(req, res, callback) {
+    var login = req.session['login'];
+    var path = req.body.path;
+    var pos = path.indexOf('/');
+    path = path.slice(pos + 1);
+    callback(null, path);
+}
+
 //checker de mot de passe
 var checkerPwd = function(password) {
     var maj = 0;
@@ -66,3 +75,4 @@ exports.checkerTag = checkerTag;
 exports.checkerPwd = checkerPwd;
 exports.checkerBio = checkerBio;
 exports.getImage = getImage;
+exports.rmImage = rmImage;

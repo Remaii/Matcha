@@ -1,17 +1,34 @@
 <% include ../partial/header %>
 <div class="container-fluid">
-	<div class="col-md-6">	
-		<form action="/compte/info" method="post">
-			<label class="col-md-6 col-md-offset-3 text-center">Prénom</label>
+	<div id="galinfo" class="col-md-12 col-xs-12">
+		<% if (locals.session['mypic'][0] === ' ' || locals.session['mypic'][0] == null) { %>
+			<label class="col-md-12 col-sm-12 text-center">Tu n'a pas de photo :(</label><br>
+		<% } else { %>
+			<label class="col-md-12 col-xs-12 text-center">T'es photo(s) :</label><br>
+			<% for (var i = 0;locals.session['mypic'][i]; i++) { %>
+				<div>
+					<img class="col-md-2 col-xs-2 img-circle" src="<%= '/asset/uploads/' + locals.session['mypic'][i] %>" onclick="deleteImg('<%= locals.session['mypic'][i] %>');"/>
+				</div>
+			<% } %>
+		<% } %>
+	</div>
+	<div class="col-md-12 col-xs-12">
+		<input type="file" class="col-md-6 col-xs-6" name="userPhoto" /> <!-- onchange="previewFile()" -->
+		<input id="Upload" class="col-md-6 col-xs-6 btn btn-primary btn-sm" type="submit" name="submit" value="Upload"><br>
+	</div><br>
+	<div class="divider"></div>
+	<div class="col-md-6 col-xs-6">	
+		<br><form action="/compte/info" method="post">
+			<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Prénom</label>
 			<input class="form-control text-center input-sm" type="text" name="firstname"
 			value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][0] %><% } %>">
-			<label class="col-md-6 col-md-offset-3 text-center">Nom</label>
+			<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Nom</label>
 			<input class="form-control text-center input-sm" type="text" name="lastname"
 			value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][1] %><% } %>">
-			<label class="col-md-6 col-md-offset-3 text-center">Âge</label>
+			<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Âge</label>
 			<input class="form-control text-center input-sm" type="text" name="age"
 			value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][2] %><% } %>">
-			<label class="col-md-6 col-md-offset-3 text-center">Sexe</label>
+			<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Sexe</label>
 			<select class="form-control text-center input-sm" name="sexe" size="1">
 				<option>
 					<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][3] %><% } %>
@@ -20,27 +37,30 @@
 				<option>Femme</option>
 			</select>
 	        
-	        <label class="col-md-6 col-md-offset-3 text-center">Orientation sexuel</label>
+	        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Orientation sexuel</label>
 			<select class="form-control text-center input-sm" name="orient" size="1">
 				<option><% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][4] %><% } %></option>
 				<option>Hetero</option>
 				<option>Gay</option>
 				<option>Bi-sex</option>
 			</select>
-	        <label class="col-md-6 col-md-offset-3 text-center">Petite Bio</label>
+	        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Mail</label>
+			<input class="form-control text-center input-sm" type="mail" name="mail"
+			value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][6] %><% } %>">
+	        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Petite Bio</label>
 	        <textarea class="form-control text-center input-sm" rows="3" name="bio"
 	        value=""><% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][5] %><% } %></textarea>
-	    	<div class="col-md-3 col-md-offset-5">
+	    	<div class="col-md-3 col-md-offset-5 col-xs-offset-5">
 	        	<input class="btn btn-primary" type="submit" name="submit" value="Update">
 	    	</div>
 	    </form>
 	</div>
-	<div class="col-md-6"><!-- Ajouter des centres d'interet a ton profile -->
+	<div class="col-md-6 col-xs-6"><!-- Ajouter des centres d'interet a ton profile -->
 		<div>
 		<% if (!locals.session['mytag'] || locals.session['mytag'][0] == ' ') { %>
-			<label class="col-md-offset-4 text-center">Tu n'a pas encore de #TAG :(</label>
+			<label class="col-md-offset-4 col-xs-offset-4 text-center">Tu n'a pas encore de #TAG :(</label>
 		<%  } else { %>
-			<label class="col-md-offset-4 text-center">Tu à c'est #TAG:</label>
+			<label class="col-md-offset-4 col-xs-offset-4 text-center">Tu à c'est #TAG:</label>
 			<p class="text-center" name="mytag">
 			<% for (var nbt = 0; locals.session['mytag'][nbt];nbt++) { %>
 				<% if (locals.session['mytag'][nbt] != ' ') { %>
@@ -51,7 +71,7 @@
 			</p>
 		</div>
 		<form method="post" action="/compte/info">
-    		<label class="col-md-offset-4 text-center">Choisis tes centres d'interets</label>
+    		<label class="col-md-offset-4 col-xs-offset-4 text-center">Choisis tes centres d'interets</label>
 			<div>
     			<% if (locals.session['interet']) { %>
     				<% var col = 0; for (var i = 0; locals.session['interet'][i]; i++) {%>
@@ -63,107 +83,22 @@
     				<% }
     			} %>
 			</div>
-			<div class="col-md-2 col-md-offset-5">
+			<div class="col-md-2 col-xs-2 col-md-offset-5 col-xs-offset-5">
 		        <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Ajouter">
 		        <input class="btn btn-default btn-sm" type="submit" name="submit" value="Supprimer">
 		    </div>
 		</form>
 	</div>
-	<div class="col-md-6"><!-- Ajouter des centres d'interets si il n'existe pas -->
+	<div class="col-md-6 col-xs-6"><!-- Ajouter des centres d'interets si il n'existe pas -->
 	    <form action="/compte/info" method="post">
-    	    <label class="col-md-offset-5 text-center">Ou ajoute en !</label>
+    	    <label class="col-md-offset-5 col-xs-offset-5 text-center">Ou ajoute en !</label>
 	        <input class="form-control input-sm text-center" type="text" name="interet">  
-	        <div class="col-md-3 col-md-offset-5">
+	        <div class="col-md-3 col-xs-3 col-md-offset-5 col-xs-offset-5">
 	        	<input class="btn btn-primary btn-sm" type="submit" name="submit" value="Creer">
 	        </div>
 	    </form>
 	</div>
-	<div class="col-md-6">
-		<% if (!locals.session['myinfo'][6]) { %>
-			<label class="col-md-offset-5 text-center">Tu n'a pas de photo :(</label><br>
-		<% } else { %>
-			<label class="col-md-offset-5 text-center">T'es photo(s) : </label><br>
-			<% for (var i = 0;locals.session['myinfo'][6][i]; i++) { %>
-				<div class="cold-md-offset-1 col-md-2 img-circle">
-					<img src="<%= locals.session['myinfo'][6][i] %>">
-				</div>
-			<% } %>
-		<% } %>
-		<div class="col-md-2">
-			<!-- <form enctype="multipart/form-data" method="post"> -->
-				<!-- <input id="data" type="text" value=""> -->
-				<div style="height: 200px;">
-					<img id="img" src="" height="200" alt="Image preview...">
-				</div>
-				<input type="file" name="userPhoto" onchange="previewFile()"/>
-				<input id="Upload" class="btn btn-primary btn-sm" type="submit" name="submit" value="Upload">
-			<!-- </form> -->
-		</div>
-<script type="text/javascript">
-var submit = document.querySelector('#Upload');
-
-submit.addEventListener('click', function(){
-	var img = document.querySelector('#img');
-	var data = img.src;
-	var xhr = new XMLHttpRequest();
-	
-	if (data) {
-		data = encodeURIComponent(data);
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4) {
-				img.src = "";
-			}
-		}
-		xhr.open("POST", "/compte/info", true);
-		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		xhr.send("photo=" + data + "&submit=Upload");
-	} else {
-		alert('tu n\'a rien upload...');
-	}
-});
-
-function previewFile() {
-	var preview = document.querySelector('#img');
-	var data = document.querySelector('#data');
-	var file = document.querySelector('input[type=file]').files[0];
-	var reader = new FileReader();
-
-	reader.onloadend = function () {
-		var data = reader.result;
-		data = encodeURIComponent(data);
-
-		preview.src = reader.result;
-	}
-		// xhr.onreadystatechange = function() {
-		// 	if (xhr.readyState == 4) {
-		// 		preview.src = reader.result;
-		// 		// data.setAttribute('value', reader.result);
-		// 	}
-		// }
-		// xhr.open("POST", "/compte/info/photo", true);
-		// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		// xhr.send("photo=" + data);
-	if (file) {
-		reader.readAsDataURL(file);
-	} else {
-		preview.src = "";
-	}
-}
-</script>
-
-
-
-
-
-
-
-
-	</div>
-
 </div>
- 
-
-
-
+<script type="text/javascript" src="/asset/js/info.js"></script>
 
 <% include ../partial/footer %>

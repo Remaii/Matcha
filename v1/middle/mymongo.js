@@ -4,7 +4,84 @@ var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
 var utilities = require('./utility')
 
+var checkImageUser = function(login, callback) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('image').find({login: login}).toArray(function(err, docs) {
+            if (err) callback(null, null);
+            if (docs.length == 0) {
+                callback(docs, null);
+            } else {
+                callback(null, docs);
+            }
+        });
+    });
+}
 
+var downMyImage = function(req, res) {
+    var toSkip = req.body.path;
+    var log = req.session['login'];
+    var toadd = {};
+    checkImageUser(log, function(vide, plein) {
+        if (plein) {
+            var decal = 0;
+            for (var i = 0; plein[0]['image'][i] && i < 5; i++) {
+                if (plein[0]['image'][i] != toSkip) {
+                    toadd[i - decal] = plein[0]['image'][i];
+                } else {
+                    decal++;
+                }
+            }
+            MongoClient.connect(url, function(err, db) {
+                var newImageR = {
+                    login: log,
+                    image:toadd
+                };
+                db.collection('image').findOneAndReplace({login: log}, newImageR,function (err, result) {
+                    console.log('User ' + log + ' MaJ Down Image success');
+                });
+                db.close();
+            });
+        }
+    });
+}
+
+var upImage = function(value, log) {
+    var toadd = {};
+    
+    checkImageUser(log, function(vide, plein) {
+        if (vide) {
+            MongoClient.connect(url, function(err, db) {
+                var newImage = {
+                    login: log,
+                    image:{0: value}
+                };
+                db.collection('image').insertOne(newImage, function (err, result) {
+                    console.log('User ' + log + ' Add Image success');
+                });
+                db.close();
+            });
+        }
+        if (plein) {
+            
+            // if (plein <= 4) {
+                for (var i = 0; plein[0]['image'][i] && i < 5; i++) {
+                    toadd[i] = plein[0]['image'][i];
+                }
+                toadd[i] = value;
+                MongoClient.connect(url, function(err, db) {
+                    var newImageR = {
+                        login: log,
+                        image:toadd
+                    };
+                    db.collection('image').findOneAndReplace({login: log}, newImageR,function (err, result) {
+                        console.log('User ' + log + ' MaJ Up Image success');
+                    });
+                    db.close();
+                });
+            // }
+        }
+    });
+}
 
 function insertThis(tab, where) {
 
@@ -31,7 +108,25 @@ function getMyInfo(req, res, call) {
                 arr[3] = doc[0]['sexe'];
                 arr[4] = doc[0]['orient'];
                 arr[5] = doc[0]['bio'];
+                arr[6] = doc[0]['mail'];
                 call(arr);
+            });
+            db.close();
+        });
+    }
+}
+
+function getMyImage(req, res, call) {
+    var log = req.session['login'];
+
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('image').find({login: log}).toArray(function(err, doc) {
+                if (doc.length != 0) {
+                    call(doc[0]['image']);
+                } else {
+                    call({0:' '});
+                }
             });
             db.close();
         });
@@ -52,20 +147,6 @@ function getMyTag(req, res, call) {
             db.close();
         });
     }
-}
-
-var upImage = function(value, log) {
-    var toadd = {};
-    MongoClient.connect(url, function(err, db) {
-        var newImage = {
-                    login: log,
-                    image:{0: value}
-                };
-        db.collection('image').insertOne(newImage, function (err, result) {
-                console.log('User ' + log + ' add success');
-        });
-        db.close();
-    });
 }
 
 var getAllProf = function (name, callback) {
@@ -231,13 +312,14 @@ var updateUser = function(req, res) {
     var age = req.body.age;
     var sexe = req.body.sexe;
     var orient = req.body.orient;
+    var mail = req.body.mail;
     var bio = req.body.bio;
     
 
-    if (lastname != '' && firstname != '' && bio != '' && sexe != '' && orient != '' && loger != undefined) {
+    if (mail != '' && age != '' && lastname != '' && firstname != '' && bio != '' && sexe != '' && orient != '' && loger != undefined) {
         if (utilities.checkerBio(bio, '500') == 1) {
             MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: req.session['login']}, { $set:{firstname: firstname, lastname: lastname, age: age, bio: bio, sexe: sexe, orient: orient}});
+                db.collection('user').updateOne({login: loger}, { $set:{mail: mail, firstname: firstname, lastname: lastname, age: age, bio: bio, sexe: sexe, orient: orient}});
                 db.close();
                 res.redirect('info');
             });
@@ -442,6 +524,7 @@ var downMyTag = function(req, res) {
     }
 }
 
+exports.getMyImage = getMyImage;
 exports.getMyTag = getMyTag;
 exports.getMyInfo = getMyInfo;
 exports.getAllProf = getAllProf;
@@ -455,3 +538,4 @@ exports.addUser = addUser;
 exports.delog = deLog;
 exports.getMyProfil = getMyProfil;
 exports.upImage = upImage;
+exports.downMyImage = downMyImage;

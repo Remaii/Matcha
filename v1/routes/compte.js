@@ -25,6 +25,11 @@ router.get('/info', function(req, res, next){
 		next();
 	});
 }, function(req, res, next) {
+	mymongo.getMyImage(req, res, function(mypic) {
+		req.session['mypic'] = mypic;
+		next();
+	});
+}, function(req, res, next) {
 	mymongo.getInterest(req, res, function(tag) {
 		req.session['interet'] = tag;
 		next();
@@ -32,6 +37,20 @@ router.get('/info', function(req, res, next){
 }, function(req, res, next) {
 	res.locals.session = req.session;
 	res.render('compte/info');
+});
+
+router.get('/info/mypic', function(req, res, next) {
+	if (req.session['login'] == undefined) {
+		res.redirect('../');
+	} else {
+		next();
+	}
+}, function(req, res, next) {
+	mymongo.getMyImage(req, res, function(mypic) {
+		req.session['mypic'] = mypic;
+		res.locals.session = req.session;
+		res.render('compte/mypic')
+	});
 });
 
 router.post('/info', function(req, res) {
@@ -50,8 +69,13 @@ router.post('/info', function(req, res) {
 			mymongo.upImage(value, req.session['login']);
 		});
 		res.redirect('info');
-	}
-	else {
+	} else if (req.body.path && sub == 'SuppPic') {
+		utilities.rmImage(req, res, function(err, result) {
+			if (result) console.log('result: ' + result);
+			mymongo.downMyImage(req, res);
+		});
+		res.redirect('info');
+	} else {
 		console.log(sub)
 		console.log('else :( ' + req.session['login']);
 		res.redirect('info');

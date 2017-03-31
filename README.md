@@ -26,7 +26,7 @@
 * Reinitialisé son Mot de Passe:❌
 
 
-### Profil de l'utilisateur 72%end
+### Profil de l'utilisateur 81%end
 * Modifier son prénom:✅
 * Modifier son Nom:✅
 * Modifier son mail:✅
@@ -36,7 +36,7 @@
 * Ajouter/Supprimer ses Tags:✅
 * Ajouter/Supprimer ses photos maximum 6:✅
 * Voir les profils des utilisateurs qui ont liké:❌
-* Localiser l'utilisateur:❌
+* Localiser l'utilisateur:✅
 * Score de popularité:❌
 
 

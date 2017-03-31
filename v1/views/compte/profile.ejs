@@ -4,11 +4,18 @@
 	<img src=<%= '"' + locals.session['myprofile']['img1'] + '"' %> class="img-circle">
 	<div class="row">
 		<div>
-			<p class="text-center"><%= locals.session['myprofile']['name'] %></p>
-			<p class="text-center"><%= locals.session['myprofile']['sexe'] %></p>
-			<p class="text-center"><%= locals.session['myprofile']['orient'] %></p>
+			<p class="text-center"><%= locals.session['myprofile']['firstname'] %> <%= locals.session['myprofile']['lastname'] %> <%= locals.session['myprofile']['age'] %> ans</p>
+			<p class="text-center"><%= locals.session['myprofile']['sexe'] %> <%= locals.session['myprofile']['orient'] %></p>
+			<% if (locals.session['myprofile']['tag']) { %>
+				<p class="text-center">
+				<% for (var i = 0; locals.session['myprofile']['tag'][i]; i++) { %>
+					<% if (locals.session['myprofile']['tag'][i] != ' ') { %>
+						<%= '#' + locals.session['myprofile']['tag'][i] %>
+					<% } %>
+				<% } %>
+				</p>
+			<% } %>
 			<p class="text-center"><%= locals.session['myprofile']['bio'] %></p>
-			<p class="text-center"><%= locals.session['myprofile']['tag'] %></p>
 		</div>
 	</div>
 <% } %>

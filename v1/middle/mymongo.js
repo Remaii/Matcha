@@ -1,41 +1,23 @@
 var crypto = require('crypto');
 var cookie = require('cookie');
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:28000/matcha";
+var utilities = require('./utility')
 
-//checker de mot de passe
-var checkerPwd = function(password) {
-    var maj = 0;
-    var num = 0;
-    var i = 0;
 
-    while (password[i]) {
-        if (password.charCodeAt(i) >= 65 && password.charCodeAt(i) <= 90)
-            maj++;
-        else if (password.charCodeAt(i) >= 48 && password.charCodeAt(i) <= 57)
-            num++;
-        i++;
-    }
-    if (i >= 5 && maj > 0 && num > 0) {
-        return 1;
-    } else {
-        return 0;
-    }
-}
 
-var checkerBio = function(str, nb) {
-    var i = 0;
-    while (str[i]){
-        i++;
-    }
-    if (i >= nb){
-        return 0;
-    } else {
-        return 1;
-    }
+function insertThis(tab, where) {
+
+    MongoClient.connect(url, function(err, db) {
+        db.collection(where).updateOne({}, tab, function(err, result) {
+            if (err) return console.log(err);
+            if (result.result.ok) return console.log("Les Tags on ete mis à jour");
+        });
+        db.close();
+    });
 }
 
 function getMyInfo(req, res, call) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
     var mytag = {};
     var arr = {};
     var log = req.session['login'];
@@ -57,8 +39,6 @@ function getMyInfo(req, res, call) {
 }
 
 function getMyTag(req, res, call) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
     var mytag = {};
     var arr = {};
     var log = req.session['login'];
@@ -74,13 +54,25 @@ function getMyTag(req, res, call) {
     }
 }
 
+var upImage = function(value, log) {
+    var toadd = {};
+    MongoClient.connect(url, function(err, db) {
+        var newImage = {
+                    login: log,
+                    image:{0: value}
+                };
+        db.collection('image').insertOne(newImage, function (err, result) {
+                console.log('User ' + log + ' add success');
+        });
+        db.close();
+    });
+}
+
 var getAllProf = function (name, callback) {
-    var mongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
     var result = {};
     var tmp = {};
 
-    mongoClient.connect(url, function(err, db) {
+    MongoClient.connect(url, function(err, db) {
         db.collection('user').find().toArray(function(err, docs) {
             for (var i = 0; docs[i]; i++){
                 tmp[0] = docs[i]['firstname'];
@@ -98,20 +90,18 @@ var getAllProf = function (name, callback) {
 }
 
 var getMyProfil = function(req, res, call) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
     var log = req.session['login'];
     
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({login: log}).toArray(function(err, doc) {
             var result = {
                 firstname: doc[0]['firstname'],
-                lastname: doc[0]['firstname'],
+                lastname: doc[0]['lastname'],
                 age: doc[0]['age'],
                 sexe: doc[0]['sexe'],
                 orient: doc[0]['orient'],
                 bio: doc[0]['bio'],
-                interet: doc[0]['tag']
+                tag: doc[0]['tag']
             };
             call(result);
         });
@@ -129,15 +119,13 @@ var deLog = function(req, res) {
 // Ajouter un utilisateur a la base mongo =>
 // Si le nom d'utilisateur et/ou mail n'existe pas dans la base
 var addUser = function(req, res) {
-	var MongoClient = require('mongodb').MongoClient;
-	var url = "mongodb://localhost:28000/matcha";
     var logre = req.body.login;
     var passwd = req.body.pwd;
     var cfpwd = req.body.cfpwd;
     var mail = req.body.mail;
 
     if (logre != '' && passwd != '' && cfpwd != '' && mail != '') {
-        if (checkerPwd(passwd) == 1) {
+        if (utilities.checkerPwd(passwd) == 1) {
             passwd = crypto.createHmac('whirlpool', passwd).digest('hex');
             cfpwd = crypto.createHmac('whirlpool', cfpwd).digest('hex');
             if (passwd === cfpwd) {
@@ -195,8 +183,6 @@ var addUser = function(req, res) {
 // si il existe, mettre a jour sa derniere connection
 // le connecter au site
 var logUser = function(req, res) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
     var i = 0;
     var ok = 0;
     var log = req.body.login;
@@ -219,7 +205,7 @@ var logUser = function(req, res) {
                     i++;
                 }
                 if (ok == 1) {
-                    collec.updateOne({name: log}, { $set:{last_co: new Date()}});
+                    collec.updateOne({login: log}, { $set:{last_co: new Date()}});
                     req.session['login'] = log;
                     req.flash('mess', 'Connection Success');
                     db.close(); 
@@ -239,8 +225,6 @@ var logUser = function(req, res) {
 };
 
 var updateUser = function(req, res) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
     var loger = req.session['login'];
     var firstname = req.body.firstname;
     var lastname = req.body.lastname;
@@ -251,7 +235,7 @@ var updateUser = function(req, res) {
     
 
     if (lastname != '' && firstname != '' && bio != '' && sexe != '' && orient != '' && loger != undefined) {
-        if (checkerBio(bio, '500') == 1) {
+        if (utilities.checkerBio(bio, '500') == 1) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: req.session['login']}, { $set:{firstname: firstname, lastname: lastname, age: age, bio: bio, sexe: sexe, orient: orient}});
                 db.close();
@@ -265,28 +249,13 @@ var updateUser = function(req, res) {
     }
 }
 
-function insertThis(tab) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
-
-    MongoClient.connect(url, function(err, db) {
-        db.collection('interet').updateOne({}, tab, function(err, result) {
-            if (err) return console.log(err);
-            if (result.result.ok) return console.log("Les Tags on ete mis à jour");
-        });
-        db.close();
-    });
-}
-
 var addInterest = function(req, res) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
     var toadd = req.body.interet.toUpperCase();
 
     if (toadd == '' || toadd == undefined) {
         req.flash('error', 'Tu n\'a rien mis :(');
         res.redirect('info');
-    } else {
+    } else if (utilities.checkerBio(toadd, 20) && utilities.checkerTag(toadd)) {
         MongoClient.connect(url, function(err, db) {
             if (err) return console.log(err);
             var tab = {};
@@ -303,7 +272,7 @@ var addInterest = function(req, res) {
                 if (ok > 5) {
                     tab[i] = toadd;
                     req.flash('mess', 'Tag ajouté avec success');
-                    insertThis(tab);
+                    insertThis(tab, 'interet');
                 }
                 else if (ok == -1) {
                     req.flash('error', 'Ce Tag existe déjà');
@@ -312,12 +281,13 @@ var addInterest = function(req, res) {
                 res.redirect('info');
             });
         });
+    } else {
+        req.flash('error', 'Il y a un espace ou plus de 20 caractères');
+        res.redirect('info');
     }
 }
 
 var getInterest = function(req, res, call) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
     var tag = {};
 
     MongoClient.connect(url, function(err, db) {
@@ -355,8 +325,6 @@ function removeDouble(toadd, call) {
 }
 
 var upMyTag = function(req, res) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
     var interet = req.body.select;
     var log = req.session['login'];
     var toadd = {};
@@ -384,11 +352,21 @@ var upMyTag = function(req, res) {
             }
         } else {
             if ((req.session['mytag'] != undefined || req.session['mytag'] != '') && req.session['mytag']) {
-                for (var u = 0; req.session['mytag'][u];u++) {
-                    toadd[u] = req.session['mytag'][u];
-                    if (!req.session['mytag'][u + 1]) {
-                        toadd[u + 1] = interet;
-                        ok = 1;
+                if (req.session['mytag'][0] != ' ') {   
+                    for (var u = 0; req.session['mytag'][u];u++) {
+                        toadd[u] = req.session['mytag'][u];
+                        if (!req.session['mytag'][u + 1]) {
+                            toadd[u + 1] = interet;
+                            ok = 1;
+                        }
+                    }
+                } else if (req.session['mytag'][1] && req.session['mytag'][0] == ' ') {
+                    for (var u = 1; req.session['mytag'][u];u++) {
+                        toadd[u - 1] = req.session['mytag'][u];
+                        if (!req.session['mytag'][u + 1]) {
+                            toadd[u + 1] = interet;
+                            ok = 1;
+                        }
                     }
                 }
             } else {
@@ -414,8 +392,6 @@ var upMyTag = function(req, res) {
 }
 
 var downMyTag = function(req, res) {
-    var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb://localhost:28000/matcha";
     var interet = req.body.select;
     var log = req.session['login'];
     var toadd = {};
@@ -478,3 +454,4 @@ exports.logUser = logUser;
 exports.addUser = addUser;
 exports.delog = deLog;
 exports.getMyProfil = getMyProfil;
+exports.upImage = upImage;

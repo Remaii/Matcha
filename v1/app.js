@@ -16,7 +16,7 @@ var register = require('./routes/register')
 app.set('view engine', 'ejs');
 
 //__________________Middlewares_______________
-app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(bodyParser.json());
 app.use('/asset', express.static('public'));
 
@@ -39,6 +39,12 @@ app.use('/register', register)
 //__________________Page Delog________________
 app.get('/delog', function(req, res) {
     mymongo.delog(req, res);
+});
+
+//______________Page introuvable______________
+app.use(function(req, res, next) {
+	res.setHeader('Content-Type', 'text/plain');
+	res.status(404).send('Page introuvable');
 });
 
 app.listen(3000)

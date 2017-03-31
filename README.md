@@ -1,4 +1,4 @@
-# Matcha
+# Matcha v0.0.1
 ## Setup
 ### Pré-requis
 
@@ -19,28 +19,28 @@
 
 ## Status:🚧
 
-### Inscription / Connection
+### Inscription / Connection 75%end
 * avec Mail, nom d'Utilisateur, Mot de Passe sécurisé✅
 * Login:✅
 * Logout:✅
 * Reinitialisé son Mot de Passe:❌
 
 
-### Profil de l'utilisateur
+### Profil de l'utilisateur 72%end
 * Modifier son prénom:✅
-* Modifier son Nom:❌
-* Modifier son mail:❌
+* Modifier son Nom:✅
+* Modifier son mail:✅
 * Modifier son sexe:✅
 * Modifier sa sexualité:✅
 * Modifier sa biographie (500 caractères):✅
 * Ajouter/Supprimer ses Tags:✅
-* Ajouter/Supprimer ses photos maximum 5:❌
+* Ajouter/Supprimer ses photos maximum 6:✅
 * Voir les profils des utilisateurs qui ont liké:❌
 * Localiser l'utilisateur:❌
 * Score de popularité:❌
 
 
-### Parcours
+### Parcours 0%end
 * Affiche uniquement les profils "interessant" suivant la sexualité:❌, par defaut trie par localisation:❌
 * Affichage intelligent (zone géographique:❌, maximum de tags:❌, maximum poplarité:❌)
 * Trie possible de la liste des profils par âge:❌, localisation:❌, poplarité:❌, tag en commun:❌
@@ -49,14 +49,14 @@
 * -Liker un profil:❌
 * -Tchatter avec un autre utilisateur:❌
 
-### Recherche
+### Recherche 0%end
 * Par intervalle d'âge:❌
 * Par intervalle de score de popularité:❌
 * Par tags:❌
 * Localisation:❌
 * Résultat triable comme le parcours:❌
 
-### Profil des autres
+### Profil des autres 0%end
 * Rendu des informations:❌
 Quand un utilisateur regarde le profil d'un autre:
 * Si il possède minimum 1 photo, Liker:❌, Engager le Tchat(*):❌
@@ -65,11 +65,11 @@ Quand un utilisateur regarde le profil d'un autre:
 * Bloquer:❌
 * Voir si l'utilisateur Like en retour:❌
 
-### Tchat
+### Tchat 0%end
 * (*) "Connecter" 2 profils par les likes:❌
 * (*2)
 
-### Notifications en cas de
+### Notifications en cas de 0%end
 * Like reçu:❌
 * Visite sur de mon profil:❌
 * Nouveau message(tchat):❌

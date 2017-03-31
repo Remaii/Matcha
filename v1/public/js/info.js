@@ -18,7 +18,6 @@ function deleteImg(path) {
 	if (confirm("Vous désirez vraiment supprimée la photo?")) {
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
-				// alert('Suppression effectuer')
 				refreshMyPic();
 			}
 		}
@@ -27,6 +26,26 @@ function deleteImg(path) {
 		xhr.send("path=" + path + "&submit=SuppPic");
 	}
 }
+
+
+(function() {
+	var onSuccess = function(geoipResponse) {
+		var xhr = new XMLHttpRequest();
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4) {
+
+			}
+		}
+		xhr.open("POST", "/compte/info/loc");
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xhr.send("city=" + geoipResponse.city.names['en'] + "&ip=" + geoipResponse.traits['ip_address']);
+	};
+	var onError = function(error) {
+		console.log(error);
+	};
+	return geoip2.insights(onSuccess, onError);
+})();
 
 var submit = document.querySelector('#Upload');
 

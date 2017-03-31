@@ -4,6 +4,23 @@ var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
 var utilities = require('./utility')
 
+var upMyLoca = function(req, res, callback) {
+    MongoClient.connect(url, function(err, db) {
+        var newLoca = {
+            login: req.session['login'],
+            city: req.body.city,
+            ip: req.body.ip
+        };
+        db.collection('loca').insertOne(newLoca, function(err, result) {
+            if (err) callback(err, null);
+            if (result.result['ok'] == 1) {
+                callback(null, req.session['login'] + ' ' + req.body.city + ' ' + req.body.ip);
+                db.close();
+            }
+        });
+    });
+}
+
 var checkImageUser = function(login, callback) {
     MongoClient.connect(url, function(err, db) {
         db.collection('image').find({login: login}).toArray(function(err, docs) {
@@ -516,3 +533,4 @@ exports.delog = deLog;
 // exports.getMyProfil = getMyProfil;
 exports.upImage = upImage;
 exports.downMyImage = downMyImage;
+exports.upMyLoca = upMyLoca;

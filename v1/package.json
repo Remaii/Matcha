@@ -3,9 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "app": "nodemon app.js",
-    "test": "nodemon server.js",
-    "start": "node server.js"
+    "test": "nodemon app.js",
+    "start": "node app.js"
   },
   "dependencies": {
     "artillery": "^1.5.2",

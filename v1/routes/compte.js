@@ -78,6 +78,15 @@ router.get('/info/mypic', function(req, res, next) {
 	});
 });
 
+router.post('/info/loc', function(req, res, next) {
+	mymongo.upMyLoca(req, res, function(err, value) {
+		if (err) console.log(err);
+		if (value) console.log(value);
+		res.locals.session = req.session;
+		res.render('compte/info')
+	});
+});
+
 router.post('/info', function(req, res) {
 	var sub = req.body.submit;
 	if (sub === 'Update') {

@@ -1,21 +1,21 @@
 <% include ../partial/header %>
 
-<% if (locals.session['myprofile']) { %>
-	<img src=<%= '"' + locals.session['myprofile']['img1'] + '"' %> class="img-circle">
+<% if (locals.session['myinfo']) { %>
+	<img src=<%= '/asset/uploads/' + locals.session['mypic'][0] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle">
 	<div class="row">
 		<div>
-			<p class="text-center"><%= locals.session['myprofile']['firstname'] %> <%= locals.session['myprofile']['lastname'] %> <%= locals.session['myprofile']['age'] %> ans</p>
-			<p class="text-center"><%= locals.session['myprofile']['sexe'] %> <%= locals.session['myprofile']['orient'] %></p>
-			<% if (locals.session['myprofile']['tag']) { %>
+			<p class="text-center"><%= locals.session['myinfo'][0] %> <%= locals.session['myinfo'][1] %> <%= locals.session['myinfo'][2] %> ans</p>
+			<p class="text-center"><%= locals.session['myinfo'][3] %> <%= locals.session['myinfo'][4] %></p>
+			<% if (locals.session['mytag'][0]) { %>
 				<p class="text-center">
-				<% for (var i = 0; locals.session['myprofile']['tag'][i]; i++) { %>
-					<% if (locals.session['myprofile']['tag'][i] != ' ') { %>
-						<%= '#' + locals.session['myprofile']['tag'][i] %>
+				<% for (var i = 0; locals.session['mytag'][i]; i++) { %>
+					<% if (locals.session['mytag'][i] != ' ') { %>
+						<%= '#' + locals.session['mytag'][i] %>
 					<% } %>
 				<% } %>
 				</p>
 			<% } %>
-			<p class="text-center"><%= locals.session['myprofile']['bio'] %></p>
+			<p class="text-center"><%= locals.session['myinfo'][5] %></p>
 		</div>
 	</div>
 <% } %>

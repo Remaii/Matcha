@@ -62,8 +62,6 @@ var upImage = function(value, log) {
             });
         }
         if (plein) {
-            
-            // if (plein <= 4) {
                 for (var i = 0; plein[0]['image'][i] && i < 5; i++) {
                     toadd[i] = plein[0]['image'][i];
                 }
@@ -78,7 +76,6 @@ var upImage = function(value, log) {
                     });
                     db.close();
                 });
-            // }
         }
     });
 }
@@ -167,26 +164,6 @@ var getAllProf = function (name, callback) {
             }
             callback(result);
         });
-    });
-}
-
-var getMyProfil = function(req, res, call) {
-    var log = req.session['login'];
-    
-    MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({login: log}).toArray(function(err, doc) {
-            var result = {
-                firstname: doc[0]['firstname'],
-                lastname: doc[0]['lastname'],
-                age: doc[0]['age'],
-                sexe: doc[0]['sexe'],
-                orient: doc[0]['orient'],
-                bio: doc[0]['bio'],
-                tag: doc[0]['tag']
-            };
-            call(result);
-        });
-        db.close();
     });
 }
 
@@ -536,6 +513,6 @@ exports.updateUser = updateUser;
 exports.logUser = logUser;
 exports.addUser = addUser;
 exports.delog = deLog;
-exports.getMyProfil = getMyProfil;
+// exports.getMyProfil = getMyProfil;
 exports.upImage = upImage;
 exports.downMyImage = downMyImage;

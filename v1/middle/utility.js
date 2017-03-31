@@ -1,11 +1,35 @@
+var uniqid = require('uniqid')
+
 //getImage
+function clean(session, callback) {
+    if (session['login'] != undefined) {
+        var login = session['login'];
+        if (session['allprof'] && login != undefined){
+            session['allprof'] = {};
+        }
+        if (session['myinfo'] && login != undefined){
+            session['myinfo'] = {};
+        }
+        if (session['mytag'] && login != undefined){
+            session['mytag'] = {};
+        }
+        if (session['mypic'] && login != undefined){
+            session['mypic'] = {};
+        }
+        if (session['interet'] && login != undefined){
+            session['interet'] = {};
+        }
+        callback();
+    }
+}
+
 var getImage = function(req, res, callback) {
     var ImageURI = require('image-data-uri');
     var mkdirp = require('mkdirp');
     var log = req.session['login'];
     var path = __dirname + "/../public/uploads/" + log;
     var data = req.body.photo;
-    var date = Date.now();
+    var date = uniqid();
     var file = log + date + '.png';
     var filePath = path + "/" + file;
 
@@ -21,11 +45,14 @@ var getImage = function(req, res, callback) {
 }
 
 var rmImage = function(req, res, callback) {
+    var fs = require('fs');
     var login = req.session['login'];
     var path = req.body.path;
     var pos = path.indexOf('/');
     path = path.slice(pos + 1);
-    callback(null, path);
+    fs.unlink(__dirname + "/../public/uploads/" + login + "/" + path, function() {
+        callback(null, path);
+    });
 }
 
 //checker de mot de passe
@@ -76,3 +103,4 @@ exports.checkerPwd = checkerPwd;
 exports.checkerBio = checkerBio;
 exports.getImage = getImage;
 exports.rmImage = rmImage;
+exports.clean = clean;

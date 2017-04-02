@@ -32,6 +32,7 @@ function deleteImg(path) {
 	var onSuccess = function(geoipResponse) {
 		var xhr = new XMLHttpRequest();
 
+		console.log(geoipResponse.city)
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
 
@@ -39,7 +40,7 @@ function deleteImg(path) {
 		}
 		xhr.open("POST", "/compte/info/loc");
 		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		xhr.send("city=" + geoipResponse.city.names['en'] + "&ip=" + geoipResponse.traits['ip_address']);
+		xhr.send("city=" + geoipResponse.city.names['en'] + "&ip=" + geoipResponse.traits['ip_address'] + "&geoname=" + geoipResponse.city['geoname_id']);
 	};
 	var onError = function(error) {
 		console.log(error);
@@ -49,7 +50,7 @@ function deleteImg(path) {
 
 var submit = document.querySelector('#Upload');
 
-submit.addEventListener('click', function(){
+submit.addEventListener('click', function(ev){
 	var file = document.querySelector('input[type=file]').files[0];
 	var reader = new FileReader();
 	var xhr = new XMLHttpRequest();
@@ -72,7 +73,25 @@ submit.addEventListener('click', function(){
 	}
 	if (file) {
 		reader.readAsDataURL(file);
+		console.log(file)
 	} else {
 		alert('tu n\'a rien upload...');
 	}
+});
+
+var dist = document.querySelector('#distance');
+
+dist.addEventListener('click', function(ev) {
+	var xhr = new XMLHttpRequest();
+	var city1;
+	var city2 = '2996944';//Lyon
+
+	// xhr.onreadystatechange = function() {
+	// 	if (xhr.readyState == 4) {
+	// 		console.log(xhr.responseText)
+	// 	}
+	// }
+	// xhr.open("get", "http://fr.thetimenow.com/distance-calculator.php?city1=" + city1 + "&city2=" + city2, true);
+	// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	// xhr.send(null);
 });

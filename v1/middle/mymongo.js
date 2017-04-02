@@ -5,20 +5,13 @@ var url = "mongodb://localhost:28000/matcha";
 var utilities = require('./utility')
 
 var upMyLoca = function(req, res, callback) {
-    MongoClient.connect(url, function(err, db) {
-        var newLoca = {
-            login: req.session['login'],
-            city: req.body.city,
-            ip: req.body.ip
-        };
-        db.collection('loca').insertOne(newLoca, function(err, result) {
-            if (err) callback(err, null);
-            if (result.result['ok'] == 1) {
-                callback(null, req.session['login'] + ' ' + req.body.city + ' ' + req.body.ip);
-                db.close();
-            }
+    if (req.session['myinfo'][7] != req.body.city) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').updateOne({login: req.session['login']}, { $set:{geoname: req.body.geoname, city: req.body.city}});
+            db.close();
+            callback(null, req.body.city);
         });
-    });
+    }
 }
 
 var checkImageUser = function(login, callback) {
@@ -109,7 +102,6 @@ function insertThis(tab, where) {
 }
 
 function getMyInfo(req, res, call) {
-    var mytag = {};
     var arr = {};
     var log = req.session['login'];
 
@@ -123,6 +115,8 @@ function getMyInfo(req, res, call) {
                 arr[4] = doc[0]['orient'];
                 arr[5] = doc[0]['bio'];
                 arr[6] = doc[0]['mail'];
+                arr[7] = doc[0]['city'];
+                arr[8] = doc[0]['geoname'];
                 call(arr);
             });
             db.close();
@@ -209,7 +203,7 @@ var addUser = function(req, res) {
                         req.flash('error', 'Connection to DataBase Failed');
                         res.redirect('login');
                     }
-            		var newUser = {login: logre, name: logre, pwd: passwd, mail: mail, created: new Date()};
+            		var newUser = {login: logre, firstname: logre, pwd: passwd, mail: mail, created: new Date()};
                     db.collection('user').find({}).toArray(function(err, docs) {
                         var i = 0;
                         var ok = 0;
@@ -337,15 +331,22 @@ var addInterest = function(req, res) {
             var tab = {};
             var ok = 1;
             db.collection('interet').find().toArray(function(err, doc) {
-                for (var i = 0; doc[0][i]; i++) {
-                    if (doc[0][i] == toadd) {
-                        ok = -1;
-                    }
-                    if (ok != -1)
-                        ok++;
-                    tab[i] = doc[0][i];
+                if (doc[0] == undefined) {
+                    tab[0] = toadd;
+                    insertThis(tab, 'interet');
+                    ok = -2;
                 }
-                if (ok > 5) {
+                if (ok != -2) {
+                    for (var i = 0; doc[0][i]; i++) {
+                        if (doc[0][i] == toadd) {
+                            ok = -1;
+                        }
+                        if (ok != -1 && ok != -2)
+                            ok++;
+                        tab[i] = doc[0][i];
+                    }
+                }
+                if (ok > 5 && ok != -2) {
                     tab[i] = toadd;
                     req.flash('mess', 'Tag ajouté avec success');
                     insertThis(tab, 'interet');
@@ -368,10 +369,14 @@ var getInterest = function(req, res, call) {
 
     MongoClient.connect(url, function(err, db) {
         db.collection('interet').find().toArray(function(err, docs){
-            for (var i = 0; docs[0][i]; i++){
-                tag[i] = docs[0][i];
-            }
-            call(tag);
+            if (docs.length > 0) {
+                for (var i = 0; docs[0][i]; i++){
+                    tag[i] = docs[0][i];
+                }
+                call(null, tag);
+            } else {
+                call("no interest in db", null);
+            }            
         });
         db.close();
     });
@@ -530,7 +535,6 @@ exports.updateUser = updateUser;
 exports.logUser = logUser;
 exports.addUser = addUser;
 exports.delog = deLog;
-// exports.getMyProfil = getMyProfil;
 exports.upImage = upImage;
 exports.downMyImage = downMyImage;
 exports.upMyLoca = upMyLoca;

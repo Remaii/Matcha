@@ -72,7 +72,7 @@
 		<form method="post" action="/compte/info">
     		<label class="col-md-offset-4 col-xs-offset-4 text-center">Choisis tes centres d'interets</label>
 			<div>
-    			<% if (locals.session['interet']) { %>
+    			<% if (locals.session['interet'] && locals.session['interet'].length > 0) { %>
     				<% var col = 0; for (var i = 0; locals.session['interet'][i]; i++) {%>
     					<input type="checkbox" name="select" value="<%= locals.session['interet'][i] %>"> <%= locals.session['interet'][i] %>
     					<% if (col == 6) { %>
@@ -96,6 +96,9 @@
 	        	<input class="btn btn-primary btn-sm" type="submit" name="submit" value="Creer">
 	        </div>
 	    </form>
+		<div class="col-md-3 col-xs-3 col-md-offset-5 col-xs-offset-5">
+		  	<input id="distance" class="btn btn-primary btn-sm" type="submit" name="submit" value="Ma distance avec lyon !">
+		</div>
 	</div>
 </div>
 	

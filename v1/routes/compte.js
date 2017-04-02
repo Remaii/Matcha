@@ -55,8 +55,14 @@ router.get('/info', function(req, res, next){
 		next();
 	});
 }, function(req, res, next) {
-	mymongo.getInterest(req, res, function(tag) {
-		req.session['interet'] = tag;
+	mymongo.getInterest(req, res, function(err, tag) {
+		if (tag) {
+			req.session['interet'] = tag;
+		}
+		//  else if (!tag, err) {
+		// 	console.log(err);
+		// 	req.session['interet'] = {0: " "};
+		// }
 		next();
 	});
 }, function(req, res, next) {
@@ -81,7 +87,7 @@ router.get('/info/mypic', function(req, res, next) {
 router.post('/info/loc', function(req, res, next) {
 	mymongo.upMyLoca(req, res, function(err, value) {
 		if (err) console.log(err);
-		if (value) console.log(value);
+		if (value) req.session['myinfo'][7] = value;
 		res.locals.session = req.session;
 		res.render('compte/info')
 	});

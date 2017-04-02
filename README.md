@@ -78,6 +78,9 @@ Quand un utilisateur regarde le profil d'un autre:
 * (*2)Les notifications sont visibles partout:❌
 
 ### Bonus
+* Choisir son avatar parmis ses photos:❌
+* Definir une autre localisation:❌
+* Compte admin, possibilité de supprimer les tags:❌
 * Charger les images a partir de facebook/google+:❌
 * Carte des utilisateurs interactive:❌
 * Ajout de tag à la base de donnée:✅

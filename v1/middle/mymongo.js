@@ -101,6 +101,32 @@ function insertThis(tab, where) {
     });
 }
 
+function getThisProf(req, res, call) {
+    var arr = {};
+    var log = req.session['login'];
+
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: log}).toArray(function(err, doc) {
+                if (err) {
+                    call(err, arr);
+                }
+                arr[0] = doc[0]['firstname'];
+                arr[1] = doc[0]['lastname'];
+                arr[2] = doc[0]['age'];
+                arr[3] = doc[0]['sexe'];
+                arr[4] = doc[0]['orient'];
+                arr[5] = doc[0]['bio'];
+                arr[6] = doc[0]['mail'];
+                arr[7] = doc[0]['city'];
+                arr[8] = doc[0]['geoname'];
+                call(null, arr);
+            });
+            db.close();
+        });
+    }
+}
+
 function getMyInfo(req, res, call) {
     var arr = {};
     var log = req.session['login'];
@@ -170,6 +196,7 @@ var getAllProf = function (name, callback) {
                 tmp[3] = docs[i]['sexe'];
                 tmp[4] = docs[i]['orient'];
                 tmp[5] = docs[i]['tag'];
+                tmp[6] = docs[i]['login'];
                 result[i] = tmp;
                 tmp = {};
             }
@@ -538,3 +565,4 @@ exports.delog = deLog;
 exports.upImage = upImage;
 exports.downMyImage = downMyImage;
 exports.upMyLoca = upMyLoca;
+exports.getThisProf = getThisProf;

@@ -13,4 +13,18 @@ router.post('/', function(req, res) {
 	
 });
 
+router.get('/:login', function(req, res) {
+	mymongo.getThisProf(req, res, function(err, result) {
+		if (err) {
+			console.log(err);
+			console.log(result);
+		}
+		if (result && !err) {
+			req.session['herPro'] = result;
+			res.locals.session = req.session;
+			res.render('herPro');
+		}
+	});
+});
+
 module.exports = router;

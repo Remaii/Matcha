@@ -114,6 +114,8 @@ router.post('/info', function(req, res) {
 			mymongo.downMyImage(req, res);
 		});
 		res.redirect('info');
+	} else if (req.body.path && sub == 'toAvatar') {
+		mymongo.setAvatar(req, res);
 	} else {
 		console.log(sub)
 		console.log('else :( ' + req.session['login']);

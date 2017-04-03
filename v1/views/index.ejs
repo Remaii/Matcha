@@ -5,7 +5,7 @@
         for (var i = 0; locals.session['allprof'][i]; i++) { %>
             <div class="col-xs-4 col-md-4">
                 <div class="col-md-offset-3">
-                    <img class="img-circle" src="http://loremflickr.com/g/200/200/cats">
+                    <img class="col-md-10 col-xs-10 img-circle" src="<% if (locals.session['allprof'][i][7] != null) { %><%= '/asset/uploads/' + locals.session['allprof'][i][7] %><% } %>">
                 </div>
                 
                     <a href="/profile/<%= locals.session['allprof'][i][6] %>"><h4 class="text-center"><%= locals.session['allprof'][i][0] %> <%= locals.session['allprof'][i][1]%> <% if (locals.session['allprof'][i][2] != undefined) { %></a>

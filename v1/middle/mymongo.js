@@ -72,20 +72,20 @@ var upImage = function(value, log) {
             });
         }
         if (plein) {
-                for (var i = 0; plein[0]['image'][i] && i < 5; i++) {
-                    toadd[i] = plein[0]['image'][i];
-                }
-                toadd[i] = value;
-                MongoClient.connect(url, function(err, db) {
-                    var newImageR = {
-                        login: log,
-                        image:toadd
-                    };
-                    db.collection('image').findOneAndReplace({login: log}, newImageR,function (err, result) {
-                        console.log('User ' + log + ' MaJ Up Image success');
-                    });
-                    db.close();
+            for (var i = 0; plein[0]['image'][i] && i < 5; i++) {
+                toadd[i] = plein[0]['image'][i];
+            }
+            toadd[i] = value;
+            MongoClient.connect(url, function(err, db) {
+                var newImageR = {
+                    login: log,
+                    image:toadd
+                };
+                db.collection('image').findOneAndReplace({login: log}, newImageR,function (err, result) {
+                    console.log('User ' + log + ' MaJ Up Image success');
                 });
+                db.close();
+            });
         }
     });
 }
@@ -94,7 +94,7 @@ function insertThis(tab, where) {
 
     MongoClient.connect(url, function(err, db) {
         db.collection(where).updateOne({}, tab, function(err, result) {
-            if (err) return console.log(err);
+            if (err) return console.log('insertThis: ' + err);
             if (result.result.ok) return console.log("Les Tags on ete mis à jour");
         });
         db.close();
@@ -120,6 +120,7 @@ function getThisProf(req, res, call) {
                 arr[6] = doc[0]['mail'];
                 arr[7] = doc[0]['city'];
                 arr[8] = doc[0]['geoname'];
+                arr[9] = doc[0]['avatar'];
                 call(null, arr);
             });
             db.close();
@@ -143,6 +144,7 @@ function getMyInfo(req, res, call) {
                 arr[6] = doc[0]['mail'];
                 arr[7] = doc[0]['city'];
                 arr[8] = doc[0]['geoname'];
+                arr[9] = doc[0]['avatar'];
                 call(arr);
             });
             db.close();
@@ -197,6 +199,7 @@ var getAllProf = function (name, callback) {
                 tmp[4] = docs[i]['orient'];
                 tmp[5] = docs[i]['tag'];
                 tmp[6] = docs[i]['login'];
+                tmp[7] = docs[i]['avatar'];
                 result[i] = tmp;
                 tmp = {};
             }
@@ -346,6 +349,18 @@ var updateUser = function(req, res) {
     }
 }
 
+var setAvatar = function(req, res) {
+    if (req.session['login'] != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').updateOne({login: req.session['login']}, { $set:{avatar: req.body.path}});
+            db.close();
+            console.log(req.session['login'] + ' à mis a jour son avatar');
+        });
+    } else {
+        console.log('un utilisateur inconnue a essayer de mettre a jour son avatar');
+    }
+}
+
 var addInterest = function(req, res) {
     var toadd = req.body.interet.toUpperCase();
 
@@ -354,7 +369,7 @@ var addInterest = function(req, res) {
         res.redirect('info');
     } else if (utilities.checkerBio(toadd, 20) && utilities.checkerTag(toadd)) {
         MongoClient.connect(url, function(err, db) {
-            if (err) return console.log(err);
+        //    if (err) return console.log(err);
             var tab = {};
             var ok = 1;
             db.collection('interet').find().toArray(function(err, doc) {
@@ -368,12 +383,12 @@ var addInterest = function(req, res) {
                         if (doc[0][i] == toadd) {
                             ok = -1;
                         }
-                        if (ok != -1 && ok != -2)
+                        if (ok != -1)
                             ok++;
                         tab[i] = doc[0][i];
                     }
                 }
-                if (ok > 5 && ok != -2) {
+                if (ok > 1 && ok != -2) {
                     tab[i] = toadd;
                     req.flash('mess', 'Tag ajouté avec success');
                     insertThis(tab, 'interet');
@@ -566,3 +581,4 @@ exports.upImage = upImage;
 exports.downMyImage = downMyImage;
 exports.upMyLoca = upMyLoca;
 exports.getThisProf = getThisProf;
+exports.setAvatar = setAvatar;

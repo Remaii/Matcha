@@ -12,6 +12,21 @@ function refreshMyPic() {
 	xhr.send(null);
 }
 
+function toAvatar(path) {
+	var xhr = new XMLHttpRequest();
+
+	if (confirm('Vous désirez vraiment faire de cette photo votre avatar ?')) {
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4) {
+				refreshMyPic();
+			}
+		}
+		xhr.open("POST", "/compte/info", true);
+		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		xhr.send("path=" + path + "&submit=toAvatar");
+	}
+}
+
 function deleteImg(path) {
 	var xhr = new XMLHttpRequest();
 

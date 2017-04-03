@@ -93,7 +93,6 @@ var checkerTag = function(str) {
         if (str[i] == ' ')
             return 0;
     }
-    console.log(str.length + ' ' + i);
     if (i == str.length)
         return 1;
 }

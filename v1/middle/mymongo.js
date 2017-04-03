@@ -91,7 +91,6 @@ var upImage = function(value, log) {
 }
 
 function insertThis(tab, where) {
-
     MongoClient.connect(url, function(err, db) {
         db.collection(where).updateOne({}, tab, function(err, result) {
             if (err) return console.log('insertThis: ' + err);
@@ -371,7 +370,7 @@ var addInterest = function(req, res) {
         MongoClient.connect(url, function(err, db) {
         //    if (err) return console.log(err);
             var tab = {};
-            var ok = 1;
+            var ok = 0;
             db.collection('interet').find().toArray(function(err, doc) {
                 if (doc[0] == undefined) {
                     tab[0] = toadd;
@@ -388,7 +387,7 @@ var addInterest = function(req, res) {
                         tab[i] = doc[0][i];
                     }
                 }
-                if (ok > 1 && ok != -2) {
+                if (ok > 0 && ok != -2) {
                     tab[i] = toadd;
                     req.flash('mess', 'Tag ajouté avec success');
                     insertThis(tab, 'interet');
@@ -544,12 +543,16 @@ var downMyTag = function(req, res) {
                 }
             }
         }
-		console.log(toadd);
-		console.log(toadd[0]);
 		if (toadd[0] == undefined) {
-			toadd[0] = " ";
-		}
-        ok = 1;
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({login: log}, { $unset:{tag: ' '}});
+                db.close();
+            });
+            console.log(log + ' suppression tag: ' + interet + ' et n\'a plus de tag');
+            res.redirect('info');
+		} else {
+            ok = 1;
+        }
         if (ok == 1) {
             removeDouble(toadd, function(resultat) {
                 MongoClient.connect(url, function(err, db) {

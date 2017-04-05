@@ -4,19 +4,28 @@ var uniqid = require('uniqid')
 function clean(session, callback) {
     if (session['login'] != undefined) {
         var login = session['login'];
-        if (session['allprof'] && login != undefined){
+        if (session['allprof']){
             session['allprof'] = {};
         }
-        if (session['myinfo'] && login != undefined){
+        if (session['myinfo']){
             session['myinfo'] = {};
         }
-        if (session['mytag'] && login != undefined){
+        if (session['mytag']){
             session['mytag'] = {};
         }
-        if (session['mypic'] && login != undefined){
+        if (session['mypic']){
             session['mypic'] = {};
         }
-        if (session['interet'] && login != undefined){
+        if (session['herPro']){
+            session['herPro'] = {};
+        }
+        if (session['herTag']){
+            session['herTag'] = {};
+        }
+        if (session['herPic']){
+            session['herPic'] = {};
+        }
+        if (session['interet']){
             session['interet'] = {};
         }
         callback();

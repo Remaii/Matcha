@@ -1,16 +1,16 @@
 <% include partial/header %>
 
 <% if (locals.session['herPro']) { %>
-	<img src=<%= '/asset/uploads/' + locals.session['herPro'][9] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle">
+	<img src=<%= '/asset/uploads/' + locals.session['herPro'][8] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle">
 	<div class="row">
 		<div>
 			<p class="text-center"><%= locals.session['herPro'][0] %> <%= locals.session['herPro'][1] %> <%= locals.session['herPro'][2] %> ans</p>
 			<p class="text-center"><%= locals.session['herPro'][3] %> <%= locals.session['herPro'][4] %></p>
-			<% if (locals.session['mytag'][0]) { %>
+			<% if (locals.session['herTag'] != null) { %>
 				<p class="text-center">
-				<% for (var i = 0; locals.session['mytag'][i]; i++) { %>
-					<% if (locals.session['mytag'][i] != ' ') { %>
-						<%= '#' + locals.session['mytag'][i] %>
+				<% for (var i = 0;locals.session['herTag'][i]; i++) { %>
+					<% if (locals.session['herTag'][i] != ' ') { %>
+						<%= '#' + locals.session['herTag'][i] %>
 					<% } %>
 				<% } %>
 				</p>

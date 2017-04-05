@@ -128,6 +128,7 @@ var setUsers = function(nb) {
 			login = uniqid();
 			var newUser = {
 				login: login,
+				pseudo: logauto + randName,
 				firstname: logauto,
 				lastname: last,
 				age: age,
@@ -135,6 +136,7 @@ var setUsers = function(nb) {
 				mail: mail,
 				sexe: sex,
 				orient: sexua,
+				avatar: 'no_avatar.png',
 				bio: "J'ai été généré de façon aléatoire",
 				tag: {
 					0: "ROBOT"

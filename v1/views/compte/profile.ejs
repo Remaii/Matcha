@@ -6,7 +6,7 @@
 		<div>
 			<p class="text-center"><%= locals.session['myinfo'][0] %> <%= locals.session['myinfo'][1] %> <%= locals.session['myinfo'][2] %> ans</p>
 			<p class="text-center"><%= locals.session['myinfo'][3] %> <%= locals.session['myinfo'][4] %></p>
-			<% if (locals.session['mytag'][0]) { %>
+			<% if (locals.session['mytag'][0] != null) { %>
 				<p class="text-center">
 				<% for (var i = 0; locals.session['mytag'][i]; i++) { %>
 					<% if (locals.session['mytag'][i] != ' ') { %>

@@ -100,13 +100,46 @@ function insertThis(tab, where) {
     });
 }
 
-function getThisProf(req, res, call) {
-    var arr = {};
-    var log = req.session['login'];
+function getHerImage(req, res, call) {
+    var pseudo = req.session['toget'];
 
-    if (log != '' || log != undefined) {
+    if (pseudo != '' || pseudo != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: log}).toArray(function(err, doc) {
+            db.collection('image').find({pseudo: pseudo}).toArray(function(err, doc) {
+                if (doc.length != 0) {
+                    call(doc[0]['image']);
+                } else {
+                    call({0:' '});
+                }
+            });
+            db.close();
+        });
+    }
+}
+
+function getHerTag(req, res, call) {
+    var mytag = {};
+    var arr = {};
+    var pseudo = req.session['toget'];
+
+    if (pseudo != '' || pseudo != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({pseudo: pseudo}).toArray(function(err, doc) {
+                mytag = doc[0]['tag'];
+                call(mytag);
+            });
+            db.close();
+        });
+    }
+}
+
+function getHerInfo(req, res, call) {
+    var arr = {};
+    var pseudo = req.session['toget'];
+
+    if (pseudo != '' || pseudo != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({pseudo: pseudo}).toArray(function(err, doc) {
                 if (err) {
                     call(err, arr);
                 }
@@ -116,10 +149,9 @@ function getThisProf(req, res, call) {
                 arr[3] = doc[0]['sexe'];
                 arr[4] = doc[0]['orient'];
                 arr[5] = doc[0]['bio'];
-                arr[6] = doc[0]['mail'];
-                arr[7] = doc[0]['city'];
-                arr[8] = doc[0]['geoname'];
-                arr[9] = doc[0]['avatar'];
+                arr[6] = doc[0]['city'];
+                arr[7] = doc[0]['geoname'];
+                arr[8] = doc[0]['avatar'];
                 call(null, arr);
             });
             db.close();
@@ -190,19 +222,21 @@ var getAllProf = function (name, callback) {
 
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find().toArray(function(err, docs) {
-            for (var i = 0; docs[i]; i++){
-                tmp[0] = docs[i]['firstname'];
-                tmp[1] = docs[i]['lastname'];
-                tmp[2] = docs[i]['age'];
-                tmp[3] = docs[i]['sexe'];
-                tmp[4] = docs[i]['orient'];
-                tmp[5] = docs[i]['tag'];
-                tmp[6] = docs[i]['login'];
-                tmp[7] = docs[i]['avatar'];
+            if (err) call(err, null);
+            for (var i = 0; docs[i]; i++) {
+                // tmp[0] = docs[i]['firstname'];
+                // tmp[1] = docs[i]['lastname'];
+                // tmp[2] = docs[i]['age'];
+                // tmp[3] = docs[i]['sexe'];
+                // tmp[4] = docs[i]['orient'];
+                // tmp[5] = docs[i]['tag'];
+                // tmp[6] = docs[i]['login'];
+                tmp[0] = docs[i]['avatar'];
+                tmp[1] = docs[i]['pseudo'];
                 result[i] = tmp;
                 tmp = {};
             }
-            callback(result);
+            callback(null, result);
         });
     });
 }
@@ -232,7 +266,7 @@ var addUser = function(req, res) {
                         req.flash('error', 'Connection to DataBase Failed');
                         res.redirect('login');
                     }
-            		var newUser = {login: logre, firstname: logre, pwd: passwd, mail: mail, created: new Date()};
+            		var newUser = {login: logre, pseudo: logre, pwd: passwd, mail: mail, created: new Date()};
                     db.collection('user').find({}).toArray(function(err, docs) {
                         var i = 0;
                         var ok = 0;
@@ -568,20 +602,31 @@ var downMyTag = function(req, res) {
     }
 }
 
+// recupere tout les pseudos et avatars des membres du site /==>/ tout les pseudo/avatar "interessant"
+exports.getAllProf = getAllProf;
+
+// récupère les informations, les images, les tags, de l'utilisateur connecté.
 exports.getMyImage = getMyImage;
 exports.getMyTag = getMyTag;
 exports.getMyInfo = getMyInfo;
-exports.getAllProf = getAllProf;
+
+// fonctionnalitées utilisateurs, MaJ des tags, Ajout de tags a la BdD, MaJ image + avatar 
 exports.upMyTag = upMyTag;
 exports.downMyTag = downMyTag;
-exports.getInterest = getInterest;
 exports.addInterest = addInterest;
 exports.updateUser = updateUser;
+exports.upImage = upImage;
+exports.downMyImage = downMyImage;
+exports.setAvatar = setAvatar;
+
+// fonctionnalitées sites, login, logout, register, localisation, recuperer une listes des tags présents en BdD
+exports.getInterest = getInterest;
 exports.logUser = logUser;
 exports.addUser = addUser;
 exports.delog = deLog;
-exports.upImage = upImage;
-exports.downMyImage = downMyImage;
 exports.upMyLoca = upMyLoca;
-exports.getThisProf = getThisProf;
-exports.setAvatar = setAvatar;
+
+// récupère les informations, les images, les tags, de l'utilisateur ciblé par /profile/:pseudo.
+exports.getHerInfo = getHerInfo;
+exports.getHerImage = getHerImage;
+exports.getHerTag = getHerTag;

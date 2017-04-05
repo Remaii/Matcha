@@ -85,6 +85,18 @@ var interet = {
 	8: "VELO"
 }
 
+function allReadySet(tab, toadd) {
+	if (tab[0] != null) {
+		for (var i = 0; tab[i]; i++) {
+			if (tab[i] == toadd)
+				return 0;
+		}
+		return 1;
+	} else {
+		return 1;
+	}
+}
+
 var setUsers = function(nb) {
 	var MongoClient = require('mongodb').MongoClient;
 	var url = "mongodb://localhost:28000/matcha";
@@ -124,11 +136,11 @@ var setUsers = function(nb) {
 				logauto = prenomH[randName];
 			} else {
 				logauto = prenoms[randName];
-			}
+			} 
 			login = uniqid();
 			var newUser = {
 				login: login,
-				pseudo: logauto + randName,
+				pseudo: logauto + i,
 				firstname: logauto,
 				lastname: last,
 				age: age,
@@ -136,7 +148,7 @@ var setUsers = function(nb) {
 				mail: mail,
 				sexe: sex,
 				orient: sexua,
-				avatar: 'no_avatar.png',
+				avatar: 'avatar.png',
 				bio: "J'ai été généré de façon aléatoire",
 				tag: {
 					0: "ROBOT"

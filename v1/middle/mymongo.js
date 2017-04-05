@@ -4,6 +4,19 @@ var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
 var utilities = require('./utility')
 
+function verifyPseudo(pseudo) {
+    MongoClient.connect(url, function(err, db){
+        db.collection('user').find({pseudo: pseudo}).toArray(function(err, doc) {
+            if (doc[0] != null) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+        db.close();
+    });
+}
+
 var upMyLoca = function(req, res, callback) {
     if (req.session['myinfo'][7] != req.body.city) {
         MongoClient.connect(url, function(err, db) {
@@ -166,17 +179,20 @@ function getMyInfo(req, res, call) {
     if (log != '' || log != undefined) {
         MongoClient.connect(url, function(err, db) {
             db.collection('user').find({login: log}).toArray(function(err, doc) {
-                arr[0] = doc[0]['firstname'];
-                arr[1] = doc[0]['lastname'];
-                arr[2] = doc[0]['age'];
-                arr[3] = doc[0]['sexe'];
-                arr[4] = doc[0]['orient'];
-                arr[5] = doc[0]['bio'];
-                arr[6] = doc[0]['mail'];
-                arr[7] = doc[0]['city'];
-                arr[8] = doc[0]['geoname'];
-                arr[9] = doc[0]['avatar'];
-                call(arr);
+                if (doc[0]) {
+                    arr[0] = doc[0]['firstname'];
+                    arr[1] = doc[0]['lastname'];
+                    arr[2] = doc[0]['age'];
+                    arr[3] = doc[0]['sexe'];
+                    arr[4] = doc[0]['orient'];
+                    arr[5] = doc[0]['bio'];
+                    arr[6] = doc[0]['mail'];
+                    arr[7] = doc[0]['city'];
+                    arr[8] = doc[0]['geoname'];
+                    arr[9] = doc[0]['avatar'];
+                    arr[10] = doc[0]['pseudo'];
+                    call(arr);
+                }
             });
             db.close();
         });
@@ -266,7 +282,14 @@ var addUser = function(req, res) {
                         req.flash('error', 'Connection to DataBase Failed');
                         res.redirect('login');
                     }
-            		var newUser = {login: logre, pseudo: logre, pwd: passwd, mail: mail, created: new Date()};
+            		var newUser = {
+                        login: logre,
+                        pseudo: logre,
+                        pwd: passwd,
+                        mail: mail,
+                        avatar: 'avatar.png',
+                        created: new Date()
+                    };
                     db.collection('user').find({}).toArray(function(err, docs) {
                         var i = 0;
                         var ok = 0;
@@ -365,12 +388,13 @@ var updateUser = function(req, res) {
     var orient = req.body.orient;
     var mail = req.body.mail;
     var bio = req.body.bio;
+    var pseudo = req.body.pseudo;
     
 
-    if (mail != '' && age != '' && lastname != '' && firstname != '' && bio != '' && sexe != '' && orient != '' && loger != undefined) {
+    if (pseudo != '' && mail != '' && age != '' && lastname != '' && firstname != '' && bio != '' && sexe != '' && orient != '' && loger != undefined) {
         if (utilities.checkerBio(bio, '500') == 1) {
             MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: loger}, { $set:{mail: mail, firstname: firstname, lastname: lastname, age: age, bio: bio, sexe: sexe, orient: orient}});
+                db.collection('user').updateOne({login: loger}, { $set:{pseudo: pseudo, mail: mail, firstname: firstname, lastname: lastname, age: age, bio: bio, sexe: sexe, orient: orient}});
                 db.close();
                 res.redirect('info');
             });
@@ -402,7 +426,6 @@ var addInterest = function(req, res) {
         res.redirect('info');
     } else if (utilities.checkerBio(toadd, 20) && utilities.checkerTag(toadd)) {
         MongoClient.connect(url, function(err, db) {
-        //    if (err) return console.log(err);
             var tab = {};
             var ok = 0;
             db.collection('interet').find().toArray(function(err, doc) {
@@ -420,11 +443,11 @@ var addInterest = function(req, res) {
                             ok++;
                         tab[i] = doc[0][i];
                     }
-                }
-                if (ok > 0 && ok != -2) {
-                    tab[i] = toadd;
-                    req.flash('mess', 'Tag ajouté avec success');
-                    insertThis(tab, 'interet');
+                    if (ok > 0) {
+                        tab[i] = toadd;
+                        req.flash('mess', 'Tag ajouté avec success');
+                        insertThis(tab, 'interet');
+                    }
                 }
                 else if (ok == -1) {
                     req.flash('error', 'Ce Tag existe déjà');

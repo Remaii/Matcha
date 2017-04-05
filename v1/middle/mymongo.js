@@ -235,25 +235,91 @@ function getMyTag(req, res, call) {
 var getAllProf = function (name, callback) {
     var result = {};
     var tmp = {};
+    var Sex;
+    var OSex;
 
     MongoClient.connect(url, function(err, db) {
-        db.collection('user').find().toArray(function(err, docs) {
-            if (err) call(err, null);
-            for (var i = 0; docs[i]; i++) {
-                // tmp[0] = docs[i]['firstname'];
-                // tmp[1] = docs[i]['lastname'];
-                // tmp[2] = docs[i]['age'];
-                // tmp[3] = docs[i]['sexe'];
-                // tmp[4] = docs[i]['orient'];
-                // tmp[5] = docs[i]['tag'];
-                // tmp[6] = docs[i]['login'];
-                tmp[0] = docs[i]['avatar'];
-                tmp[1] = docs[i]['pseudo'];
-                result[i] = tmp;
-                tmp = {};
+        db.collection('user').find({login: name}).toArray(function(err, doc){
+            if (err) callback(err, null);
+            Sex = doc[0]['sexe'];
+            OSex = doc[0]['orient'];
+            if (OSex == 'Hetero') {
+                if (Sex == 'Homme') {
+                    MongoClient.connect(url, function(err, db1) {
+                        db1.collection('user').find({sexe: 'Femme'}).toArray(function(err, docs) {
+                            if (err) callback(err, null);
+                            for (var i = 0; docs[i]; i++) {
+                                tmp[0] = docs[i]['avatar'];
+                                tmp[1] = docs[i]['pseudo'];
+                                result[i] = tmp;
+                                tmp = {};
+                            }
+                            callback(null, result);
+                        });
+                        db1.close();
+                    });
+                } else {
+                    MongoClient.connect(url, function(err, db1) {
+                        db1.collection('user').find({sexe: 'Homme'}).toArray(function(err, docs) {
+                            if (err) callback(err, null);
+                            for (var i = 0; docs[i]; i++) {
+                                tmp[0] = docs[i]['avatar'];
+                                tmp[1] = docs[i]['pseudo'];
+                                result[i] = tmp;
+                                tmp = {};
+                            }
+                            callback(null, result);
+                        });
+                        db1.close();
+                    });
+                }
+            } else if (OSex == 'Gay') {
+                if (Sex == 'Homme') {
+                    MongoClient.connect(url, function(err, db1) {
+                        db1.collection('user').find({sexe: 'Homme'}).toArray(function(err, docs) {
+                            if (err) callback(err, null);
+                            for (var i = 0; docs[i]; i++) {
+                                tmp[0] = docs[i]['avatar'];
+                                tmp[1] = docs[i]['pseudo'];
+                                result[i] = tmp;
+                                tmp = {};
+                            }
+                            callback(null, result);
+                        });
+                        db1.close();
+                    });
+                } else {
+                    MongoClient.connect(url, function(err, db1) {
+                        db1.collection('user').find({sexe: 'Femme'}).toArray(function(err, docs) {
+                            if (err) callback(err, null);
+                            for (var i = 0; docs[i]; i++) {
+                                tmp[0] = docs[i]['avatar'];
+                                tmp[1] = docs[i]['pseudo'];
+                                result[i] = tmp;
+                                tmp = {};
+                            }
+                            callback(null, result);
+                        });
+                        db1.close();
+                    });
+                }
+            } else {
+                MongoClient.connect(url, function(err, db1) {
+                    db1.collection('user').find().toArray(function(err, docs) {
+                        if (err) callback(err, null);
+                        for (var i = 0; docs[i]; i++) {
+                            tmp[0] = docs[i]['avatar'];
+                            tmp[1] = docs[i]['pseudo'];
+                            result[i] = tmp;
+                            tmp = {};
+                        }
+                        callback(null, result);
+                    });
+                    db1.close();
+                });
             }
-            callback(null, result);
         });
+        db.close();
     });
 }
 
@@ -390,16 +456,70 @@ var updateUser = function(req, res) {
     var bio = req.body.bio;
     var pseudo = req.body.pseudo;
     
-
-    if (pseudo != '' && mail != '' && age != '' && lastname != '' && firstname != '' && bio != '' && sexe != '' && orient != '' && loger != undefined) {
-        if (utilities.checkerBio(bio, '500') == 1) {
-            MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: loger}, { $set:{pseudo: pseudo, mail: mail, firstname: firstname, lastname: lastname, age: age, bio: bio, sexe: sexe, orient: orient}});
-                db.close();
-                res.redirect('info');
-            });
+    if (loger != undefined) {
+        if (pseudo != '' && pseudo != undefined) {
+            if (verifyPseudo(pseudo) == 0) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({login: loger}, { $set:{pseudo: pseudo}});
+                    db.close();
+                });
+            } else {
+                req.flash('err', 'Ce Pseudo existe déjà :/');
+            }
+            console.log('Pseudo de ' + loger + ' mis à jour');
         }
-        console.log('User: ' + loger + ' info update');
+        if (mail != undefined) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({login: loger}, { $set:{mail: mail}});
+                db.close();
+            });
+            console.log('Mail de ' + loger + ' mis à jour');
+        }
+        if (age != undefined) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({login: loger}, { $set:{age: age}});
+                db.close();
+            });
+            console.log('l\'âge de ' + loger + ' mis à jour');
+        }
+        if(lastname != undefined) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({login: loger}, { $set:{lastname: lastname}});
+                db.close();
+            });
+            console.log('Le nom de ' + loger + ' mis à jour');
+        }
+        if (firstname != undefined) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({login: loger}, { $set:{firstname: firstname}});
+                db.close();
+            });
+            console.log('le prénom de ' + loger + ' mis à jour');
+        }
+        if (bio != undefined) {
+            if (utilities.checkerBio(bio, '500') == 1) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({login: loger}, { $set:{bio: bio}});
+                    db.close();
+                });
+                console.log('Bio de ' + loger + ' mise à jour');
+            }
+        }
+        if (sexe != undefined) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({login: loger}, { $set:{sexe: sexe}});
+                db.close();
+            });
+            console.log('Sexe de ' + loger + ' mis à jour');
+        }
+        if (orient != undefined) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({login: loger}, { $set:{orient: orient}});
+                db.close();
+            });
+            console.log('Orientation sexuel de ' + loger + ' mise à jour');
+        }
+        res.redirect('info');
     }
     else {
         req.flash('error', 'Un ou Plusieurs champ(s) vide');

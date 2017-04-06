@@ -4,7 +4,7 @@
 	<img src=<%= '/asset/uploads/' + locals.session['herPro'][8] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle">
 	<div class="row">
 		<div>
-			<p class="text-center"><%= locals.session['herPro'][0] %> <%= locals.session['herPro'][1] %> <%= locals.session['herPro'][2] %> ans</p>
+			<p class="text-center"><%= locals.session['herPro'][0] %> <%= locals.session['herPro'][1] %> <% if (locals.session['herPro'][2] != undefined) { %><%= locals.session['herPro'][2] + 'ans' %><% } %></p>
 			<p class="text-center"><%= locals.session['herPro'][3] %> <%= locals.session['herPro'][4] %></p>
 			<% if (locals.session['herTag'] != null) { %>
 				<p class="text-center">

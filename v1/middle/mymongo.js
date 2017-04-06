@@ -20,7 +20,7 @@ function verifyPseudo(pseudo) {
 var upMyLoca = function(req, res, callback) {
     if (req.session['myinfo'][7] != req.body.city) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').updateOne({login: req.session['login']}, { $set:{geoname: req.body.geoname, city: req.body.city}});
+            db.collection('user').updateOne({login: req.session['login']}, { $set:{la: req.body.la, lo: req.body.lo, city: req.body.city}});
             db.close();
             callback(null, req.body.city);
         });
@@ -251,6 +251,8 @@ var getAllProf = function (name, callback) {
                             for (var i = 0; docs[i]; i++) {
                                 tmp[0] = docs[i]['avatar'];
                                 tmp[1] = docs[i]['pseudo'];
+                                tmp[2] = docs[i]['la'];
+                                tmp[3] = docs[i]['lo'];
                                 result[i] = tmp;
                                 tmp = {};
                             }
@@ -265,6 +267,8 @@ var getAllProf = function (name, callback) {
                             for (var i = 0; docs[i]; i++) {
                                 tmp[0] = docs[i]['avatar'];
                                 tmp[1] = docs[i]['pseudo'];
+                                tmp[2] = docs[i]['la'];
+                                tmp[3] = docs[i]['lo'];
                                 result[i] = tmp;
                                 tmp = {};
                             }
@@ -281,6 +285,8 @@ var getAllProf = function (name, callback) {
                             for (var i = 0; docs[i]; i++) {
                                 tmp[0] = docs[i]['avatar'];
                                 tmp[1] = docs[i]['pseudo'];
+                                tmp[2] = docs[i]['la'];
+                                tmp[3] = docs[i]['lo'];
                                 result[i] = tmp;
                                 tmp = {};
                             }
@@ -295,6 +301,8 @@ var getAllProf = function (name, callback) {
                             for (var i = 0; docs[i]; i++) {
                                 tmp[0] = docs[i]['avatar'];
                                 tmp[1] = docs[i]['pseudo'];
+                                tmp[2] = docs[i]['la'];
+                                tmp[3] = docs[i]['lo'];
                                 result[i] = tmp;
                                 tmp = {};
                             }
@@ -310,6 +318,8 @@ var getAllProf = function (name, callback) {
                         for (var i = 0; docs[i]; i++) {
                             tmp[0] = docs[i]['avatar'];
                             tmp[1] = docs[i]['pseudo'];
+                            tmp[2] = docs[i]['la'];
+                            tmp[3] = docs[i]['lo'];
                             result[i] = tmp;
                             tmp = {};
                         }

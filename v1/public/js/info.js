@@ -47,15 +47,13 @@ function deleteImg(path) {
 	var onSuccess = function(geoipResponse) {
 		var xhr = new XMLHttpRequest();
 
-		console.log(geoipResponse.city)
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
-
 			}
 		}
 		xhr.open("POST", "/compte/info/loc");
 		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		xhr.send("city=" + geoipResponse.city.names['en'] + "&ip=" + geoipResponse.traits['ip_address'] + "&geoname=" + geoipResponse.city['geoname_id']);
+		xhr.send("city=" + geoipResponse.city.names['en'] + "&la=" + geoipResponse.location['latitude'] + "&lo=" + geoipResponse.location['longitude']);
 	};
 	var onError = function(error) {
 		console.log(error);
@@ -96,17 +94,46 @@ submit.addEventListener('click', function(ev){
 
 var dist = document.querySelector('#distance');
 
-dist.addEventListener('click', function(ev) {
-	var xhr = new XMLHttpRequest();
-	var city1;
-	var city2 = '2996944';//Lyon
 
-	// xhr.onreadystatechange = function() {
-	// 	if (xhr.readyState == 4) {
-	// 		console.log(xhr.responseText)
-	// 	}
-	// }
-	// xhr.open("get", "http://fr.thetimenow.com/distance-calculator.php?city1=" + city1 + "&city2=" + city2, true);
-	// xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	// xhr.send(null);
+dist.addEventListener('click', function(ev) {
+	function convertRad(input){
+	        return (Math.PI * input)/180;
+	}
+	 
+	function Distance(lat_a_degre, lon_a_degre, lat_b_degre, lon_b_degre){
+	     
+	        R = 6378000; //Rayon de la terre en mètre
+	 
+	    lat_a = convertRad(lat_a_degre);
+	    lon_a = convertRad(lon_a_degre);
+	    lat_b = convertRad(lat_b_degre);
+	    lon_b = convertRad(lon_b_degre);
+	     
+	    d = R * (Math.PI/2 - Math.asin( Math.sin(lat_b) * Math.sin(lat_a) + Math.cos(lon_b - lon_a) * Math.cos(lat_b) * Math.cos(lat_a)))
+	    return d;
+	}
+
+	function getMyPos(callback) {
+		var longitude = 0.00;
+		var latitude = 0.00;
+		var onSuccess = function(geoipResponse) {
+			longitude = geoipResponse.location.longitude;
+			latitude = geoipResponse.location.latitude;
+			callback(longitude, latitude);
+		};
+		var onError = function(error) {
+			console.log(error);
+		};
+		return geoip2.insights(onSuccess, onError);
+	}
+
+	var lo_lyon = 4.85;
+	var la_lyon = 45.75;
+	var my_la;
+	var my_lo;
+	getMyPos(function(longitude, latitude) {
+		var d = Distance(latitude, longitude, la_lyon, lo_lyon);
+		d = d / 1000;
+		alert('tu es å ' + d + ' km de Lyon!');
+	});
 });

@@ -4,13 +4,13 @@ var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
 var utilities = require('./utility')
 
-function verifyPseudo(pseudo) {
+function verifyPseudo(pseudo, callback) {
     MongoClient.connect(url, function(err, db){
         db.collection('user').find({pseudo: pseudo}).toArray(function(err, doc) {
-            if (doc[0] != null) {
-                return 1;
+            if (doc[0] == undefined) {
+                callback(null, pseudo);
             } else {
-                return 0;
+                callback(pseudo, null);
             }
         });
         db.close();
@@ -232,104 +232,71 @@ function getMyTag(req, res, call) {
     }
 }
 
-var getAllProf = function (name, callback) {
-    var result = {};
+function getThis(filtre, lo, la, rayon, callback) {
     var tmp = {};
+    var result = {};
+    MongoClient.connect(url, function(err, db1) {
+        db1.collection('user').find(filtre).toArray(function(err, docs) {
+            if (err) callback(null);
+            for (var i = docs.length - 1; docs[i] && i >= 0; i--) {
+                tmp[0] = docs[i]['avatar'];
+                tmp[1] = docs[i]['pseudo'];
+                tmp[2] = utilities.Distance(la, lo, docs[i]['la'], docs[i]['lo']) / 100;
+                if (tmp[2] <= rayon) {
+                    result[i] = tmp;
+                }
+                tmp = {};
+            }
+            callback(result);
+        });
+        db1.close();
+    });
+}
+
+var getAllProf = function (name, callback) {
     var Sex;
     var OSex;
+    var lo;
+    var la;
 
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({login: name}).toArray(function(err, doc){
             if (err) callback(err, null);
             Sex = doc[0]['sexe'];
             OSex = doc[0]['orient'];
+            lo = doc[0]['lo'];
+            la = doc[0]['la'];
             if (OSex == 'Hetero') {
                 if (Sex == 'Homme') {
-                    MongoClient.connect(url, function(err, db1) {
-                        db1.collection('user').find({sexe: 'Femme'}).toArray(function(err, docs) {
-                            if (err) callback(err, null);
-                            for (var i = 0; docs[i]; i++) {
-                                tmp[0] = docs[i]['avatar'];
-                                tmp[1] = docs[i]['pseudo'];
-                                tmp[2] = docs[i]['la'];
-                                tmp[3] = docs[i]['lo'];
-                                result[i] = tmp;
-                                tmp = {};
-                            }
-                            callback(null, result);
-                        });
-                        db1.close();
+                    getThis({sexe: 'Femme', orient: 'Hetero'}, lo, la, 400, function(result) {
+                        callback(null, result);
+                        db.close();
                     });
                 } else {
-                    MongoClient.connect(url, function(err, db1) {
-                        db1.collection('user').find({sexe: 'Homme'}).toArray(function(err, docs) {
-                            if (err) callback(err, null);
-                            for (var i = 0; docs[i]; i++) {
-                                tmp[0] = docs[i]['avatar'];
-                                tmp[1] = docs[i]['pseudo'];
-                                tmp[2] = docs[i]['la'];
-                                tmp[3] = docs[i]['lo'];
-                                result[i] = tmp;
-                                tmp = {};
-                            }
-                            callback(null, result);
-                        });
-                        db1.close();
+                    getThis({sexe: 'Homme', orient: 'Hetero'}, lo, la, 400, function(result) {
+                        callback(null, result);
+                        db.close();
                     });
                 }
             } else if (OSex == 'Gay') {
                 if (Sex == 'Homme') {
-                    MongoClient.connect(url, function(err, db1) {
-                        db1.collection('user').find({sexe: 'Homme'}).toArray(function(err, docs) {
-                            if (err) callback(err, null);
-                            for (var i = 0; docs[i]; i++) {
-                                tmp[0] = docs[i]['avatar'];
-                                tmp[1] = docs[i]['pseudo'];
-                                tmp[2] = docs[i]['la'];
-                                tmp[3] = docs[i]['lo'];
-                                result[i] = tmp;
-                                tmp = {};
-                            }
-                            callback(null, result);
-                        });
-                        db1.close();
+                    getThis({sexe: 'Homme'}, lo, la, 400, function(result) {
+                        callback(null, result);
+                        db.close();
                     });
                 } else {
-                    MongoClient.connect(url, function(err, db1) {
-                        db1.collection('user').find({sexe: 'Femme'}).toArray(function(err, docs) {
-                            if (err) callback(err, null);
-                            for (var i = 0; docs[i]; i++) {
-                                tmp[0] = docs[i]['avatar'];
-                                tmp[1] = docs[i]['pseudo'];
-                                tmp[2] = docs[i]['la'];
-                                tmp[3] = docs[i]['lo'];
-                                result[i] = tmp;
-                                tmp = {};
-                            }
-                            callback(null, result);
-                        });
-                        db1.close();
+                    getThis({sexe: 'Femme'}, lo, la, 400, function(result) {
+                        callback(null, result);
+                        db.close();
                     });
                 }
             } else {
-                MongoClient.connect(url, function(err, db1) {
-                    db1.collection('user').find().toArray(function(err, docs) {
-                        if (err) callback(err, null);
-                        for (var i = 0; docs[i]; i++) {
-                            tmp[0] = docs[i]['avatar'];
-                            tmp[1] = docs[i]['pseudo'];
-                            tmp[2] = docs[i]['la'];
-                            tmp[3] = docs[i]['lo'];
-                            result[i] = tmp;
-                            tmp = {};
-                        }
-                        callback(null, result);
-                    });
-                    db1.close();
+                getThis({orient: 'Bi-sex'}, lo, la, 400, function(result){
+                    callback(null, result);
+                    db.close();
                 });
             }
         });
-        db.close();
     });
 }
 
@@ -467,67 +434,74 @@ var updateUser = function(req, res) {
     var pseudo = req.body.pseudo;
     
     if (loger != undefined) {
-        if (pseudo != '' && pseudo != undefined) {
-            if (verifyPseudo(pseudo) == 0) {
-                MongoClient.connect(url, function(err, db) {
-                    db.collection('user').updateOne({login: loger}, { $set:{pseudo: pseudo}});
-                    db.close();
-                });
-            } else {
-                req.flash('err', 'Ce Pseudo existe déjà :/');
-            }
-            console.log('Pseudo de ' + loger + ' mis à jour');
+        if (pseudo != '' && pseudo != req.session['myinfo'][10]) {
+            verifyPseudo(pseudo, function (err, result) {
+                if (err) console.log(err + ' éxiste déjà!');
+                if (result) {
+                    MongoClient.connect(url, function(err, db) {
+                        db.collection('user').updateOne({login: loger}, { $set:{pseudo: result}});
+                        db.close();
+                    });
+                }
+            });
         }
-        if (mail != undefined) {
+        if (mail != undefined && mail != req.session['myinfo'][6]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{mail: mail}});
                 db.close();
+                console.log('Mail de ' + loger + ' mis à jour');
             });
-            console.log('Mail de ' + loger + ' mis à jour');
+            
         }
-        if (age != undefined) {
+        if (age != undefined && age != req.session['myinfo'][2]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{age: age}});
                 db.close();
+                console.log('l\'âge de ' + loger + ' mis à jour');
             });
-            console.log('l\'âge de ' + loger + ' mis à jour');
+            
         }
-        if(lastname != undefined) {
+        if(lastname != undefined && lastname != req.session['myinfo'][1]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{lastname: lastname}});
                 db.close();
+                console.log('Le nom de ' + loger + ' mis à jour');
             });
-            console.log('Le nom de ' + loger + ' mis à jour');
+            
         }
-        if (firstname != undefined) {
+        if (firstname != undefined && firstname != req.session['myinfo'][0]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{firstname: firstname}});
                 db.close();
+                console.log('le prénom de ' + loger + ' mis à jour');
             });
-            console.log('le prénom de ' + loger + ' mis à jour');
+            
         }
-        if (bio != undefined) {
+        if (bio != undefined && bio != req.session['myinfo'][5]) {
             if (utilities.checkerBio(bio, '500') == 1) {
                 MongoClient.connect(url, function(err, db) {
                     db.collection('user').updateOne({login: loger}, { $set:{bio: bio}});
                     db.close();
+                    console.log('Bio de ' + loger + ' mise à jour');
                 });
-                console.log('Bio de ' + loger + ' mise à jour');
+                
             }
         }
-        if (sexe != undefined) {
+        if (sexe != undefined && sexe != req.session['myinfo'][3]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{sexe: sexe}});
                 db.close();
+                console.log('Sexe de ' + loger + ' mis à jour');
             });
-            console.log('Sexe de ' + loger + ' mis à jour');
+            
         }
-        if (orient != undefined) {
+        if (orient != undefined && orient != req.session['myinfo'][4]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{orient: orient}});
                 db.close();
+                console.log('Orientation sexuel de ' + loger + ' mise à jour');
             });
-            console.log('Orientation sexuel de ' + loger + ' mise à jour');
+            
         }
         res.redirect('info');
     }

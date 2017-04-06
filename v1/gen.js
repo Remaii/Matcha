@@ -3,13 +3,12 @@ var uniqid = require('uniqid')
 
 var sexe = {
 	0: "Homme",
-	1: "Femme",
-	2: "Secret"
+	1: "Femme"
 }
 
 var sexual = {
 	0: "Hetero",
-	1: "Bi-Sex",
+	1: "Bi-sex",
 	2: "Gay"
 }
 
@@ -115,8 +114,8 @@ var setUsers = function(nb) {
 		if (err) return console.log(err);
 		var randName = Math.floor((Math.random() * 16) + 0);
 		var randLast = Math.floor((Math.random() * 16) + 0);
-		var age = Math.floor((Math.random() * (80 - 18)) + 18);
-		var randSexe = Math.floor((Math.random() * 3) + 0);
+		var age = Math.floor((Math.random() * (50 - 18)) + 18);
+		var randSexe = Math.floor((Math.random() * 2) + 0);
 		var randSexual = Math.floor((Math.random() * 3) + 0);
 		var login = uniqid();
 		var last = lastName[randLast];
@@ -125,11 +124,11 @@ var setUsers = function(nb) {
 		var sexua = sexual[randSexual];
 		for (var i = 0; i < nb; i++) {
 			randSexual = Math.floor((Math.random() * 3) + 0);
-			randSexe = Math.floor((Math.random() * 3) + 0);
+			randSexe = Math.floor((Math.random() * 2) + 0);
 			randLast = Math.floor((Math.random() * 16) + 0);
 			randName = Math.floor((Math.random() * 16) + 0);
 			sex = sexe[randSexe];
-			age = Math.floor((Math.random() * (80 - 18)) + 18);
+			age = Math.floor((Math.random() * (50 - 18)) + 18);
 			last = lastName[randLast];
 			sexua = sexual[randSexual];
 			if (sex == "Homme") {
@@ -146,6 +145,8 @@ var setUsers = function(nb) {
 				age: age,
 				pwd: passwd,
 				mail: mail,
+				lo: '4.85',
+				la: '45.75',
 				sexe: sex,
 				orient: sexua,
 				avatar: 'avatar.png',

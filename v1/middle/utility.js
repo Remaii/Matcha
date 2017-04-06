@@ -106,6 +106,27 @@ var checkerTag = function(str) {
         return 1;
 }
 
+var Distance = function(la_a, lo_a, la_b, lo_b) {
+    function convertRad(input){
+            return (Math.PI * input)/180;
+    }
+     
+    function Distance(lat_a_degre, lon_a_degre, lat_b_degre, lon_b_degre){
+         
+            R = 6378000; //Rayon de la terre en mètre
+     
+        lat_a = convertRad(lat_a_degre);
+        lon_a = convertRad(lon_a_degre);
+        lat_b = convertRad(lat_b_degre);
+        lon_b = convertRad(lon_b_degre);
+         
+        d = R * (Math.PI/2 - Math.asin( Math.sin(lat_b) * Math.sin(lat_a) + Math.cos(lon_b - lon_a) * Math.cos(lat_b) * Math.cos(lat_a)))
+        return d / 10;
+    }
+    return (Math.round(Distance(la_a, lo_a, la_b, lo_b)));
+}
+
+exports.Distance = Distance;
 exports.checkerTag = checkerTag;
 exports.checkerPwd = checkerPwd;
 exports.checkerBio = checkerBio;

@@ -37,7 +37,7 @@ var prenomH = {
 	1: "Alexandre",
 	2: "Arthur",
 	3: "Adam",
-	4: "Raphaël",
+	4: "Raphael",
 	5: "Louis",
 	6: "Paul",
 	7: "Antoine",
@@ -68,7 +68,7 @@ var prenoms = {
 	12: "Charline",
 	13: "Morgane",
 	14: "Sacha",
-	15: "Stéphane",
+	15: "Stephane",
 	16: "Yannick"
 }
 
@@ -122,6 +122,8 @@ var setUsers = function(nb) {
 		var logauto = prenoms[randName];
 		var sex = sexe[randSexe];
 		var sexua = sexual[randSexual];
+		var avatar = 'avatar.png';
+
 		for (var i = 0; i < nb; i++) {
 			randSexual = Math.floor((Math.random() * 3) + 0);
 			randSexe = Math.floor((Math.random() * 2) + 0);
@@ -132,8 +134,10 @@ var setUsers = function(nb) {
 			last = lastName[randLast];
 			sexua = sexual[randSexual];
 			if (sex == "Homme") {
+				avatar = 'avatarH.png';
 				logauto = prenomH[randName];
 			} else {
+				avatar = 'avatarF.png';
 				logauto = prenoms[randName];
 			} 
 			login = uniqid();
@@ -145,11 +149,11 @@ var setUsers = function(nb) {
 				age: age,
 				pwd: passwd,
 				mail: mail,
-				lo: '4.85',
-				la: '45.75',
+				lo: '2.2945',
+				la: '48.8584',
 				sexe: sex,
 				orient: sexua,
-				avatar: 'avatar.png',
+				avatar: avatar,
 				bio: "J'ai été généré de façon aléatoire",
 				tag: {
 					0: "ROBOT"

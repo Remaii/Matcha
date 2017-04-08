@@ -188,9 +188,10 @@ function getMyInfo(req, res, call) {
                     arr[5] = doc[0]['bio'];
                     arr[6] = doc[0]['mail'];
                     arr[7] = doc[0]['city'];
-                    arr[8] = doc[0]['geoname'];
+                    arr[8] = doc[0]['lo'];
                     arr[9] = doc[0]['avatar'];
                     arr[10] = doc[0]['pseudo'];
+                    arr[11] = doc[0]['la'];
                     call(arr);
                 }
             });
@@ -232,77 +233,28 @@ function getMyTag(req, res, call) {
     }
 }
 
-function getThis(filtre, lo, la, rayon, callback) {
+
+var getAllProf = function(name, callback) {
     var tmp = {};
     var result = {};
-    MongoClient.connect(url, function(err, db1) {
-        db1.collection('user').find(filtre).toArray(function(err, docs) {
-            if (err) callback(null);
-            console.log(docs);
-            console.log(filtre);
-            if (docs != undefined) {
-                for (var i = 0; docs[i]; i++) {
-                    tmp[0] = docs[i]['avatar'];
-                    tmp[1] = docs[i]['pseudo'];
-                    tmp[2] = utilities.Distance(la, lo, docs[i]['la'], docs[i]['lo']) / 100;
-                    if (tmp[2] <= rayon) {
-                        result[i] = tmp;
-                    }
-                    tmp = {};
-                }
-                callback(result);
-            } else {
-                callback(404);
-            }
-        });
-        db1.close();
-    });
-}
-
-var getAllProf = function (name, callback) {
-    var rayon = 400;
-    var Sex;
-    var OSex;
-    var lo;
-    var la;
+    var nb = 0;
 
     MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({login: name}).toArray(function(err, doc){
+        db.collection('user').find().toArray(function(err, docs) {
             if (err) callback(err, null);
-            Sex = doc[0]['sexe'];
-            OSex = doc[0]['orient'];
-            lo = doc[0]['lo'];
-            la = doc[0]['la'];
-            if (OSex == 'Hetero') {
-                if (Sex == 'Homme') {
-                    getThis({sexe: 'Femme', orient: 'Hetero'}, lo, la, rayon, function(result) {
-                        callback(null, result);
-                        db.close();
-                    });
-                } else {
-                    getThis({sexe: 'Homme', orient: 'Hetero'}, lo, la, rayon, function(result) {
-                        callback(null, result);
-                        db.close();
-                    });
-                }
-            } else if (OSex == 'Gay') {
-                if (Sex == 'Homme') {
-                    getThis({sexe: 'Homme'}, lo, la, rayon, function(result) {
-                        callback(null, result);
-                        db.close();
-                    });
-                } else {
-                    getThis({sexe: 'Femme'}, lo, la, rayon, function(result) {
-                        callback(null, result);
-                        db.close();
-                    });
-                }
-            } else {
-                getThis({orient: 'Bi'}, lo, la, rayon, function(result){
-                    callback(null, result);
-                    db.close();
-                });
+            for (var i = docs.length - 1; i >= 0; i--) {
+                tmp[0] = docs[i]['avatar'];
+                tmp[1] = docs[i]['pseudo'];
+                tmp[2] = docs[i]['sexe'];
+                tmp[3] = docs[i]['orient'];
+                tmp[4] = docs[i]['la'];
+                tmp[5] = docs[i]['lo'];
+                result[nb] = tmp;
+                tmp = {};
+                nb++;
             }
+            callback(null, result);
+            db.close();
         });
     });
 }

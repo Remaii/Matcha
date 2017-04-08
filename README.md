@@ -36,16 +36,16 @@
 * Ajouter/Supprimer ses Tags:✅
 * Ajouter/Supprimer ses photos maximum 6:✅
 * Voir les profils des utilisateurs qui ont liké:❌
-* Localiser l'utilisateur:✅
+* Localiser l'utilisateur:✅(geoip2)
 * Score de popularité:❌
 
 
-### Parcours 0%end
-* Affiche uniquement les profils "interessant" suivant la sexualité:❌, par defaut trie par localisation:❌
+### Parcours 18%end
+* Affiche uniquement les profils "interessant" suivant la sexualité:✅, par defaut trie par localisation:✅(rayon de 200km)
 * Affichage intelligent (zone géographique:❌, maximum de tags:❌, maximum poplarité:❌)
 * Trie possible de la liste des profils par âge:❌, localisation:❌, poplarité:❌, tag en commun:❌
 * Trie possible de la liste des profils par INTERVALE d'âge:❌, localisation:❌, poplarité:❌, tag en commun:❌
-* -Voir les autres profils:❌
+* -Voir les autres profils:✅
 * -Liker un profil:❌
 * -Tchatter avec un autre utilisateur:❌
 
@@ -57,7 +57,7 @@
 * Résultat triable comme le parcours:❌
 
 ### Profil des autres 0%end
-* Rendu des informations:❌
+* Rendu des informations:✅(prénom, nom, âge, orientation sexuel, sexe, tags, bio)
 Quand un utilisateur regarde le profil d'un autre:
 * Si il possède minimum 1 photo, Liker:❌, Engager le Tchat(*):❌
 * Voir le statut de connection:❌

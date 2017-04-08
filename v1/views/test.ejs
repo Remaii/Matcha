@@ -1,15 +1,40 @@
 <% include partial/header %>
 
-<div id="div">
-	<div>
-		<div style="border: 2px solid black; width:100px; height:100px;" onclick="ajax('remaii');"></div>
-		<div>coucou</div>
+<div class="row">
+	<div class="col-md-12 col-xs-12">
+		<form>
+			<div class="col-md-6 col-xs-6">
+				<select class="form-control text-center input-sm" name="sexe" size="1">
+					<option></option>
+					<option>Homme</option>
+					<option>Femme</option>
+				</select>
+				<select class="form-control text-center input-sm" name="sexe" size="1">
+					<option></option>
+					<option>Bi</option>
+					<option>Gay</option>
+					<option>Hétéro</option>
+				</select>
+				<b>18</b>
+				<input id="ex2" type="text" class="span2" value="" data-slider-min="18" data-slider-max="80" data-slider-step="1" data-slider-value="[20,35]"/>
+				<b>80</b>
+				<b>0</b>
+				<input id="ex2" type="text" class="span2" value="" data-slider-min="18" data-slider-max="80" data-slider-step="1" data-slider-value="[0,200]"/>
+				<b>500</b>
+			</div>
+			<div class="col-md-6 col-xs-6">
+				coucou2
+			</div>
+		</form>
 	</div>
 </div>
+<div id="SearchRes">
+	
+</div>
 
-<form id="uploadForm" enctype="multipart/form-data" action="/test/photo" method="post">
-	<input type="file" name="userPhoto" />
-	<input type="submit" value="Upload Image" name="submit">
-</form>
+<script type="text/javascript">
+
+$("#ex2").slider({});
+</script>
 
 <% include partial/footer %>

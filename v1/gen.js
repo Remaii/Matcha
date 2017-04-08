@@ -8,7 +8,7 @@ var sexe = {
 
 var sexual = {
 	0: "Hetero",
-	1: "Bi-sex",
+	1: "Bi",
 	2: "Gay"
 }
 

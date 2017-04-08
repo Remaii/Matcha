@@ -3,6 +3,7 @@ var bodyParser = require('body-parser')
 var session = require('express-session')
 var mymongo = require('./middle/mymongo')
 var jQuery = require('jquery')
+var bootSlider = require('bootstrap-slider')
 var app = express()
 
 

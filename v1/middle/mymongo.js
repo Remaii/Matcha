@@ -234,7 +234,7 @@ function getMyTag(req, res, call) {
 }
 
 
-var getAllProf = function(name, callback) {
+var getAllProf = function(callback) {
     var tmp = {};
     var result = {};
     var nb = 0;

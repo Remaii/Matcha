@@ -13,7 +13,7 @@ router.get('/', function(req, res, next) {
 		res.redirect('register');
 	}
 }, function(req, res, next) {
-	mymongo.getAllProf(req.session['login'], function(err, result){ 
+	mymongo.getAllProf(function(err, result){ 
 		if (err) console.log(err);
 		req.session['allprof'] = result;
 		next();

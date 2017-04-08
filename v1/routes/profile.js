@@ -26,7 +26,14 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-	trie.makeResearch(req.body, function(err, result) {
+	req.session['tosearch'] = req.body;
+	mymongo.getAllProf(function(err, result) { 
+		if (err) console.log(err);
+		req.session['allprof'] = result;
+		next();
+	});
+}, function(req, res, next) {
+	trie.makeResearch(req, function(err, result) {
 		req.session['allprof'] = result;
 	});
 	next();

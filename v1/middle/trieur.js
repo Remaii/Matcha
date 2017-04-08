@@ -109,9 +109,20 @@ var forIndex = function(myinfo, allprof, callback) {
     }
 }
 
-var makeResearch = function(body, callback) {
+var makeResearch = function(req, callback) {
+    var list = req.session['allprof'];
+    var body = req.session['tosearch'];
+    var result = {};
+    var nb = 0;
 
-    callback(null, {0: {0:'avatar.png', 1: 'Coucou', 2: '233'}});
+    console.log(req);
+    for (var i = 0; list[i]; i++) {
+        result[nb] = list[i];
+        nb++;
+    }
+    if (!list[i]) {
+        callback(null, result);
+    }
 }
 
 exports.makeResearch = makeResearch;

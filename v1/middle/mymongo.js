@@ -253,8 +253,10 @@ var getAllProf = function(name, callback) {
                 tmp = {};
                 nb++;
             }
-            callback(null, result);
-            db.close();
+            if (i == -1) {
+                callback(null, result);
+                db.close();
+            }
         });
     });
 }

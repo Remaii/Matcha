@@ -2,16 +2,40 @@ var express = require('express')
 var router = express.Router()
 var mymongo = require('../middle/mymongo')
 var utilities = require('../middle/utility')
+var trie = require('../middle/trieur')
 
-router.get('/', function(req, res) {
+router.get('/', function(req, res, next) {
+	if (req.session['login'] != undefined) {
+		utilities.clean(req.session, function(ret) {
+			if (ret) console.log('ret: ' + ret);
+			next();
+		});
+	} else {
+		res.redirect('../');
+	}
+}, function(req, res, next) {
+	mymongo.getInterest(req, res, function(err, tag) {
+		if (tag) {
+			req.session['interet'] = tag;
+		}
+		next();
+	});
+}, function(req, res) {
 	res.locals.session = req.session;
-    // res.locals.userlog = req.session['login'];
-    // mymongo.getProfile(req, res);
-    res.render('test');
+    res.render('recherche');
 });
 
-router.post('/', function(req, res) {
-	
+router.post('/', function(req, res, next) {
+	trie.makeResearch(req.body, function(err, result) {
+		req.session['allprof'] = result;
+	});
+	next();
+}, function(req, res, next) {
+
+	next();
+}, function(req, res) {
+	res.locals.session = req.session;
+    res.render('search');
 });
 
 router.get('/:pseudo', function(req, res, next) {

@@ -17,7 +17,6 @@ function getGay(list, Sex, callback) {
 function getOposite(list, Sex, callback) {
     var result = {};
     var nb = 0;
-    console.log(list)
     for (var i = 0; list[i]; i++) {
         if (list[i][2] != Sex && (list[i][3] == 'Hetero' || list[i][3] == 'Bi')) {
             result[nb] = list[i];
@@ -110,6 +109,11 @@ var forIndex = function(myinfo, allprof, callback) {
     }
 }
 
+var makeResearch = function(body, callback) {
 
+    callback(null, {0: {0:'avatar.png', 1: 'Coucou', 2: '233'}});
+}
+
+exports.makeResearch = makeResearch;
 exports.forIndex = forIndex;
 exports.intelTri = intelTri;

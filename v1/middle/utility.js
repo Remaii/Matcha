@@ -1,31 +1,39 @@
 var uniqid = require('uniqid')
 
-//getImage
+var defineAvatar = function(sexe, avatar, callback) {
+    if (avatar == 'avatar.png' || avatar == 'avatarH.png' || avatar == 'avatarF.png') {
+        if (sexe == 'Homme') {
+            callback(sexe, 'avatarH.png');
+        } else {
+            callback(sexe, 'avatarF.png');
+        }
+    }
+}
+
 function clean(session, callback) {
     if (session['login'] != undefined) {
-        var login = session['login'];
-        if (session['allprof']){
+        if (session['allprof']) {
             session['allprof'] = {};
         }
-        if (session['myinfo']){
+        if (session['myinfo']) {
             session['myinfo'] = {};
         }
-        if (session['mytag']){
+        if (session['mytag']) {
             session['mytag'] = {};
         }
-        if (session['mypic']){
+        if (session['mypic']) {
             session['mypic'] = {};
         }
-        if (session['herPro']){
+        if (session['herPro']) {
             session['herPro'] = {};
         }
-        if (session['herTag']){
+        if (session['herTag']) {
             session['herTag'] = {};
         }
-        if (session['herPic']){
+        if (session['herPic']) {
             session['herPic'] = {};
         }
-        if (session['interet']){
+        if (session['interet']) {
             session['interet'] = {};
         }
         callback();
@@ -126,6 +134,7 @@ var Distance = function(la_a, lo_a, la_b, lo_b) {
     return (Math.round(Distance(la_a, lo_a, la_b, lo_b)));
 }
 
+exports.defineAvatar = defineAvatar;
 exports.Distance = Distance;
 exports.checkerTag = checkerTag;
 exports.checkerPwd = checkerPwd;

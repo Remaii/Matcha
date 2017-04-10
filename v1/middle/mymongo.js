@@ -114,11 +114,12 @@ function insertThis(tab, where) {
 }
 
 function getHerImage(req, res, call) {
-    var pseudo = req.session['toget'];
-
-    if (pseudo != '' || pseudo != undefined) {
+    var login = req.session['herPro'][9];
+    req.session['herPro'][9] = '';
+    
+    if (login != '' || login != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('image').find({pseudo: pseudo}).toArray(function(err, doc) {
+            db.collection('image').find({login: login}).toArray(function(err, doc) {
                 if (doc.length != 0) {
                     call(doc[0]['image']);
                 } else {
@@ -165,6 +166,7 @@ function getHerInfo(req, res, call) {
                 arr[6] = doc[0]['city'];
                 arr[7] = doc[0]['geoname'];
                 arr[8] = doc[0]['avatar'];
+                arr[9] = doc[0]['login'];
                 call(null, arr);
             });
             db.close();
@@ -233,7 +235,6 @@ function getMyTag(req, res, call) {
     }
 }
 
-
 var getAllProf = function(callback) {
     var tmp = {};
     var result = {};
@@ -249,6 +250,8 @@ var getAllProf = function(callback) {
                 tmp[3] = docs[i]['orient'];
                 tmp[4] = docs[i]['la'];
                 tmp[5] = docs[i]['lo'];
+                tmp[6] = docs[i]['age'];
+                tmp[7] = docs[i]['tag'];
                 result[nb] = tmp;
                 tmp = {};
                 nb++;
@@ -291,6 +294,7 @@ var addUser = function(req, res) {
                         pseudo: logre,
                         pwd: passwd,
                         mail: mail,
+                        orient: 'Bi',
                         avatar: 'avatar.png',
                         created: new Date()
                     };
@@ -422,7 +426,7 @@ var updateUser = function(req, res) {
             });
             
         }
-        if(lastname != undefined && lastname != req.session['myinfo'][1]) {
+        if (lastname != undefined && lastname != req.session['myinfo'][1]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{lastname: lastname}});
                 db.close();
@@ -449,12 +453,13 @@ var updateUser = function(req, res) {
             }
         }
         if (sexe != undefined && sexe != req.session['myinfo'][3]) {
-            MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: loger}, { $set:{sexe: sexe}});
-                db.close();
-                console.log('Sexe de ' + loger + ' mis à jour');
+            utilities.defineAvatar(sexe, req.session['myinfo'][9], function(s, a) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({login: loger}, { $set:{sexe: s, avatar: a}});
+                    db.close();
+                    console.log('Sexe de ' + loger + ' mis à jour');
+                });
             });
-            
         }
         if (orient != undefined && orient != req.session['myinfo'][4]) {
             MongoClient.connect(url, function(err, db) {

@@ -1,10 +1,12 @@
 <% include partial/header %>
 
 <% if (locals.session['herPro']) { %>
-	<img src=<%= '/asset/uploads/' + locals.session['herPro'][8] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle">
-	<div class="row">
+	<div class="col-md-12 col-xs-12">
+		<img src=<%= '/asset/uploads/' + locals.session['herPro'][8] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle">
+	</div>
+	<div class="col-md-12 col-xs-12">
 		<div>
-			<p class="text-center"><%= locals.session['herPro'][0] %> <%= locals.session['herPro'][1] %> <% if (locals.session['herPro'][2] != undefined) { %><%= locals.session['herPro'][2] + 'ans' %><% } %></p>
+			<p class="text-center"><%= locals.session['herPro'][0] %> <%= locals.session['herPro'][1] %> <% if (locals.session['herPro'][2] != '' && locals.session['herPro'][2]) { %><%= locals.session['herPro'][2] + ' ans' %><% } %></p>
 			<p class="text-center"><%= locals.session['herPro'][3] %> <%= locals.session['herPro'][4] %></p>
 			<% if (locals.session['herTag'] != null) { %>
 				<p class="text-center">
@@ -17,6 +19,15 @@
 			<% } %>
 			<p class="text-center"><%= locals.session['herPro'][5] %></p>
 		</div>
+	</div>
+	<div class="col-md-12 col-xs-12">
+		<% if (locals.session['herPic']) { %>
+			<% if (locals.session['herPic'][0] != ' ') { %>
+				<% for (var i = 0; locals.session['herPic'][i]; i++) { %>
+					<img src=<%= '/asset/uploads/' + locals.session['herPic'][i] %> class="col-md-2 col-xs-2 img-circle">
+				<% } %>
+			<% } %>
+		<% } %>
 	</div>
 <% } %>
 

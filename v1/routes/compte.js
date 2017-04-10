@@ -59,10 +59,6 @@ router.get('/info', function(req, res, next){
 		if (tag) {
 			req.session['interet'] = tag;
 		}
-		//  else if (!tag, err) {
-		// 	console.log(err);
-		// 	req.session['interet'] = {0: " "};
-		// }
 		next();
 	});
 }, function(req, res, next) {
@@ -116,11 +112,12 @@ router.post('/info', function(req, res) {
 		res.redirect('info');
 	} else if (req.body.path && sub == 'toAvatar') {
 		mymongo.setAvatar(req, res);
-	} else {
-		console.log(sub)
-		console.log('else :( ' + req.session['login']);
-		res.redirect('info');
-	}
+	} 
+	// else {
+	// 	console.log(sub)
+	// 	console.log('else :( ' + req.session['login']);
+	// 	res.redirect('info');
+	// }
 });
 
 module.exports = router;

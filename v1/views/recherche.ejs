@@ -2,11 +2,11 @@
 
 <div class="row">
 	<div class="col-md-12 col-xs-12">
-		<h3 class="text-center">Tu recherche ?</h3>
+		<!-- <h3 class="text-center">Tu recherche...</h3> -->
 		<form action="/profile" method="post">
 			<div class="col-md-12 col-xs-12">
 				<div class="col-xs-6 col-md-6">
-					<label class="col-xs-12 col-md-12 text-center">Sexe</label>
+					<label class="col-xs-12 col-md-12 text-center">Un Homme ou une Femme ?</label>
 					<select id="sexe" class="form-control text-center input-sm" name="sexe" size="1">
 						<option></option>
 						<option>Homme</option>
@@ -14,7 +14,7 @@
 					</select>
 				</div>
 				<div class="col-xs-6 col-md-6">
-					<label class="col-xs-12 col-md-12 text-center">Orientation Sexuel</label>
+					<label class="col-xs-12 col-md-12 text-center">Cette personne doit être:</label>
 					<select id="orient" class="form-control text-center input-sm" name="sexe" size="1">
 						<option></option>
 						<option>Bi</option>
@@ -22,11 +22,12 @@
 						<option>Hetero</option>
 					</select>
 				</div>
+			</div>
 				<div class="text-center">
-					<label class="col-xs-12 col-md-12 text-center">Tag</label>
+					<label class="col-xs-12 col-md-12 text-center">Cette personne doit avoir l'un de ces tag(s):</label>
     			<% if (locals.session['interet']) { %>
     				<% var col = 0; for (var i = 0; locals.session['interet'][i]; i++) {%>
-    					<input type="checkbox" name="select" value="<%= locals.session['interet'][i] %>"> <%= locals.session['interet'][i] %>
+    					<input class="tags" type="checkbox" name="select" value="<%= locals.session['interet'][i] %>"> <%= locals.session['interet'][i] %>
     					<% if (col == 6) { %>
     						</br>
     						<% col = 0; %>
@@ -34,16 +35,21 @@
     				<% }
     			} %>
 				</div>
+				<br>
 				<div class="col-md-6 col-xs-6 text-center">
-					<label class="col-xs-12 col-md-12 text-center">Âge</label>
-					<input id="agemin" class="text-center col-md-6 col-xs-6" type="number" name="age" value="18" min="18" max="80" onchange="agemax.min=value;">
-					<input id="agemax" class="text-center col-md-6 col-xs-6" type="number" name="age" value="80" min="18" max="80" onchange="agemin.max=value;">
+					<label class="col-xs-6 col-md-6 text-center">Avoir au minimun: </label>
+					<input id="agemin" class="text-center col-md-4 col-xs-4" type="number" name="age" value="18" min="18" max="80" onchange="agemax.min=value;">
+					<label class="col-xs-1 col-md-1 text-center">Ans</label>
+					<label class="col-xs-6 col-md-6 text-center">Au maximun: </label>
+					<input id="agemax" class="text-center col-md-4 col-xs-4" type="number" name="age" value="80" min="18" max="80" onchange="agemin.max=value;">
+					<label class="col-xs-1 col-md-1 text-center">Ans</label>
 				</div>
 				<div class="col-md-6 col-xs-6 text-center">
-					<label class="col-xs-12 col-md-12 text-center">Distance</label>
-					<input id="dist" class="text-center col-md-12 col-xs-12" type="number" name="distance" min="0" max="500" value="200">
+					<label class="col-xs-12 col-md-12 text-center">Se situé à moins de: </label>
+					<input id="dist" class="text-center col-md-10 col-xs-10" type="number" name="distance" min="0" max="500" value="200">
+					<label class="col-xs-2 col-md-2 text-left"> Km</label>
 				</div>
-			</div>
+			<!-- </div> -->
 			<input id="search" class="form-control btn-primary" text-center" type="button" name="recherche" value="Lancer la recherche">
 		</form>
 	</div>
@@ -61,17 +67,23 @@ button.addEventListener('click', function(ev) {
 		sexe = document.querySelector('#sexe').value,
 		orient = document.querySelector('#orient').value,
 		dist = document.querySelector('#dist').value,
+		tags = document.querySelectorAll('input[type=checkbox]:checked'),
 		result = document.querySelector('#SearchRes'),
+		t = new Array(),
 		xhr = new XMLHttpRequest();
 
+	for (var i = 0; tags[i]; i++){
+		t.push(tags[i].value);
+	}
+	t = t.toString();
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			result.innerHTML = xhr.responseText;
 		}
 	}
 	xhr.open("POST", "/profile", true);
-	xhr.setRequestHeader("Content-Type", "application/-www-form-urlencoded");
-	xhr.send('s=' + sexe + '&os=' + orient + '&amin=' + agemin + '&amax=' + agemax + '&d=' + dist);
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.send('s=' + sexe + '&os=' + orient + '&amin=' + agemin + '&amax=' + agemax + '&d=' + dist + '&t=' + t);
 });
 </script>
 

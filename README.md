@@ -49,14 +49,14 @@
 * -Liker un profil:❌
 * -Tchatter avec un autre utilisateur:❌
 
-### Recherche 0%end
-* Par intervalle d'âge:❌
+### Recherche 60%end
+* Par intervalle d'âge:✅
 * Par intervalle de score de popularité:❌
-* Par tags:❌
-* Localisation:❌
+* Par tags:✅
+* Localisation:✅(L'utilisateur peut choisir le rayon de recherche)
 * Résultat triable comme le parcours:❌
 
-### Profil des autres 0%end
+### Profil des autres 14%end
 * Rendu des informations:✅(prénom, nom, âge, orientation sexuel, sexe, tags, bio)
 Quand un utilisateur regarde le profil d'un autre:
 * Si il possède minimum 1 photo, Liker:❌, Engager le Tchat(*):❌
@@ -78,7 +78,7 @@ Quand un utilisateur regarde le profil d'un autre:
 * (*2)Les notifications sont visibles partout:❌
 
 ### Bonus
-* Choisir son avatar parmis ses photos:❌
+* Choisir son avatar parmis ses photos:✅
 * Definir une autre localisation:❌
 * Compte admin, possibilité de supprimer les tags:❌
 * Charger les images a partir de facebook/google+:❌

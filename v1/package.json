@@ -21,6 +21,7 @@
     "mongodb": "^2.2.24",
     "nodemon": "^1.11.0",
     "pm2": "^2.4.2",
+    "socket.io": "^1.7.3",
     "uniqid": "^4.1.1"
   },
   "description": "Matcha",

@@ -79,7 +79,6 @@ router.get('/:pseudo', function(req, res, next) {
 }, function(req, res, next) {
 	req.session['toget'] = req.url.slice(1);
 	mymongo.getHerInfo(req, res, function(err, result) {
-		console.log(result);
 		if (err) console.log(err);
 		if (result)	req.session['herPro'] = result;
 		next();

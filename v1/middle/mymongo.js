@@ -167,6 +167,7 @@ function getHerInfo(req, res, call) {
                 arr[7] = doc[0]['geoname'];
                 arr[8] = doc[0]['avatar'];
                 arr[9] = doc[0]['login'];
+                arr[10] = doc[0]['pseudo'];
                 call(null, arr);
             });
             db.close();

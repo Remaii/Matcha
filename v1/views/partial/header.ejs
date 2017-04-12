@@ -40,10 +40,54 @@
                     </div>
                     <button type="submit" class="btn btn-default">Rechercher</button>
                 </form>
+                <ul class="nav navbar-nav navbar-left">
+                    <li><a href="/test">Test</a></li>
+                </ul>
                 <ul class="nav navbar-nav navbar-right">
             <% if (!locals.session['login']) { %>
                     <li><a href="/login">Login</a></li>
             <% } else { %>
+                    <!-- dropup gauche avec les profils autoriser au tchat -->
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tchat <span class="caret"></span></a>
+                            <ul id="notif_drop" class="dropdown-menu" role="menu">
+                                <li>Je peux Tchater avec :</li>
+                                <li class="divider"></li>
+                        <% if (locals.session['tchat']) { %>
+                            <% for (var a = 0; locals.session['tchat'][a]; a++) { %>
+                                <li><a href="/tchat/<%= locals.session['tchat'][a] %>"><%= locals.session['tchat'][a] %></a></li>
+                            <% } %>
+                        <% } else { %>
+                            <% if (locals.session['myinfo']) { 
+                                if (locals.session['myinfo'][9] == 'avatar.png' || locals.session['myinfo'][9] == 'avatarF.png' || locals.session['myinfo'][9] == 'avatarH.png') { %>
+                                <li><a href="/compte/info">Mets une photo en avatar!</a></li>
+                                <% } else { %>
+                                <li><a href="/">Attend qu'on te like</a></li>
+                                <% } %>
+                            <% } %>
+                        <% } %>
+                                <li class="divider"></li>
+                                <li>J'ai liker :</li>
+                                <li class="divider"></li>
+                        <% if (locals.session['mylike']) { %>
+                            <% for (var b = 0; locals.session['mylike'][b]; b++) { %>
+                                <li><a href="/profile/<%= locals.session['mylike'][b] %>"><%= locals.session['mylike'][b] %></a></li>
+                            <% } %>
+                        <% } else { %>
+                                <li><a href="/">Like des profils !</a></li>
+                        <% } %>
+                            </ul>
+                        </li>
+                        <li class="divider"></li>
+                    <!-- dropup droit avec les notif -->
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Notif <span class="caret"></span></a>
+                            <ul id="notif_drop" class="dropdown-menu" role="menu">
+                                <li>exemple1</li>
+                                <li class="divider"></li>
+                                <li>exemple2</li>
+                            </ul>
+                        </li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Mon compte <span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">

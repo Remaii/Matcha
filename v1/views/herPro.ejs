@@ -2,10 +2,23 @@
 
 <% if (locals.session['herPro']) { %>
 	<div class="col-md-12 col-xs-12">
-		<img src=<%= '/asset/uploads/' + locals.session['herPro'][8] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle">
+		<div class="col-md-8 col-xs-8">
+			<img src=<%= '/asset/uploads/' + locals.session['herPro'][8] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle">
+		</div>
+		<div class="col-md-4 col-xs-4"><br><br>
+			<div id="like_user" class="col-md-12 col-xs-12">
+				<p class="text-center"><span class="glyphicon glyphicon-heart"></span> Liker <%= locals.session['herPro'][10] %> !</p>
+			</div>
+			<div id="false_user" class="col-md-12 col-xs-12">
+				<p class="text-center"><span class="glyphicon glyphicon-eye-close"></span> <%= locals.session['herPro'][10] %> n'est pas réel !</p>
+			</div>
+			<div id="block_user" class="col-md-12 col-xs-12">
+				<p class="text-center"><span class="glyphicon glyphicon-eye-close"></span> Bloquer <%= locals.session['herPro'][10] %> !</p>
+			</div>
+		</div>
 	</div>
 	<div class="col-md-12 col-xs-12">
-		<div>
+		<div class="col-xs-8 col-md-8">
 			<p class="text-center"><%= locals.session['herPro'][0] %> <%= locals.session['herPro'][1] %> <% if (locals.session['herPro'][2] != '' && locals.session['herPro'][2]) { %><%= locals.session['herPro'][2] + ' ans' %><% } %></p>
 			<p class="text-center"><%= locals.session['herPro'][3] %> <%= locals.session['herPro'][4] %></p>
 			<% if (locals.session['herTag'] != null) { %>
@@ -17,6 +30,8 @@
 				<% } %>
 				</p>
 			<% } %>
+		</div>
+		<div class="col-md-4 col-xs-4">
 			<p class="text-center"><%= locals.session['herPro'][5] %></p>
 		</div>
 	</div>

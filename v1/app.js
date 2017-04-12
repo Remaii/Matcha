@@ -1,11 +1,15 @@
+
 var express = require('express')
+var app = express()
+var server = require('http').createServer(app)
+var io = require('socket.io').listen(server)
 var bodyParser = require('body-parser')
 var session = require('express-session')
 var mymongo = require('./middle/mymongo')
 var jQuery = require('jquery')
 var bootSlider = require('bootstrap-slider')
-var app = express()
 
+var ioFile = require('./ioFile')
 
 var index = require('./routes/index')
 var compte = require('./routes/compte')
@@ -37,6 +41,20 @@ app.use('/login', login)
 app.use('/profile', profile)
 app.use('/register', register)
 
+app.use('/test', require('./routes/test'))//page test
+
+io.sockets.on('connection', function(socket, pseudo){
+	console.log('socket');
+	console.log(socket)
+	console.log(pseudo)
+
+	socket.on('new_membre', function(pseudo) {
+		socket.user_name = pseudo;
+		socket.emit('logged_on', pseudo + ' viens de se connecter');
+	});
+
+});
+
 //__________________Page Delog________________
 app.get('/delog', function(req, res) {
     mymongo.delog(req, res);
@@ -48,4 +66,4 @@ app.use(function(req, res, next) {
 	res.status(404).send('Page introuvable');
 });
 
-app.listen(3000)
+server.listen(3000)

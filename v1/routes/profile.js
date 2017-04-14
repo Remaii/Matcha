@@ -98,4 +98,20 @@ router.get('/:pseudo', function(req, res, next) {
 	res.render('herPro');
 });
 
+router.post('/like', function(req, res, next) {
+	console.log(req.body);
+	console.log(req.url);
+	next();
+}, function(req, res) {
+	res.render('partial/like')
+});
+
+router.post('/dislike', function(req, res, next) {
+	console.log(req.body);
+	console.log(req.url);
+	next();
+}, function(req, res) {
+	res.render('partial/like')
+});
+
 module.exports = router;

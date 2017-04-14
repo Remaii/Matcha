@@ -3,17 +3,20 @@
 <% if (locals.session['herPro']) { %>
 	<div class="col-md-12 col-xs-12">
 		<div class="col-md-8 col-xs-8">
-			<img src=<%= '/asset/uploads/' + locals.session['herPro'][8] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle">
+			<img id="avatar" name="<%= locals.session['herPro'][10] %>" src=<%= '/asset/uploads/' + locals.session['herPro'][8] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle" alt="<%= locals.session['herPro'][7] %>">
 		</div>
 		<div class="col-md-4 col-xs-4"><br><br>
-			<div id="like_user" class="col-md-12 col-xs-12">
-				<p class="text-center"><span class="glyphicon glyphicon-heart"></span> Liker <%= locals.session['herPro'][10] %> !</p>
+			<div id="like_user" style="" class="col-md-12 col-xs-12 text-center">
+				<input class="btn btn-success" type="button" name="like_user" value="J'aime :)">
 			</div>
-			<div id="false_user" class="col-md-12 col-xs-12">
-				<p class="text-center"><span class="glyphicon glyphicon-eye-close"></span> <%= locals.session['herPro'][10] %> n'est pas réel !</p>
+			<div id="dis_like" style="display:none;" class="col-md-12 col-xs-12 text-center">
+				<input class="btn btn-info" type="button" name="dis_like" value="J'aime plus :(">
 			</div>
-			<div id="block_user" class="col-md-12 col-xs-12">
-				<p class="text-center"><span class="glyphicon glyphicon-eye-close"></span> Bloquer <%= locals.session['herPro'][10] %> !</p>
+			<div id="false_user" class="col-md-12 col-xs-12 text-center">
+				<input  class="btn btn-warning" type="button" name="false_user" value="C'est un faux !">
+			</div>
+			<div id="block_user" class="col-md-12 col-xs-12 text-center">
+				<input  class="btn btn-danger" type="button" name="block_user" value="Block">
 			</div>
 		</div>
 	</div>
@@ -46,5 +49,6 @@
 	</div>
 <% } %>
 
+<script type="text/javascript" src="/asset/js/herPro.js"></script>
 
 <% include partial/footer %>

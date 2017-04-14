@@ -9,7 +9,14 @@ router.get('/', function(req, res) {
 
 router.post('/', function(req, res) {
 	if (req.body.submit === 'Logon') {
-		mymongo.logUser(req, res);
+		mymongo.logUser(req, res, function (err, mess, login, redir) {
+			if (err) res.redirect(redir);
+			if (login) {
+				req.flash('mess', mess['mess']);
+				req.session['login'] = login;
+				res.redirect(redir);
+			}
+		});
 	}
 });
 

@@ -155,7 +155,7 @@ function getHerInfo(req, res, call) {
         MongoClient.connect(url, function(err, db) {
             db.collection('user').find({pseudo: pseudo}).toArray(function(err, doc) {
                 if (err) {
-                    call(err, arr);
+                    call(err, null);
                 }
                 arr[0] = doc[0]['firstname'];
                 arr[1] = doc[0]['lastname'];
@@ -164,7 +164,7 @@ function getHerInfo(req, res, call) {
                 arr[4] = doc[0]['orient'];
                 arr[5] = doc[0]['bio'];
                 arr[6] = doc[0]['city'];
-                arr[7] = doc[0]['geoname'];
+                arr[7] = doc[0]['login'];
                 arr[8] = doc[0]['avatar'];
                 arr[9] = doc[0]['login'];
                 arr[10] = doc[0]['pseudo'];
@@ -196,6 +196,23 @@ function getMyInfo(req, res, call) {
                     arr[10] = doc[0]['pseudo'];
                     arr[11] = doc[0]['la'];
                     call(arr);
+                }
+            });
+            db.close();
+        });
+    }
+}
+
+function getMyLike(req, res, call) {
+    var log = req.session['login'];
+
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('like').find({login: log}).toArray(function(err, doc) {
+                if (doc.length != 0) {
+                    call(doc[0]['like']);
+                } else {
+                    call({0:' '});
                 }
             });
             db.close();
@@ -346,7 +363,7 @@ var addUser = function(req, res) {
 // Chercher un utilisateur dans la base mongo,
 // si il existe, mettre a jour sa derniere connection
 // le connecter au site
-var logUser = function(req, res) {
+var logUser = function(req, res, callback) {
     var i = 0;
     var ok = 0;
     var log = req.body.login;
@@ -357,8 +374,8 @@ var logUser = function(req, res) {
         MongoClient.connect(url, function (err, db) {
             var collec = db.collection('user');
             if (err) {
+                callback({err: 'Connection to DataBase Failed'}, null, null, 'login');
                 req.flash('error', 'Connection to DataBase Failed');
-                res.redirect('login');
             }
             collec.find({}).toArray(function(err, docs){
                 while (docs[i]) {
@@ -370,21 +387,19 @@ var logUser = function(req, res) {
                 }
                 if (ok == 1) {
                     collec.updateOne({login: log}, { $set:{last_co: new Date()}});
-                    req.session['login'] = log;
-                    req.flash('mess', 'Connection Success');
-                    db.close(); 
-                    res.redirect('/');
+                    db.close();
+                    callback(null, {mess: 'Connection Success'}, log, '/');
                 }
                 else {
                     req.flash('error', 'Utilisateur/Mot de passe invalides');
                     db.close();
-                    res.redirect('login');
+                    callback('Utilisateur/Mot de passe incorrects', null, null, 'login');
                 }
             });
         });
     } else {
         req.flash('error', 'Un ou Plusieurs champ(s) vide');
-        res.redirect('login');
+        callback('Un ou Plusieurs champ(s) vide', null, null, 'login');
     }
 };
 
@@ -458,8 +473,8 @@ var updateUser = function(req, res) {
                 MongoClient.connect(url, function(err, db) {
                     db.collection('user').updateOne({login: loger}, { $set:{sexe: s, avatar: a}});
                     db.close();
-                    console.log('Sexe de ' + loger + ' mis à jour');
                 });
+                console.log('Sexe de ' + loger + ' mis à jour');
             });
         }
         if (orient != undefined && orient != req.session['myinfo'][4]) {
@@ -471,9 +486,6 @@ var updateUser = function(req, res) {
             
         }
         res.redirect('info');
-    }
-    else {
-        req.flash('error', 'Un ou Plusieurs champ(s) vide');
     }
 }
 
@@ -699,10 +711,11 @@ var downMyTag = function(req, res) {
 // recupere tout les pseudos et avatars des membres du site /==>/ tout les pseudo/avatar "interessant"
 exports.getAllProf = getAllProf;
 
-// récupère les informations, les images, les tags, de l'utilisateur connecté.
+// récupère les informations, les images, les tags, les likes, de l'utilisateur connecté.
 exports.getMyImage = getMyImage;
 exports.getMyTag = getMyTag;
 exports.getMyInfo = getMyInfo;
+exports.getMyLike = getMyLike;
 
 // fonctionnalitées utilisateurs, MaJ des tags, Ajout de tags a la BdD, MaJ image + avatar 
 exports.upMyTag = upMyTag;

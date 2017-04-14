@@ -7,6 +7,8 @@ var defineAvatar = function(sexe, avatar, callback) {
         } else {
             callback(sexe, 'avatarF.png');
         }
+    } else {
+        callback(sexe, avatar);
     }
 }
 

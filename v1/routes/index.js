@@ -23,6 +23,11 @@ router.get('/', function(req, res, next) {
 		req.session['myinfo'] = myinfo;
 		next();
 	});
+}, function(req, res, next) {
+	mymongo.getMyLike(req, res, function(result) {
+		req.session['mylike'] = result;
+		next();
+	});
 }, function (req, res, next) {
 	trie.intelTri(req.session['myinfo'], req.session['allprof'], function(result) {
 		req.session['allprof'] = result;

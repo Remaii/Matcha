@@ -6,18 +6,39 @@
 			<img id="avatar" name="<%= locals.session['herPro'][10] %>" src=<%= '/asset/uploads/' + locals.session['herPro'][8] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle" alt="<%= locals.session['herPro'][7] %>">
 		</div>
 		<div class="col-md-4 col-xs-4"><br><br>
-			<div id="like_user" style="" class="col-md-12 col-xs-12 text-center">
-				<input class="btn btn-success" type="button" name="like_user" value="J'aime :)">
-			</div>
-			<div id="dis_like" style="display:none;" class="col-md-12 col-xs-12 text-center">
-				<input class="btn btn-info" type="button" name="dis_like" value="J'aime plus :(">
-			</div>
-			<div id="false_user" class="col-md-12 col-xs-12 text-center">
-				<input  class="btn btn-warning" type="button" name="false_user" value="C'est un faux !">
-			</div>
-			<div id="block_user" class="col-md-12 col-xs-12 text-center">
-				<input  class="btn btn-danger" type="button" name="block_user" value="Block">
-			</div>
+			<% if (locals.session['likeHer'] == undefined) { %>	
+				<div id="like_user" style="" class="col-md-12 col-xs-12 text-center">
+					<input class="btn btn-success" type="button" name="like_user" value="J'aime :)">
+				</div>
+				<div id="dis_like" style="display:none;" class="col-md-12 col-xs-12 text-center">
+					<input class="btn btn-info" type="button" name="dis_like" value="J'aime plus :(">
+				</div>
+			<% } else { %>
+				<div id="like_user" style="display:none;" class="col-md-12 col-xs-12 text-center">
+					<input class="btn btn-success" type="button" name="like_user" value="J'aime :)">
+				</div>
+				<div id="dis_like" style="" class="col-md-12 col-xs-12 text-center">
+					<input class="btn btn-info" type="button" name="dis_like" value="J'aime plus :(">
+				</div>
+			<% } if (locals.session['falseHer'] == undefined) { %>
+				<div id="false_user" class="col-md-12 col-xs-12 text-center">
+					<input  class="btn btn-warning" type="button" name="false_user" value="C'est un faux !">
+				</div>
+			<% } if (locals.session['blockHer'] == undefined) { %>
+				<div id="block_user"  style="" class="col-md-12 col-xs-12 text-center">
+					<input  class="btn btn-danger" type="button" name="block_user" value="Bloque">
+				</div>
+				<div id="deblock_user" style="display:none;" class="col-md-12 col-xs-12 text-center">
+					<input class="btn btn-info" type="button" name="deblock_user" value="Débloque">
+				</div>
+			<% } else { %>
+				<div id="block_user" style="display:none;" class="col-md-12 col-xs-12 text-center">
+					<input  class="btn btn-danger" type="button" name="block_user" value="Bloque">
+				</div>
+				<div id="deblock_user"  style="" class="col-md-12 col-xs-12 text-center">
+					<input class="btn btn-info" type="button" name="deblock_user" value="Débloque">
+				</div>
+			<% } %>
 		</div>
 	</div>
 	<div class="col-md-12 col-xs-12">

@@ -93,22 +93,78 @@ router.get('/:pseudo', function(req, res, next) {
 		req.session['herPic'] = mypic;
 		next();
 	});
+}, function(req, res, next) {
+//	console.log('check my like list + block list + falseUser list')
+//	console.log('function(like, block, false) { callback du check if (like) req.session[likeHer] == 1; ...}');
+	next();
 }, function(req, res) {
 	res.locals.session = req.session;
 	res.render('herPro');
 });
 
 router.post('/like', function(req, res, next) {
-	console.log(req.body);
-	console.log(req.url);
+	mymongo.likeUser(req, res, function(err, ret) {
+		if (err) console.log(err);
+		console.log(ret);
+	});
+	next();
+}, function(req, res, next) {
+	console.log('update like');
 	next();
 }, function(req, res) {
 	res.render('partial/like')
 });
 
 router.post('/dislike', function(req, res, next) {
-	console.log(req.body);
-	console.log(req.url);
+	mymongo.disLikeUser(req, res, function(err, ret) {
+		if (err) console.log(err);
+		console.log(ret);
+	});
+	next();
+}, function(req, res, next) {
+	console.log('update like');
+	next();
+}, function(req, res) {
+	res.render('partial/like')
+});
+
+router.post('/false_user', function(req, res, next) {
+	mymongo.falseUser(req, res, function(err, ret) {
+		if (err) console.log(err);
+		console.log(ret);
+	});
+	next();
+}, function(req, res, next) {
+	console.log('update false_user');
+	next();
+}, function(req, res ,next) {
+	console.log('update myfalseuser');
+	next();
+}, function(req, res) {
+	res.render('partial/like')
+});
+
+router.post('/block', function(req, res, next) {
+	mymongo.blockUser(req, res, function(err, ret) {
+		if (err) console.log(err);
+		console.log(ret);
+	});
+	next();
+}, function(req, res, next) {
+	console.log('update myBlocked add' + req.body.log);
+	next();
+}, function(req, res) {
+	res.render('partial/like')
+});
+
+router.post('/deblock', function(req, res, next) {
+	mymongo.deBlockUser(req, res, function(err, ret) {
+		if (err) console.log(err);
+		console.log(ret);
+	});
+	next();
+}, function(req, res, next) {
+	console.log('update myBlocked');
 	next();
 }, function(req, res) {
 	res.render('partial/like')

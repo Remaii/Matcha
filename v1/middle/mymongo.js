@@ -708,7 +708,67 @@ var downMyTag = function(req, res) {
     }
 }
 
-// recupere tout les pseudos et avatars des membres du site /==>/ tout les pseudo/avatar "interessant"
+var likeUser = function(req, res, callback) {
+    console.log(req.session['myLike'])
+    MongoClient.connect(url, function(err, db) {
+        
+        // db.collection('user').find({login: login}).toArray(function(err, doc) {
+
+        // });
+        db.close();
+        callback(null, {mess: 'Like Success'});
+    });
+}
+
+var disLikeUser = function(req, res, callback) {
+    MongoClient.connect(url, function(err, db) {
+        // db.collection('user').find({login: login}).toArray(function(err, doc) {
+
+        // });
+        db.close();
+        callback(null, {mess: 'Dislike Success'});
+    });
+}
+
+var blockUser = function(req, res, callback) {
+    MongoClient.connect(url, function(err, db) {
+        // db.collection('blockUser').find({login: login}).toArray(function(err, doc) {
+
+        // });
+        db.close();
+        callback(null, {mess: 'BlockSucces'});
+    });
+}
+
+var deBlockUser = function(req, res, callback) {
+    MongoClient.connect(url, function(err, db) {
+        // db.collection('blockUser').find({login: login}).toArray(function(err, doc) {
+
+        // });
+        db.close();
+        callback(null, {mess: 'deBlock Success'});
+    });
+}
+
+var falseUser = function(req, res, callback) {
+    MongoClient.connect(url, function(err, db) {
+        // db.collection('falseUser').find({login: login}).toArray(function(err, doc) {
+
+        // });
+        db.close();
+        callback(null, {mess: 'falseUser Success'});
+    });
+}
+
+var getMyList = function(login, callback) {
+    // MongoClient.connect(url, function(err, db) {
+    //     db.collection('list').find({login: login}).toArray(function(err, doc) {
+
+    //     });
+    // });
+}
+
+// récupère tout les pseudos et avatars des membres du site /==>/ tout les pseudo/avatar "interessant" avec utilities.intelTri(); 
 exports.getAllProf = getAllProf;
 
 // récupère les informations, les images, les tags, les likes, de l'utilisateur connecté.
@@ -716,6 +776,7 @@ exports.getMyImage = getMyImage;
 exports.getMyTag = getMyTag;
 exports.getMyInfo = getMyInfo;
 exports.getMyLike = getMyLike;
+exports.getMyList = getMyList;
 
 // fonctionnalitées utilisateurs, MaJ des tags, Ajout de tags a la BdD, MaJ image + avatar 
 exports.upMyTag = upMyTag;
@@ -725,6 +786,13 @@ exports.updateUser = updateUser;
 exports.upImage = upImage;
 exports.downMyImage = downMyImage;
 exports.setAvatar = setAvatar;
+
+// fonctionnalitées utilisateurs sur les autres utilisateurs, like/dislike, bloque/débloque, déclarer faux
+exports.likeUser = likeUser;
+exports.disLikeUser = disLikeUser;
+exports.blockUser = blockUser;
+exports.deBlockUser = deBlockUser;
+exports.falseUser = falseUser;
 
 // fonctionnalitées sites, login, logout, register, localisation, recuperer une listes des tags présents en BdD
 exports.getInterest = getInterest;

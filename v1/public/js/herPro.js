@@ -4,6 +4,7 @@ var like_user = document.getElementById('like_user');
 var dis_like = document.getElementById('dis_like');
 var false_user = document.getElementById('false_user');
 var block_user = document.getElementById('block_user');
+var deblock_user = document.getElementById('deblock_user');
 
 like_user.addEventListener('click', function(ev) {
 	var xhr = new XMLHttpRequest();
@@ -34,9 +35,42 @@ dis_like.addEventListener('click', function(ev) {
 });
 
 false_user.addEventListener('click', function(ev){
-	alert('false' + login);
+	var xhr = new XMLHttpRequest();
+
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+	 		false_user.setAttribute('style', 'display:none;');
+	 	}
+	}
+	xhr.open("post", "/profile/false_user", true);
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.send("log=" + login + "&pseudo=" + pseudo);
+});
+
+deblock_user.addEventListener('click', function(ev){
+	var xhr = new XMLHttpRequest();
+
+	xhr.onreadystatechange = function() {
+		deblock_user.setAttribute('style', 'display:none;');
+		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+	 		block_user.setAttribute('style', '');
+	 	}
+	}
+	xhr.open("post", "/profile/deblock", true);
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.send("log=" + login + "&pseudo=" + pseudo);
 });
 
 block_user.addEventListener('click', function(ev){
-	alert('block' + login);
+	var xhr = new XMLHttpRequest();
+
+	xhr.onreadystatechange = function() {
+		block_user.setAttribute('style', 'display:none;');
+		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+	 		deblock_user.setAttribute('style', '');
+	 	}
+	}
+	xhr.open("post", "/profile/block", true);
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.send("log=" + login + "&pseudo=" + pseudo);
 });

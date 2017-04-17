@@ -14,6 +14,15 @@ var defineAvatar = function(sexe, avatar, callback) {
 
 function clean(session, callback) {
     if (session['login'] != undefined) {
+        if (session['likeHer']) {
+            session['likeHer'] = null;
+        }
+        if (session['blockHer']) {
+            session['blockHer'] = null;
+        }
+        if (session['falseHer']) {
+            session['falseHer'] = null;
+        }
         if (session['allprof']) {
             session['allprof'] = {};
         }

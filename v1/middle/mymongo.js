@@ -157,18 +157,22 @@ function getHerInfo(req, res, call) {
                 if (err) {
                     call(err, null);
                 }
-                arr[0] = doc[0]['firstname'];
-                arr[1] = doc[0]['lastname'];
-                arr[2] = doc[0]['age'];
-                arr[3] = doc[0]['sexe'];
-                arr[4] = doc[0]['orient'];
-                arr[5] = doc[0]['bio'];
-                arr[6] = doc[0]['city'];
-                arr[7] = doc[0]['login'];
-                arr[8] = doc[0]['avatar'];
-                arr[9] = doc[0]['login'];
-                arr[10] = doc[0]['pseudo'];
-                call(null, arr);
+                if (doc[0] != undefined) {
+                    arr[0] = doc[0]['firstname'];
+                    arr[1] = doc[0]['lastname'];
+                    arr[2] = doc[0]['age'];
+                    arr[3] = doc[0]['sexe'];
+                    arr[4] = doc[0]['orient'];
+                    arr[5] = doc[0]['bio'];
+                    arr[6] = doc[0]['city'];
+                    arr[7] = doc[0]['login'];
+                    arr[8] = doc[0]['avatar'];
+                    arr[9] = doc[0]['login'];
+                    arr[10] = doc[0]['pseudo'];
+                    call(null, arr);
+                } else {
+                    call(doc, null);
+                }
             });
             db.close();
         });
@@ -203,13 +207,30 @@ function getMyInfo(req, res, call) {
     }
 }
 
+function getMyBlock(req, res, call) {
+    var log = req.session['login'];
+
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: log}).toArray(function(err, doc) {
+                if (doc.length > 0) {
+                    call(doc[0]['block']);
+                } else {
+                    call({0:' '});
+                }
+            });
+            db.close();
+        });
+    }
+}
+
 function getMyLike(req, res, call) {
     var log = req.session['login'];
 
     if (log != '' || log != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('like').find({login: log}).toArray(function(err, doc) {
-                if (doc.length != 0) {
+            db.collection('user').find({login: log}).toArray(function(err, doc) {
+                if (doc.length > 0) {
                     call(doc[0]['like']);
                 } else {
                     call({0:' '});
@@ -708,45 +729,80 @@ var downMyTag = function(req, res) {
     }
 }
 
-var likeUser = function(req, res, callback) {
-    console.log(req.session['myLike'])
-    MongoClient.connect(url, function(err, db) {
-        
-        // db.collection('user').find({login: login}).toArray(function(err, doc) {
+function makeTab(pastTab, pseudo, call) {
+    if (pastTab != undefined) {
+        for (var i = 0; pastTab[i]; i++) {}
+        pastTab[i] = pseudo;
+        call(pastTab);
+    } else {
+        var result = {}
+        result[0] = pseudo;
+        call(result);
+    }
+}
 
-        // });
-        db.close();
-        callback(null, {mess: 'Like Success'});
+function downTab(pastTab, pseudo, call) {
+    var result = {};
+    var nb = 0;
+
+    if (pastTab[0]) {
+        for (var i = 0; pastTab[i]; i++) {
+            if (pastTab[i] != pseudo) {
+                result[nb] = pastTab[i];
+                nb++;
+            }
+        }
+        call(result);
+    } else if (pastTab[0] == pseudo && !pastTab[1]) {
+        call({});
+    }
+}
+
+var likeUser = function(req, res, callback) {
+    var login = req.session['login'];
+
+    makeTab(req.session['myLike'], req.body.pseudo, function(result) {
+        MongoClient.connect(url, function(err, db) {  
+            db.collection('user').updateOne({login: login}, { $set:{like: result}});
+            db.close();
+            callback(null, {mess: 'Like Success'});
+        });
     });
 }
 
 var disLikeUser = function(req, res, callback) {
-    MongoClient.connect(url, function(err, db) {
-        // db.collection('user').find({login: login}).toArray(function(err, doc) {
+    var login = req.session['login'];
 
-        // });
-        db.close();
-        callback(null, {mess: 'Dislike Success'});
+    downTab(req.session['myLike'], req.body.pseudo, function(result) {
+        MongoClient.connect(url, function(err, db) {  
+            db.collection('user').updateOne({login: login}, { $set:{like: result}});
+            db.close();
+            callback(null, {mess: 'Dislike Success'});
+        });
     });
 }
 
 var blockUser = function(req, res, callback) {
-    MongoClient.connect(url, function(err, db) {
-        // db.collection('blockUser').find({login: login}).toArray(function(err, doc) {
+    var login = req.session['login'];
 
-        // });
-        db.close();
-        callback(null, {mess: 'BlockSucces'});
+    makeTab(req.session['myBlock'], req.body.pseudo, function(result) {
+        MongoClient.connect(url, function(err, db) {  
+            db.collection('user').updateOne({login: login}, { $set:{block: result}});
+            db.close();
+            callback(null, {mess: 'Block Success'});
+        });
     });
 }
 
 var deBlockUser = function(req, res, callback) {
-    MongoClient.connect(url, function(err, db) {
-        // db.collection('blockUser').find({login: login}).toArray(function(err, doc) {
+    var login = req.session['login'];
 
-        // });
-        db.close();
-        callback(null, {mess: 'deBlock Success'});
+    downTab(req.session['myBlock'], req.body.pseudo, function(result) {
+        MongoClient.connect(url, function(err, db) {  
+            db.collection('user').updateOne({login: login}, { $set:{block: result}});
+            db.close();
+            callback(null, {mess: 'Deblock Success'});
+        });
     });
 }
 
@@ -776,6 +832,7 @@ exports.getMyImage = getMyImage;
 exports.getMyTag = getMyTag;
 exports.getMyInfo = getMyInfo;
 exports.getMyLike = getMyLike;
+exports.getMyBlock = getMyBlock;
 exports.getMyList = getMyList;
 
 // fonctionnalitées utilisateurs, MaJ des tags, Ajout de tags a la BdD, MaJ image + avatar 

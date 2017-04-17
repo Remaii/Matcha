@@ -224,6 +224,23 @@ function getMyBlock(req, res, call) {
     }
 }
 
+function getMyFalse(req, res, call) {
+    var log = req.session['login'];
+
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: log}).toArray(function(err, doc) {
+                if (doc.length > 0) {
+                    call(doc[0]['falseUser']);
+                } else {
+                    call({0:' '});
+                }
+            });
+            db.close();
+        });
+    }
+}
+
 function getMyLike(req, res, call) {
     var log = req.session['login'];
 
@@ -453,7 +470,6 @@ var updateUser = function(req, res) {
                 db.close();
                 console.log('Mail de ' + loger + ' mis à jour');
             });
-            
         }
         if (age != undefined && age != req.session['myinfo'][2]) {
             MongoClient.connect(url, function(err, db) {
@@ -461,7 +477,6 @@ var updateUser = function(req, res) {
                 db.close();
                 console.log('l\'âge de ' + loger + ' mis à jour');
             });
-            
         }
         if (lastname != undefined && lastname != req.session['myinfo'][1]) {
             MongoClient.connect(url, function(err, db) {
@@ -469,7 +484,6 @@ var updateUser = function(req, res) {
                 db.close();
                 console.log('Le nom de ' + loger + ' mis à jour');
             });
-            
         }
         if (firstname != undefined && firstname != req.session['myinfo'][0]) {
             MongoClient.connect(url, function(err, db) {
@@ -477,7 +491,6 @@ var updateUser = function(req, res) {
                 db.close();
                 console.log('le prénom de ' + loger + ' mis à jour');
             });
-            
         }
         if (bio != undefined && bio != req.session['myinfo'][5]) {
             if (utilities.checkerBio(bio, '500') == 1) {
@@ -486,7 +499,6 @@ var updateUser = function(req, res) {
                     db.close();
                     console.log('Bio de ' + loger + ' mise à jour');
                 });
-                
             }
         }
         if (sexe != undefined && sexe != req.session['myinfo'][3]) {
@@ -504,7 +516,6 @@ var updateUser = function(req, res) {
                 db.close();
                 console.log('Orientation sexuel de ' + loger + ' mise à jour');
             });
-            
         }
         res.redirect('info');
     }
@@ -807,21 +818,15 @@ var deBlockUser = function(req, res, callback) {
 }
 
 var falseUser = function(req, res, callback) {
-    MongoClient.connect(url, function(err, db) {
-        // db.collection('falseUser').find({login: login}).toArray(function(err, doc) {
+    var login = req.session['login'];
 
-        // });
-        db.close();
-        callback(null, {mess: 'falseUser Success'});
+    makeTab(req.session['myFalse'], req.body.pseudo, function(result) {
+        MongoClient.connect(url, function(err, db) {  
+            db.collection('user').updateOne({login: login}, { $set:{falseUser: result}});
+            db.close();
+            callback(null, {mess: 'False User Success'});
+        });
     });
-}
-
-var getMyList = function(login, callback) {
-    // MongoClient.connect(url, function(err, db) {
-    //     db.collection('list').find({login: login}).toArray(function(err, doc) {
-
-    //     });
-    // });
 }
 
 // récupère tout les pseudos et avatars des membres du site /==>/ tout les pseudo/avatar "interessant" avec utilities.intelTri(); 
@@ -832,8 +837,8 @@ exports.getMyImage = getMyImage;
 exports.getMyTag = getMyTag;
 exports.getMyInfo = getMyInfo;
 exports.getMyLike = getMyLike;
+exports.getMyFalse = getMyFalse;
 exports.getMyBlock = getMyBlock;
-exports.getMyList = getMyList;
 
 // fonctionnalitées utilisateurs, MaJ des tags, Ajout de tags a la BdD, MaJ image + avatar 
 exports.upMyTag = upMyTag;

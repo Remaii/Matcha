@@ -122,6 +122,18 @@ router.get('/:pseudo', function(req, res, next) {
 		}
 		next();
 	});
+}, function(req, res, next) {
+	mymongo.getMyFalse(req, res, function(myFalse) {
+		req.session['myFalse'] = myFalse;
+		if (myFalse != undefined) {
+			for (var i = 0; myFalse[i]; i++) {
+				if (myFalse[i] == req.session['herPro'][10]) {
+					req.session['falseHer'] = myFalse[i];
+				}
+			}
+		}
+		next();
+	});
 }, function(req, res) {
 	res.locals.session = req.session;
 	res.render('herPro');
@@ -130,6 +142,7 @@ router.get('/:pseudo', function(req, res, next) {
 router.post('/like', function(req, res, next) {
 	mymongo.likeUser(req, res, function(err, ret) {
 		if (err) console.log(err);
+		console.log(ret['mess']);
 		next();
 	});
 }, function(req, res) {
@@ -139,6 +152,7 @@ router.post('/like', function(req, res, next) {
 router.post('/dislike', function(req, res, next) {
 	mymongo.disLikeUser(req, res, function(err, ret) {
 		if (err) console.log(err);
+		console.log(ret['mess']);
 		next();
 	});
 }, function(req, res) {
@@ -148,6 +162,7 @@ router.post('/dislike', function(req, res, next) {
 router.post('/false_user', function(req, res, next) {
 	mymongo.falseUser(req, res, function(err, ret) {
 		if (err) console.log(err);
+		console.log(ret['mess']);
 		next();
 	});
 }, function(req, res) {
@@ -157,6 +172,7 @@ router.post('/false_user', function(req, res, next) {
 router.post('/block', function(req, res, next) {
 	mymongo.blockUser(req, res, function(err, ret) {
 		if (err) console.log(err);
+		console.log(ret['mess']);
 		next();
 	});
 }, function(req, res) {
@@ -166,6 +182,7 @@ router.post('/block', function(req, res, next) {
 router.post('/deblock', function(req, res, next) {
 	mymongo.deBlockUser(req, res, function(err, ret) {
 		if (err) console.log(err);
+		console.log(ret['mess']);
 		next();
 	});
 }, function(req, res) {

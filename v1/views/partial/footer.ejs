@@ -1,14 +1,8 @@
-<script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
-	var socket = io.connect('http://localhost:2000');
+	// var socket = io.connect('http://localhost:3000');
 
-	// var pseudo = prompt('Pseudo ?')
-	// socket.emit('new_membre', pseudo)
-
-	// socket.on('logged_on', function(data){
-		// alert(data)
-	// });
 </script>
+<div id="userName" style="display: none;"><%= locals.session['login'] %></div>
 </div>
 </body>
 </html>

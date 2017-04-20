@@ -1,4 +1,3 @@
-
 var express = require('express')
 var app = express()
 var server = require('http').createServer(app)
@@ -43,14 +42,19 @@ app.use('/register', register)
 
 app.use('/test', require('./routes/test'))//page test
 
-io.sockets.on('connection', function(socket, pseudo){
-	console.log('socket');
-	console.log(socket)
-	console.log(pseudo)
+io.sockets.on('connection', function(socket, pseudo, dest, mess){
 
-	socket.on('new_membre', function(pseudo) {
-		socket.user_name = pseudo;
-		socket.emit('logged_on', pseudo + ' viens de se connecter');
+	socket.on('test', function(pseudo, dest, mess){
+		console.log(pseudo + ' send message to ' + dest + ' : ' + mess);
+	});
+	socket.on('mess', function(pseudo, dest){
+		console.log(pseudo + ' send message to ' + dest);
+	});
+	socket.on('connect_to', function(pseudo) {
+		console.log('User connect ' + pseudo);
+	});
+	socket.on('disconnect', function(pseudo) {
+		console.log('User disconnect');
 	});
 
 });
@@ -60,10 +64,11 @@ app.get('/delog', function(req, res) {
     mymongo.delog(req, res);
 });
 
-//______________Page introuvable______________
-app.use(function(req, res, next) {
-	res.setHeader('Content-Type', 'text/plain');
-	res.status(404).send('Page introuvable');
-});
+// //______________Page introuvable______________
+// app.use(function(req, res, next) {
+// 	console.log(req.url);
+// 	// res.setHeader('Content-Type', 'text/plain');
+// 	res.status(404).send('Page introuvable');
+// });
 
 server.listen(3000)

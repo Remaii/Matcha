@@ -6,6 +6,7 @@
     <script src="https://code.jquery.com/jquery-3.2.0.min.js"></script>
     <script type="text/javascript" src="/asset/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/asset/bootstrap/js/bootstrap-slider.min.js"></script>
+    <script type="text/javascript" src="/asset/js/socket.io.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/asset/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/asset/bootstrap/css/bootstrap-slider.min.css">
     <link rel='stylesheet' href='https://bootswatch.com/slate/bootstrap.css' />
@@ -57,25 +58,20 @@
                         <% } else { %>
                             <% if (locals.session['myinfo']) { 
                                 if (locals.session['myinfo'][9] == 'avatar.png' || locals.session['myinfo'][9] == 'avatarF.png' || locals.session['myinfo'][9] == 'avatarH.png') { %>
-                                <li><a href="/compte/info">Mets une photo en avatar!</a></li>
-                                <% } else { %>
+                                <li><a href="/compte/info">Mets une photo en avatar!</a></li> 
+                                <% } else if (locals.session['heLikeMe'][0] == undefined) { %>
                                 <li><a href="/">Attend qu'on te like</a></li>
                                 <% } %>
                             <% } %>
-                        <% } %>
+                        <% } if (locals.session['heLikeMe']) { %>
                                 <li class="divider"></li>
-                                <li>J'ai liker :</li>
-                                <li class="divider"></li>
-                        <% if (locals.session['mylike']) { %>
-                            <% for (var b = 0; locals.session['mylike'][b]; b++) { %>
-                                <li><a href="/profile/<%= locals.session['mylike'][b] %>"><%= locals.session['mylike'][b] %></a></li>
+                                <li>Il t'on liker :</li> 
+                            <% for (var c = 0; locals.session['heLikeMe'][c]; c++) { %>
+                                <li><a href="/profile/<%= locals.session['heLikeMe'][c] %>"><%= locals.session['heLikeMe'][c] %></a></li>
                             <% } %>
-                        <% } else { %>
-                                <li><a href="/">Like des profils !</a></li>
                         <% } %>
                             </ul>
                         </li>
-                        <li class="divider"></li>
                     <!-- dropup droit avec les notif -->
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Notif <span class="caret"></span></a>

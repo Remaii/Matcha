@@ -24,6 +24,10 @@
 				<div id="false_user" class="col-md-12 col-xs-12 text-center">
 					<input  class="btn btn-warning" type="button" name="false_user" value="C'est un faux !">
 				</div>
+			<% } else { %>
+				<div id="false_user" class="col-md-12 col-xs-12 text-center" style="display:none;">
+					<input  class="btn btn-warning" type="button" name="false_user" value="C'est un faux !">
+				</div>
 			<% } if (locals.session['blockHer'] == undefined) { %>
 				<div id="block_user"  style="" class="col-md-12 col-xs-12 text-center">
 					<input  class="btn btn-danger" type="button" name="block_user" value="Bloque">

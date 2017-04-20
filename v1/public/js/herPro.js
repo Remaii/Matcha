@@ -17,7 +17,7 @@ like_user.addEventListener('click', function(ev) {
 	}
 	xhr.open("post", "/profile/like", true);
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	xhr.send("log=" + login + "&pseudo=" + pseudo);
+	xhr.send("log=" + pseudo + "&pseudo=" + login);
 });
 
 unlike_user.addEventListener('click', function(ev) {
@@ -31,7 +31,7 @@ unlike_user.addEventListener('click', function(ev) {
 	}
 	xhr.open("post", "/profile/dislike", true);
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	xhr.send("log=" + login + "&pseudo=" + pseudo);
+	xhr.send("log=" + pseudo + "&pseudo=" + login);
 });
 
 false_user.addEventListener('click', function(ev){
@@ -44,7 +44,7 @@ false_user.addEventListener('click', function(ev){
 	}
 	xhr.open("post", "/profile/false_user", true);
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	xhr.send("log=" + login + "&pseudo=" + pseudo);
+	xhr.send("log=" + pseudo + "&pseudo=" + login);
 });
 
 deblock_user.addEventListener('click', function(ev){
@@ -58,7 +58,7 @@ deblock_user.addEventListener('click', function(ev){
 	}
 	xhr.open("post", "/profile/deblock", true);
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	xhr.send("log=" + login + "&pseudo=" + pseudo);
+	xhr.send("log=" + pseudo + "&pseudo=" + login);
 });
 
 block_user.addEventListener('click', function(ev){
@@ -72,5 +72,5 @@ block_user.addEventListener('click', function(ev){
 	}
 	xhr.open("post", "/profile/block", true);
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	xhr.send("log=" + login + "&pseudo=" + pseudo);
+	xhr.send("log=" + pseudo + "&pseudo=" + login);
 });

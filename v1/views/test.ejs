@@ -1,5 +1,19 @@
 <% include partial/header %>
 
+<div class="col-md-12 col-xs-12">
+	<input id="connect_but" type="button" name="connect" value="Connect socket">
+</div>
 
+<script type="text/javascript">
+	var socket = io.connect('http://localhost:3000/');
+
+	var connect_but = document.querySelector('#connect_but');
+
+	socket.emit('test', 'test');
+	connect_but.addEventListener('click', function(ev) {
+		var pseudo = document.querySelector('#userName').innerText;
+		socket.emit('connect_to', pseudo);
+	});
+</script>
 
 <% include partial/footer %>

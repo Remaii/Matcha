@@ -103,11 +103,18 @@ router.get('/:pseudo', function(req, res, next) {
 		req.session['myLike'] = myLike;
 		if (myLike != undefined) {
 			for (var i = 0; myLike[i]; i++) {
-				if (myLike[i] == req.session['herPro'][10]) {
+				if (myLike[i] == req.session['herPro'][7]) {
 					req.session['likeHer'] = myLike[i];
 				}
 			}
+			if (!myLike[i] && req.session['likeHer'] != req.session['herPro'][7])
+				req.session['likeHer'] = undefined;
 		}
+		next();
+	});
+}, function(req, res, next) {
+	mymongo.getMyLiker(req, res, function(myLiker) {
+		req.session['heLikeMe'] = myLiker;
 		next();
 	});
 }, function(req, res, next) {
@@ -115,10 +122,12 @@ router.get('/:pseudo', function(req, res, next) {
 		req.session['myBlock'] = myBlock;
 		if (myBlock != undefined) {
 			for (var i = 0; myBlock[i]; i++) {
-				if (myBlock[i] == req.session['herPro'][10]) {
+				if (myBlock[i] == req.session['herPro'][7]) {
 					req.session['blockHer'] = myBlock[i];
 				}
 			}
+			if (!myBlock[i] && req.session['blockHer'] != req.session['herPro'][7])
+				req.session['blockHer'] = undefined;
 		}
 		next();
 	});
@@ -127,10 +136,12 @@ router.get('/:pseudo', function(req, res, next) {
 		req.session['myFalse'] = myFalse;
 		if (myFalse != undefined) {
 			for (var i = 0; myFalse[i]; i++) {
-				if (myFalse[i] == req.session['herPro'][10]) {
+				if (myFalse[i] == req.session['herPro'][7]) {
 					req.session['falseHer'] = myFalse[i];
+					next();
 				}
 			}
+			req.session['falseHer'] = undefined;
 		}
 		next();
 	});

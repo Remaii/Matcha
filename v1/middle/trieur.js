@@ -101,6 +101,7 @@ var forIndex = function(myinfo, allprof, callback, ray) {
         tmp[0] = allprof[i][0];
         tmp[1] = allprof[i][1];
         tmp[2] = utilities.Distance(myinfo[8], myinfo[11], allprof[i][5], allprof[i][4]) / 100;
+        tmp[3] = allprof[i][8];
         if (tmp[2] <= rayon) {
             result[nb] = tmp;    
             nb++;
@@ -249,6 +250,7 @@ var makeResearch = function(req, callback) {
 var verifyTag = function(req, callback) {
     callback(req.session['allprof']);
 }
+
 exports.verifyTag = verifyTag;
 exports.makeResearch = makeResearch;
 exports.forIndex = forIndex;

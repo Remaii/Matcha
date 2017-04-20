@@ -138,7 +138,7 @@ function getHerTag(req, res, call) {
 
     if (pseudo != '' || pseudo != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({pseudo: pseudo}).toArray(function(err, doc) {
+            db.collection('user').find({login: pseudo}).toArray(function(err, doc) {
                 mytag = doc[0]['tag'];
                 call(mytag);
             });
@@ -153,7 +153,7 @@ function getHerInfo(req, res, call) {
 
     if (pseudo != '' || pseudo != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({pseudo: pseudo}).toArray(function(err, doc) {
+            db.collection('user').find({login: pseudo}).toArray(function(err, doc) {
                 if (err) {
                     call(err, null);
                 }
@@ -241,6 +241,23 @@ function getMyFalse(req, res, call) {
     }
 }
 
+function getMyLiker(req, res, call) {
+    var log = req.session['login'];
+
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: log}).toArray(function(err, doc) {
+                if (doc.length > 0) {
+                    call(doc[0]['heLikeMe']);
+                } else {
+                    call({0:' '});
+                }
+            });
+            db.close();
+        });
+    }
+}
+
 function getMyLike(req, res, call) {
     var log = req.session['login'];
 
@@ -308,6 +325,7 @@ var getAllProf = function(callback) {
                 tmp[5] = docs[i]['lo'];
                 tmp[6] = docs[i]['age'];
                 tmp[7] = docs[i]['tag'];
+                tmp[8] = docs[i]['login'];
                 result[nb] = tmp;
                 tmp = {};
                 nb++;
@@ -615,7 +633,9 @@ function removeDouble(toadd, call) {
             nb++;
         }
     }
-    call(tmp);
+    if (!toadd[a]) {
+        call(tmp);
+    }
 }
 
 var upMyTag = function(req, res) {
@@ -744,7 +764,8 @@ function makeTab(pastTab, pseudo, call) {
     if (pastTab != undefined) {
         for (var i = 0; pastTab[i]; i++) {}
         pastTab[i] = pseudo;
-        call(pastTab);
+        removeDouble(pastTab, call);
+        // call(pastTab);
     } else {
         var result = {}
         result[0] = pseudo;
@@ -753,10 +774,10 @@ function makeTab(pastTab, pseudo, call) {
 }
 
 function downTab(pastTab, pseudo, call) {
-    var result = {};
-    var nb = 0;
+    var result = {},
+        nb = 0;
 
-    if (pastTab[0]) {
+    if (pastTab) {
         for (var i = 0; pastTab[i]; i++) {
             if (pastTab[i] != pseudo) {
                 result[nb] = pastTab[i];
@@ -769,9 +790,36 @@ function downTab(pastTab, pseudo, call) {
     }
 }
 
+function upHisLike(sens, login, me) {
+    if (sens == true) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: login}).toArray(function(err, doc) {
+                makeTab(doc[0]['heLikeMe'], me, function(result) {
+                    MongoClient.connect(url, function(err, db) {  
+                        db.collection('user').updateOne({login: login}, { $set:{heLikeMe: result}});
+                        db.close();
+                    });
+                });
+            });
+        });
+    } else {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: login}).toArray(function(err, doc) {
+                downTab(doc[0]['heLikeMe'], me, function(result) {
+                    MongoClient.connect(url, function(err, db) {  
+                        db.collection('user').updateOne({login: login}, { $set:{heLikeMe: result}});
+                        db.close();
+                    });
+                });
+            });
+        });
+    }
+}
+
 var likeUser = function(req, res, callback) {
     var login = req.session['login'];
 
+    upHisLike(true, req.body.pseudo, login);
     makeTab(req.session['myLike'], req.body.pseudo, function(result) {
         MongoClient.connect(url, function(err, db) {  
             db.collection('user').updateOne({login: login}, { $set:{like: result}});
@@ -784,6 +832,7 @@ var likeUser = function(req, res, callback) {
 var disLikeUser = function(req, res, callback) {
     var login = req.session['login'];
 
+    upHisLike(false, req.body.pseudo, login);
     downTab(req.session['myLike'], req.body.pseudo, function(result) {
         MongoClient.connect(url, function(err, db) {  
             db.collection('user').updateOne({login: login}, { $set:{like: result}});
@@ -837,6 +886,7 @@ exports.getMyImage = getMyImage;
 exports.getMyTag = getMyTag;
 exports.getMyInfo = getMyInfo;
 exports.getMyLike = getMyLike;
+exports.getMyLiker = getMyLiker;
 exports.getMyFalse = getMyFalse;
 exports.getMyBlock = getMyBlock;
 

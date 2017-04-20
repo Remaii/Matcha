@@ -19,6 +19,11 @@ router.get('/', function(req, res, next) {
 		next();
 	});
 }, function(req, res, next) {
+	mymongo.getMyLiker(req, res, function(myLiker) {
+		req.session['heLikeMe'] = myLiker;
+		next();
+	});
+}, function(req, res, next) {
 	mymongo.getMyInfo(req, res, function(myinfo){
 		req.session['myinfo'] = myinfo;
 		next();

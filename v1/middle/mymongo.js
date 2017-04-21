@@ -368,6 +368,10 @@ var addUser = function(req, res) {
                         pseudo: logre,
                         pwd: passwd,
                         mail: mail,
+                        heLikeMe: {},
+                        like: {},
+                        block: {},
+                        falseUser: {},
                         orient: 'Bi',
                         avatar: 'avatar.png',
                         created: new Date()
@@ -486,28 +490,28 @@ var updateUser = function(req, res) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{mail: mail}});
                 db.close();
-                console.log('Mail de ' + loger + ' mis à jour');
+                // console.log('Mail de ' + loger + ' mis à jour');
             });
         }
         if (age != undefined && age != req.session['myinfo'][2]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{age: age}});
                 db.close();
-                console.log('l\'âge de ' + loger + ' mis à jour');
+                // console.log('l\'âge de ' + loger + ' mis à jour');
             });
         }
         if (lastname != undefined && lastname != req.session['myinfo'][1]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{lastname: lastname}});
                 db.close();
-                console.log('Le nom de ' + loger + ' mis à jour');
+                // console.log('Le nom de ' + loger + ' mis à jour');
             });
         }
         if (firstname != undefined && firstname != req.session['myinfo'][0]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{firstname: firstname}});
                 db.close();
-                console.log('le prénom de ' + loger + ' mis à jour');
+                // console.log('le prénom de ' + loger + ' mis à jour');
             });
         }
         if (bio != undefined && bio != req.session['myinfo'][5]) {
@@ -515,7 +519,7 @@ var updateUser = function(req, res) {
                 MongoClient.connect(url, function(err, db) {
                     db.collection('user').updateOne({login: loger}, { $set:{bio: bio}});
                     db.close();
-                    console.log('Bio de ' + loger + ' mise à jour');
+                    // console.log('Bio de ' + loger + ' mise à jour');
                 });
             }
         }
@@ -525,14 +529,14 @@ var updateUser = function(req, res) {
                     db.collection('user').updateOne({login: loger}, { $set:{sexe: s, avatar: a}});
                     db.close();
                 });
-                console.log('Sexe de ' + loger + ' mis à jour');
+                // console.log('Sexe de ' + loger + ' mis à jour');
             });
         }
         if (orient != undefined && orient != req.session['myinfo'][4]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({login: loger}, { $set:{orient: orient}});
                 db.close();
-                console.log('Orientation sexuel de ' + loger + ' mise à jour');
+                // console.log('Orientation sexuel de ' + loger + ' mise à jour');
             });
         }
         res.redirect('info');
@@ -544,10 +548,10 @@ var setAvatar = function(req, res) {
         MongoClient.connect(url, function(err, db) {
             db.collection('user').updateOne({login: req.session['login']}, { $set:{avatar: req.body.path}});
             db.close();
-            console.log(req.session['login'] + ' à mis a jour son avatar');
+            // console.log(req.session['login'] + ' à mis a jour son avatar');
         });
     } else {
-        console.log('un utilisateur inconnue a essayer de mettre a jour son avatar');
+        // console.log('un utilisateur inconnue a essayer de mettre a jour son avatar');
     }
 }
 
@@ -696,7 +700,7 @@ var upMyTag = function(req, res) {
                     db.collection('user').updateOne({login: log}, { $set:{tag: resultat}});
                     db.close();
                 });
-                console.log(log + ' ajout tag: ' + interet);
+                // console.log(log + ' ajout tag: ' + interet);
                 res.redirect('info');
             });
         }
@@ -740,7 +744,7 @@ var downMyTag = function(req, res) {
                 db.collection('user').updateOne({login: log}, { $unset:{tag: ' '}});
                 db.close();
             });
-            console.log(log + ' suppression tag: ' + interet + ' et n\'a plus de tag');
+            // console.log(log + ' suppression tag: ' + interet + ' et n\'a plus de tag');
             res.redirect('info');
 		} else {
             ok = 1;
@@ -751,7 +755,7 @@ var downMyTag = function(req, res) {
                     db.collection('user').updateOne({login: log}, { $set:{tag: resultat}});
                     db.close();
                 });
-                console.log(log + ' suppression tag: ' + interet);
+                // console.log(log + ' suppression tag: ' + interet);
                 res.redirect('info');
             });
         }
@@ -790,6 +794,75 @@ function downTab(pastTab, pseudo, call) {
     }
 }
 
+function getHisLike(login, call) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({login: login}).toArray(function(err, doc) {
+            call(doc[0]['like']);
+        });
+        db.close();
+    });
+}
+
+function upHisMatch(sens, login, me) {
+    if (sens == true) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: login}).toArray(function(err, doc) {
+                makeTab(doc[0]['tchat'], me, function(result) {
+                    MongoClient.connect(url, function(err, db) {  
+                        db.collection('user').updateOne({login: login}, { $set:{tchat: result}});
+                        db.close();
+                    });
+                });
+            });
+        });
+    } else {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: login}).toArray(function(err, doc) {
+                downTab(doc[0]['tchat'], me, function(result) {
+                    MongoClient.connect(url, function(err, db) {  
+                        db.collection('user').updateOne({login: login}, { $set:{tchat: result}});
+                        db.close();
+                    });
+                });
+            });
+        });
+    }
+}
+
+function checkConnect(loginA, loginB) {
+    var logA = undefined,
+        ok = 0;
+        logB = undefined;
+
+    function checkMatch(logA, logB) {
+        if (logA && logB) {
+            for (var a = 0; logA[a]; a++) {
+                if (logA[a] == loginB) {
+                    for (var b = 0; logB[b]; b++) {
+                        if (logB[b] == loginA) {
+                            ok = 1;
+                            console.log('Match!')
+                            upHisMatch(true, loginA, loginB);
+                            upHisMatch(true, loginB, loginA);
+                        }
+                    }
+                }
+            }
+            if (!logA[a] && !logB[b] && ok != 1) {
+                console.log('No match !');
+            }
+        }
+    }
+    getHisLike(loginA, function(tab) {
+        logA = tab;
+        checkMatch(logA, logB);
+    });
+    getHisLike(loginB, function(tab) {
+        logB = tab;
+        checkMatch(logA, logB);
+    });
+}
+
 function upHisLike(sens, login, me) {
     if (sens == true) {
         MongoClient.connect(url, function(err, db) {
@@ -798,6 +871,7 @@ function upHisLike(sens, login, me) {
                     MongoClient.connect(url, function(err, db) {  
                         db.collection('user').updateOne({login: login}, { $set:{heLikeMe: result}});
                         db.close();
+                        checkConnect(me, login);
                     });
                 });
             });
@@ -819,9 +893,9 @@ function upHisLike(sens, login, me) {
 var likeUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    upHisLike(true, req.body.pseudo, login);
     makeTab(req.session['myLike'], req.body.pseudo, function(result) {
         MongoClient.connect(url, function(err, db) {  
+            upHisLike(true, req.body.pseudo, login);
             db.collection('user').updateOne({login: login}, { $set:{like: result}});
             db.close();
             callback(null, {mess: 'Like Success'});
@@ -832,7 +906,6 @@ var likeUser = function(req, res, callback) {
 var disLikeUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    upHisLike(false, req.body.pseudo, login);
     downTab(req.session['myLike'], req.body.pseudo, function(result) {
         MongoClient.connect(url, function(err, db) {  
             db.collection('user').updateOne({login: login}, { $set:{like: result}});
@@ -840,6 +913,7 @@ var disLikeUser = function(req, res, callback) {
             callback(null, {mess: 'Dislike Success'});
         });
     });
+    upHisLike(false, req.body.pseudo, login);
 }
 
 var blockUser = function(req, res, callback) {
@@ -878,6 +952,17 @@ var falseUser = function(req, res, callback) {
     });
 }
 
+var getMyNotif = function(name, callback) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({login: name}).toArray(function(err, doc){
+            if (err) callback(null);
+            var res = {like: doc[0]['heLikeMe'], tchat: doc[0]['tchat']};
+            callback(res);
+        });
+        db.close();
+    });
+}
+
 // récupère tout les pseudos et avatars des membres du site /==>/ tout les pseudo/avatar "interessant" avec utilities.intelTri(); 
 exports.getAllProf = getAllProf;
 
@@ -889,6 +974,7 @@ exports.getMyLike = getMyLike;
 exports.getMyLiker = getMyLiker;
 exports.getMyFalse = getMyFalse;
 exports.getMyBlock = getMyBlock;
+exports.getMyNotif = getMyNotif;
 
 // fonctionnalitées utilisateurs, MaJ des tags, Ajout de tags a la BdD, MaJ image + avatar 
 exports.upMyTag = upMyTag;

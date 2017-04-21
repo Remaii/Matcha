@@ -1,6 +1,7 @@
 var express = require('express')
 var router = express.Router()
 var mymongo = require('../middle/mymongo')
+var io = require('socket.io')
 
 router.get('/', function(req, res) {
 	res.locals.session = req.session;

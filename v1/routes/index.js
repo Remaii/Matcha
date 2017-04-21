@@ -3,10 +3,12 @@ var router = express.Router()
 var utilities = require('../middle/utility')
 var mymongo = require('../middle/mymongo')
 var trie = require('../middle/trieur')
+var io = require('socket.io')
+
 
 router.get('/', function(req, res, next) {
 	if (req.session['login'] != undefined) {
-		utilities.clean(req.session, function(ret){
+		utilities.clean(req.session, function(ret) {
 			next();
 		});
 	} else {

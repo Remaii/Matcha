@@ -23,6 +23,33 @@
     </style>
 </head>
 <body>
+    <div id="userName" style="display: none;"><%= locals.session['login'] %></div>
+    <script type="text/javascript">
+        var socket = io();
+        var user;
+        var log = document.querySelector('#userName');
+        if (log.innerText != '') {
+            socket.emit('checkNotif', {login: log.innerText});
+            
+            socket.on('notif', function(data) {
+                console.log(data);
+                var notif = document.querySelector('#notif_drop');
+                var tchat = document.querySelector('#tchat_drop');
+                notif.innerHTML = '';
+                tchat.innerHTML = '';
+                if (data.myNotif.like) {
+                    for (var i = 0; data.myNotif.like[i]; i++) {
+                    notif.innerHTML += '<li><a href="/profile/'+ data.myNotif.like[i] +'">"' + data.myNotif.like[i] + '" a liker votre profile</a></li>';
+                    }
+                }
+                if (data.myNotif.tchat) {
+                    for (var b = 0; data.myNotif.tchat[b]; b++) {
+                        tchat.innerHTML += '<li><a href="/tchat/'+ data.myNotif.tchat[b] +'">"' + data.myNotif.tchat[b] + '"</a></li>';
+                    }
+                }
+            });
+        }
+    </script>
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -48,37 +75,15 @@
                     <!-- dropup gauche avec les profils autoriser au tchat -->
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tchat <span class="caret"></span></a>
-                            <ul id="notif_drop" class="dropdown-menu" role="menu">
-                                <li>Je peux Tchater avec :</li>
-                                <li class="divider"></li>
-                        <% if (locals.session['tchat']) { %>
-                            <% for (var a = 0; locals.session['tchat'][a]; a++) { %>
-                                <li><a href="/tchat/<%= locals.session['tchat'][a] %>"><%= locals.session['tchat'][a] %></a></li>
-                            <% } %>
-                        <% } else { %>
-                            <% if (locals.session['myinfo']) { 
-                                if (locals.session['myinfo'][9] == 'avatar.png' || locals.session['myinfo'][9] == 'avatarF.png' || locals.session['myinfo'][9] == 'avatarH.png') { %>
-                                <li><a href="/compte/info">Mets une photo en avatar!</a></li> 
-                                <% } else if (locals.session['heLikeMe'][0] == undefined) { %>
-                                <li><a href="/">Attend qu'on te like</a></li>
-                                <% } %>
-                            <% } %>
-                        <% } if (locals.session['heLikeMe']) { %>
-                                <li class="divider"></li>
-                                <li>Il t'on liker :</li> 
-                            <% for (var c = 0; locals.session['heLikeMe'][c]; c++) { %>
-                                <li><a href="/profile/<%= locals.session['heLikeMe'][c] %>"><%= locals.session['heLikeMe'][c] %></a></li>
-                            <% } %>
-                        <% } %>
+                            <ul id="tchat_drop" class="dropdown-menu" role="menu">
+                            <!-- remplissage par socket.io getMyNotif tchateur -->
                             </ul>
                         </li>
                     <!-- dropup droit avec les notif -->
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Notif <span class="caret"></span></a>
                             <ul id="notif_drop" class="dropdown-menu" role="menu">
-                                <li>exemple1</li>
-                                <li class="divider"></li>
-                                <li>exemple2</li>
+                                <!-- remplissage par socket.io getMyNotif like -->
                             </ul>
                         </li>
                     <li class="dropdown">

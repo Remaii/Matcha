@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
 			next();
 		});
 	} else {
-		res.redirect('register');
+		res.redirect('login');
 	}
 }, function(req, res, next) {
 	mymongo.getAllProf(function(err, result){ 

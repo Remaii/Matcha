@@ -15,7 +15,8 @@ var index = require('./routes/index'),
 	compte = require('./routes/compte'),
 	login = require('./routes/login'),
 	profile = require('./routes/profile'),
-	register = require('./routes/register')
+	register = require('./routes/register'),
+	tchat = require('./routes/tchat')
 
 //__________________Moteur de template________
 app.set('view engine', 'ejs');
@@ -39,7 +40,7 @@ app.use('/compte', compte)
 app.use('/login', login)
 app.use('/profile', profile)
 app.use('/register', register)
-
+app.use('/tchat', tchat)
 app.use('/test', require('./routes/test'))//page test
 
 
@@ -49,7 +50,7 @@ users = [];
 people = [];
 
 io.sockets.on('connection', function(socket) {
-	console.log(people)
+	// console.log(people)
 	socket.on('checkNotif', function(data) {
     	if (users.indexOf(data.login) > -1) {
     		for (var a = 0; people[a]; a++) {
@@ -74,28 +75,16 @@ io.sockets.on('connection', function(socket) {
 		for (var i = 0; people[i]; i++) {
 			if (people[i].log == data.to) {
 				var to = i;
-				mymongo.getMyNotif(data.to, function(myNotif) {
-					if (myNotif != null) {
-						console.log(data.to);
-						console.log(myNotif);
-						socket.broadcast.to(people[to].id).emit('notif', {myNotif});
-					}
-				});
+				socket.broadcast.to(people[to].id).emit('newNotif', {log: data.to});
 			}
 			if (people[i].log == data.me) {
 				var me = i;
-				mymongo.getMyNotif(data.me, function(myNotif1) {
-					if (myNotif1 != null) {
-						console.log(data.me);
-						console.log(myNotif1);
-						socket.broadcast.to(people[me].id).emit('notif', {myNotif1});
-					}
-				});
+				socket.emit('newNotif', {log: data.me});
 			}
 		}
 	});
-	
-	socket.on('newmsg', function(data){
+
+	socket.on('newMsg', function(data){
 		//Send message to everyone
 		for (var i = 0;people[i]; i++) {
 			if (people[i].log == data.to) {
@@ -112,36 +101,6 @@ io.sockets.on('connection', function(socket) {
 		}
 	});
 });
-// io.on('connection', function(socket) {
-// 	console.log('A user connected');
-// 	socket.on('setUsername', function(data) {
-// 	    console.log(users);
-// 	    console.log(data);
-// 	    if (users.indexOf(data) > -1) {
-// 	    	users.push(data);
-// 	    	socket.emit('userSet', {username: data});
-// 	    } else {
-//     		socket.emit('userExists', data + ' username is taken! Try some other username.');
-//     	}
-// 	})
-// 	socket.on('msg', function(data){
-//     	//Send message to everyone
-//     	io.sockets.emit('newmsg', data);
-// 	})
-// 	// socket.on('test', function(pseudo, dest, mess){
-// 	// 	console.log(pseudo + ' send message to ' + dest + ' : ' + mess);
-// 	// });
-// 	// socket.on('mess', function(pseudo, dest){
-// 	// 	console.log(pseudo + ' send message to ' + dest);
-// 	// });
-// 	// socket.on('connect_to', function(pseudo) {
-// 	// 	console.log('User connect ' + pseudo);
-// 	// });
-// 	// socket.on('disconnect', function(pseudo) {
-// 	// 	console.log('User disconnect');
-// 	// });
-
-// });
 
 //__________________Page Delog________________
 app.get('/delog', function(req, res) {

@@ -1,14 +1,50 @@
 <% include partial/header %>
 
-<div class="row">
-	<div class="col-md-12 col-xs-12 text-center">
-		<h2><%= locals.session['herPro'][0] %> <%= locals.session['herPro'][1] %></h2>
-	</div>
-</div>
+<div id="correspond" style="display: none;"><%= locals.session['tchat_with'] %></div>
+
 <div class="container">
-	<div class="">
+	<div class="jumbotron" style="border: 2px solid blue;position: relative; height: 90%;">
+		<div class="col-md-12">
+			
+		</div>
+		<div class="col-md-12" style="border: 2px solid red;">
+			<input id="msg_area" type="text" name="entry_msg">
+			<input id="send_but" type="button" class="btn btn-primary btn-xs" name="Send">
+		</div>
+	</div>
+	<div class="row">
 		
 	</div>
 </div>
+<script type="text/javascript">
+	var sock = io(),
+		send_but = document.querySelector('#send_but'),
+		log = document.querySelector('#userName').innerText;
 
+    if (log.innerText != '') {
+    	sock.emit('checkMsg', {login: log});
+
+    	sock.on('newMsg', function(data) {
+        	setTimeout(function() {
+        		socket.emit('checkMsg', {login: log});
+        	}, 1000);
+        });
+
+    	send_but.addEventListener('click', function(ev) {
+			var xhr = new XMLHttpRequest(),
+				to = document.querySelector('#correspond').innerText;
+				msg = document.querySelector('#msg_area').value,
+				log = document.querySelector('#userName').innerText
+
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+					
+				}
+			}
+			xhr.open("post", "/tchat", true);
+			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			xhr.send("log=" + log + "&to=" + to + "&msg=" + msg);
+		});
+    }
+</script>
 <% include partial/footer %>

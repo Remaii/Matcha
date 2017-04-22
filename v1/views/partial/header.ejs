@@ -24,32 +24,6 @@
 </head>
 <body>
     <div id="userName" style="display: none;"><%= locals.session['login'] %></div>
-    <script type="text/javascript">
-        var socket = io();
-        var user;
-        var log = document.querySelector('#userName');
-        if (log.innerText != '') {
-            socket.emit('checkNotif', {login: log.innerText});
-            
-            socket.on('notif', function(data) {
-                console.log(data);
-                var notif = document.querySelector('#notif_drop');
-                var tchat = document.querySelector('#tchat_drop');
-                notif.innerHTML = '';
-                tchat.innerHTML = '';
-                if (data.myNotif.like) {
-                    for (var i = 0; data.myNotif.like[i]; i++) {
-                    notif.innerHTML += '<li><a href="/profile/'+ data.myNotif.like[i] +'">"' + data.myNotif.like[i] + '" a liker votre profile</a></li>';
-                    }
-                }
-                if (data.myNotif.tchat) {
-                    for (var b = 0; data.myNotif.tchat[b]; b++) {
-                        tchat.innerHTML += '<li><a href="/tchat/'+ data.myNotif.tchat[b] +'">"' + data.myNotif.tchat[b] + '"</a></li>';
-                    }
-                }
-            });
-        }
-    </script>
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">

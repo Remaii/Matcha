@@ -790,7 +790,7 @@ function downTab(pastTab, pseudo, call) {
         }
         call(result);
     } else if (pastTab[0] == pseudo && !pastTab[1]) {
-        call({});
+        call({0:' '});
     }
 }
 
@@ -967,10 +967,16 @@ var getMyNotif = function(name, callback) {
 
 var getMsg = function(me, wth, callback) {
     console.log('getMsg');
+    var result = {};
     MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({login: me}).toArray(function(err, doc) {
-            if (doc[0]['msg'][wth]) {
-                callback(doc[0]['msg'][wth]);
+        db.collection('tchat').find({convers: {$all: [me, wth]}}).toArray(function(err, doc) {
+            if (doc) {
+                for (var i = 0; i < doc.length; i++) {
+                    result[i] = doc[i]['msg'];
+                }
+                if (i == doc.length) {
+                    callback(result);
+                }
             } else {
                 callback({0:' '});
             }
@@ -979,22 +985,22 @@ var getMsg = function(me, wth, callback) {
 }
 
 function upHisMsg(to, msg) {
-
+    
 }
 
 var postMsg = function(to, off, msg, callback) {
-    console.log('postMsg');
-    getMsg(to, off, function(result) {
-        console.log('result: ');
-        console.log(result[off]);
-        // makeTab(result, msg, function(resultat) {
-        //     MongoClient.connect(url, function(err, db) {  
-        //         db.collection('user').updateOne({login: login}, { $set:{msg: resultat}});
-        //         db.close();
-        //         callback(resultat);
-        //     });
-        // });
-    });
+    if (msg != '') {
+        var tchat = {
+            convers: [off, to],
+            exp: off,
+            msg: msg
+        };
+        MongoClient.connect(url, function (err, db) {
+            db.collection('tchat').insertOne(tchat, function (err, result) {
+                db.close();
+            });
+        });
+    }
 }
 
 // récupère tout les pseudos et avatars des membres du site /==>/ tout les pseudo/avatar "interessant" avec utilities.intelTri(); 

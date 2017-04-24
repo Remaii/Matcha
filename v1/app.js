@@ -50,7 +50,7 @@ users = [];
 people = [];
 
 io.sockets.on('connection', function(socket) {
-	// console.log(people)
+	console.log(people)
 	socket.on('checkNotif', function(data) {
     	if (users.indexOf(data.login) > -1) {
     		for (var a = 0; people[a]; a++) {
@@ -70,7 +70,7 @@ io.sockets.on('connection', function(socket) {
 			});
     	}
 	});
-	
+
 	socket.on('like_user', function(data) {
 		for (var i = 0; people[i]; i++) {
 			if (people[i].log == data.to) {
@@ -78,28 +78,29 @@ io.sockets.on('connection', function(socket) {
 				socket.broadcast.to(people[to].id).emit('newNotif', {log: data.to});
 			}
 			if (people[i].log == data.me) {
-				var me = i;
 				socket.emit('newNotif', {log: data.me});
 			}
 		}
 	});
 
-	socket.on('newMsg', function(data){
-		//Send message to everyone
-		for (var i = 0;people[i]; i++) {
-			if (people[i].log == data.to) {
-				mymongo.getMyNotif(data.to, function(myNotif) {
-					if (myNotif != null) {
-						for (var b = 0; people[b]; b++) {
-							if (people[b].log == data.to) {
-								socket.broadcast.to(people[b].id).emit('notif', {myNotif});
-							}
-						}
+	socket.on('checkMsg', function(data) {
+		for (var a = 0; people[a]; a++) {
+			if (people[a].log == data.to) {
+				var i = a;
+				mymongo.getMsg(data.me, data.to, function(myMsg) {
+					if (myMsg != null) {
+						console.log('me: ' + data.me + ' to: ' + data.to + ' msg:');
+						console.log(myMsg);
+						socket.emit('Msg', {myMsg});
+						console.log(people[i].log + ' | ' + people[i].id);
+						//io.to(people[i].id).emit('Msg', {myMsg});
+						socket.broadcast.to(people[i].id).emit('Msg', {myMsg});
 					}
 				});
 			}
 		}
 	});
+
 });
 
 //__________________Page Delog________________

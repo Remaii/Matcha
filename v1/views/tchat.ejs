@@ -4,12 +4,13 @@
 
 <div class="container">
 	<div class="jumbotron" style="border: 2px solid blue;position: relative; height: 90%;">
-		<div class="col-md-12">
+		<div id="message" class="col-md-12">
 			
 		</div>
-		<div class="col-md-12" style="border: 2px solid red;">
-			<input id="msg_area" type="text" name="entry_msg">
-			<input id="send_but" type="button" class="btn btn-primary btn-xs" name="Send">
+
+		<div class="col-md-12 col-xs-12" style="border: 2px solid red;">
+			<input id="msg_area" class="col-md-8 col-xs-8 text-center" type="text" name="entry_msg">
+			<input id="send_but" class="col-md-4 col-xs-4 text-center btn btn-primary btn-sm" type="button" name="Send" value="Send">
 		</div>
 	</div>
 	<div class="row">
@@ -19,16 +20,29 @@
 <script type="text/javascript">
 	var sock = io(),
 		send_but = document.querySelector('#send_but'),
+		to = document.querySelector('#correspond').innerText,
 		log = document.querySelector('#userName').innerText;
 
-    if (log.innerText != '') {
-    	sock.emit('checkMsg', {login: log});
+    if (log.innerText != '' || log.innerText != undefined) {
+    	sock.emit('checkMsg', {me: log, to: to});
 
     	sock.on('newMsg', function(data) {
+    		console.log(data);
         	setTimeout(function() {
-        		socket.emit('checkMsg', {login: log});
-        	}, 1000);
+        		sock.emit('checkMsg', {me: log, to: to});
+        	}, 500);
         });
+
+    	sock.on('Msg', function(data) {
+    		console.log('receive message')
+    		var msg = document.querySelector('#message')
+    		msg.innerText = '';
+    		for (var f = 0; data.myMsg[f]; f++) {
+    			var p = document.createElement('p');
+    			p.innerText = data.myMsg[f];
+    			msg.appendChild(p);
+    		}
+    	});
 
     	send_but.addEventListener('click', function(ev) {
 			var xhr = new XMLHttpRequest(),
@@ -38,7 +52,9 @@
 
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
-					
+        			setTimeout(function() {
+						sock.emit('checkMsg', {me: log, to: to})
+        			}, 500);
 				}
 			}
 			xhr.open("post", "/tchat", true);

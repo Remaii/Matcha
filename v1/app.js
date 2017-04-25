@@ -34,6 +34,51 @@ var sessionMiddle = {
 app.use(session(sessionMiddle));
 app.use(require('./middle/flash'));
 
+
+app.use('/', function(req, res, next) {
+	if (req.session['login'] != undefined) {
+		console.log('clean req.session')
+	    if (req.session['likeHer']) {
+	        req.session['likeHer'] = null;
+	    }
+	    if (req.session['blockHer']) {
+	        req.session['blockHer'] = null;
+	    }
+	    if (req.session['falseHer']) {
+	        req.session['falseHer'] = null;
+	    }
+	    if (req.session['allprof']) {
+	        req.session['allprof'] = {};
+	    }
+	    if (req.session['myinfo']) {
+	        req.session['myinfo'] = {};
+	    }
+	    if (req.session['mytag']) {
+	        req.session['mytag'] = {};
+	    }
+	    if (req.session['mypic']) {
+	        req.session['mypic'] = {};
+	    }
+	    if (req.session['herPro']) {
+	        req.session['herPro'] = {};
+	    }
+	    if (req.session['herTag']) {
+	        req.session['herTag'] = {};
+	    }
+	    if (req.session['herPic']) {
+	        req.session['herPic'] = {};
+	    }
+	    if (req.session['interet']) {
+	        req.session['interet'] = {};
+	    }
+	    next();
+	} else if (req.url == '/login') {
+		next();
+	} else {
+		res.redirect('/login');
+	}
+})
+
 ////__________________Routes__________________
 app.use('/', index)
 app.use('/compte', compte)
@@ -75,7 +120,6 @@ io.sockets.on('connection', function(socket) {
 	    				people[i].id = tab;
 	    			}
 	    		}
-
 	    		mymongo.getMyNotif(data.login, function(myNotif) {
 					socket.emit('notif', {myNotif});
 				});
@@ -118,6 +162,7 @@ io.sockets.on('connection', function(socket) {
 
 
 	socket.on('message', function(data) {
+		mymongo.postMsg(data.to, data.log, data.msg);
 		for (var i = 0; people[i]; i++) {
 			if (people[i].log == data.to) {
 				var idto = people[i].id;
@@ -130,20 +175,13 @@ io.sockets.on('connection', function(socket) {
 	});
 
 	socket.on('checkMsg', function(data) {
-		console.log(data);
-		for (var a = 0; people[a]; a++) {
-			if (people[a].log == data.to) {
-				var i = a;
-				mymongo.getMsg(data.me, data.to, function(myMsg) {
-					if (myMsg != null) {
-						for (var b = 0; myMsg[b]; b++) {
-							socket.emit('theNewMsg', {off: myMsg[b].off, content: myMsg[b].content});
-							//socket.broadcast.to(people[i].id).emit('theNewMsg', {off: myMsg[b].off, content: myMsg[b].content});	
-						}
-					}
-				});
+		mymongo.getMsg(data.me, data.to, function(myMsg) {
+			if (myMsg != null) {
+				for (var b = 0; myMsg[b]; b++) {
+					socket.emit('theNewMsg', {off: myMsg[b].off, content: myMsg[b].content});
+				}
 			}
-		}
+		});
 	});
 
 });

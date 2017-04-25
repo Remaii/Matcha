@@ -14,7 +14,7 @@ like_user.addEventListener('click', function(ev) {
 		like_user.setAttribute('style', 'display:none;');
 		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
 			unlike_user.setAttribute('style', '');
-			socket.emit('like_user', {me: me, to: login});
+			sock.emit('like_user', {me: me, to: login});
 			// socket.emit('checkNotif', {login: login});
 		}
 	}
@@ -30,7 +30,7 @@ unlike_user.addEventListener('click', function(ev) {
 		unlike_user.setAttribute('style', 'display:none;');
 		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
 	 		like_user.setAttribute('style', '');
-	 		socket.emit('like_user', {me: me, to: login});
+	 		sock.emit('like_user', {me: me, to: login});
 	 	}
 	}
 	xhr.open("post", "/profile/dislike", true);

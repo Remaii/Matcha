@@ -1,7 +1,7 @@
 	</div>
     <script type="text/javascript">
-        var log = document.querySelector('#userName');
-        if (log.innerText != '') {
+        // var log = document.querySelector('#userName').innerText;
+        if (document.querySelector('#userName').innerText != '') {
             // var socket = io();
         //     var Nblock = document.querySelector('#notifblock'),
         //         Tblock = document.querySelector('#tchatblock');
@@ -10,7 +10,9 @@
 
             sock.on('newNotif', function(data) {
             	setTimeout(function() {
-            		socket.emit('checkNotif', {login: log.innerText});
+                    var lol = document.querySelector('#userName').innerText;
+                    console.log(lol);
+            		sock.emit('stayco', {login: lol});
             	}, 2000);
             });
 

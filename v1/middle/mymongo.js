@@ -987,7 +987,7 @@ function upHisMsg(to, msg) {
     
 }
 
-var postMsg = function(to, off, msg, callback) {
+var postMsg = function(to, off, msg) {
     if (msg != '') {
         var tchat = {
             convers: [off, to],

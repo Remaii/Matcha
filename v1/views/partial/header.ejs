@@ -24,6 +24,14 @@
 </head>
 <body>
     <div id="userName" style="display: none;"><%= locals.session['login'] %></div>
+    <script type="text/javascript">
+        var sock = io(),
+            log = document.querySelector('#userName').innerText;
+
+        if (log != '' || log != undefined) {
+            sock.emit('stayco', {login: log});
+        }
+    </script>
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -48,16 +56,16 @@
             <% } else { %>
                     <!-- dropup gauche avec les profils autoriser au tchat -->
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tchat <span class="caret"></span></a>
+                            <a href="#" id="tchatblock" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tchat <span class="caret"></span></a>
                             <ul id="tchat_drop" class="dropdown-menu" role="menu">
-                            <!-- remplissage par socket.io getMyNotif tchateur -->
+                    <!-- remplissage par socket.io getMyNotif tchateur -->
                             </ul>
                         </li>
                     <!-- dropup droit avec les notif -->
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Notif <span class="caret"></span></a>
+                            <a href="#" id="notifblock" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Notif <span class="caret"></span></a>
                             <ul id="notif_drop" class="dropdown-menu" role="menu">
-                                <!-- remplissage par socket.io getMyNotif like -->
+                    <!-- remplissage par socket.io getMyNotif like -->
                             </ul>
                         </li>
                     <li class="dropdown">

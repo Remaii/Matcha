@@ -966,13 +966,12 @@ var getMyNotif = function(name, callback) {
 }
 
 var getMsg = function(me, wth, callback) {
-    console.log('getMsg');
     var result = {};
     MongoClient.connect(url, function(err, db) {
         db.collection('tchat').find({convers: {$all: [me, wth]}}).toArray(function(err, doc) {
             if (doc) {
                 for (var i = 0; i < doc.length; i++) {
-                    result[i] = doc[i]['msg'];
+                    result[i] = {off: doc[i]['exp'], content: doc[i]['msg']};
                 }
                 if (i == doc.length) {
                     callback(result);

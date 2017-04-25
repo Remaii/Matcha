@@ -44,31 +44,64 @@ app.use('/tchat', tchat)
 app.use('/test', require('./routes/test'))//page test
 
 
+function getnameID(id, people) {
+
+	for (var i = 0; people[i]; i++) {
+		for (var a = 0; people[i].id[a]; a++) {
+			if (people[i].id[a] == id)
+				return ({pos: i, id: people[i].id});
+		}
+	}
+	if (!people[i]) {
+		return ({pos: '-1', id: '-1'});
+	}
+}
 
 // Socket.io
 users = [];
 people = [];
 
 io.sockets.on('connection', function(socket) {
-	console.log(people)
-	socket.on('checkNotif', function(data) {
-    	if (users.indexOf(data.login) > -1) {
-    		for (var a = 0; people[a]; a++) {
-    			if (people[a].log == data.login) {
-    				people[a].id = socket.id;
-    			}
-    		}
-    		mymongo.getMyNotif(data.login, function(myNotif) {
-				socket.emit('notif', {myNotif});
-			});
-    	} else {
-    		people.push({log: data.login, id: socket.id});
-			users.push(data.login);
-			socket.user = data.login;
-			mymongo.getMyNotif(data.login, function(myNotif) {
-				socket.emit('notif', {myNotif});
-			});
-    	}
+
+	socket.on('stayco', function(data) {
+		var tab = new Array();
+		if (data.login != '' && data.login != undefined) {
+	    	if (users.indexOf(data.login) > -1) {
+	    		for (var a = 0; people[a]; a++) {
+	    			if (people[a].log == data.login) {
+	    				var i = a;
+	    				tab = people[i].id;
+	    				tab[tab.length] = socket.id;
+	    				people[i].id = tab;
+	    			}
+	    		}
+
+	    		mymongo.getMyNotif(data.login, function(myNotif) {
+					socket.emit('notif', {myNotif});
+				});
+	    	} else {
+	    		tab[tab.length] = socket.id;
+	    		people.push({log: data.login, id: tab});
+				users.push(data.login);
+
+				mymongo.getMyNotif(data.login, function(myNotif) {
+					socket.emit('notif', {myNotif});
+				});
+	    	}
+	    }
+	});
+
+	socket.on('disconnect', function(data) {
+		
+		if (data == 'transport close') {
+			for (var a = 0; people[a]; a++) {
+				for (var b = 0; people[a].id[b]; b++) {
+					if (people[a].id[b] == socket.id) {
+						people[a].id.splice(b, 1);
+					}
+				}
+			}
+		}
 	});
 
 	socket.on('like_user', function(data) {
@@ -83,18 +116,30 @@ io.sockets.on('connection', function(socket) {
 		}
 	});
 
+
+	socket.on('message', function(data) {
+		for (var i = 0; people[i]; i++) {
+			if (people[i].log == data.to) {
+				var idto = people[i].id;
+				for (var a = 0; idto[a]; a++) {
+					socket.to(idto[a]).emit('theNewMsg', {off: data.log, content: data.msg});
+				}
+			}
+		}
+		socket.emit('theNewMsg', {off: data.log, content: data.msg});
+	});
+
 	socket.on('checkMsg', function(data) {
+		console.log(data);
 		for (var a = 0; people[a]; a++) {
 			if (people[a].log == data.to) {
 				var i = a;
 				mymongo.getMsg(data.me, data.to, function(myMsg) {
 					if (myMsg != null) {
-						console.log('me: ' + data.me + ' to: ' + data.to + ' msg:');
-						console.log(myMsg);
-						socket.emit('Msg', {myMsg});
-						console.log(people[i].log + ' | ' + people[i].id);
-						//io.to(people[i].id).emit('Msg', {myMsg});
-						socket.broadcast.to(people[i].id).emit('Msg', {myMsg});
+						for (var b = 0; myMsg[b]; b++) {
+							socket.emit('theNewMsg', {off: myMsg[b].off, content: myMsg[b].content});
+							//socket.broadcast.to(people[i].id).emit('theNewMsg', {off: myMsg[b].off, content: myMsg[b].content});	
+						}
 					}
 				});
 			}

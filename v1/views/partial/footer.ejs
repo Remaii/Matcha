@@ -1,33 +1,44 @@
 	</div>
     <script type="text/javascript">
-        var socket = io();
-        var user;
         var log = document.querySelector('#userName');
         if (log.innerText != '') {
-            socket.emit('checkNotif', {login: log.innerText});
-            
-            socket.on('newNotif', function(data) {
+            // var socket = io();
+        //     var Nblock = document.querySelector('#notifblock'),
+        //         Tblock = document.querySelector('#tchatblock');
+            // socket.emit('connect')
+            // socket.emit('stayco', {login: log.innerText});
+
+            sock.on('newNotif', function(data) {
             	setTimeout(function() {
             		socket.emit('checkNotif', {login: log.innerText});
             	}, 2000);
             });
 
-            socket.on('notif', function(data) {
-                var notif = document.querySelector('#notif_drop');
-                var tchat = document.querySelector('#tchat_drop');
+            sock.on('notif', function(data) {
+                var notif = document.querySelector('#notif_drop'),
+                    tchat = document.querySelector('#tchat_drop');
                 notif.innerHTML = '';
                 tchat.innerHTML = '';
                 if (data.myNotif.like) {
                     for (var i = 0; data.myNotif.like[i]; i++) {
-                    notif.innerHTML += '<li><a href="/profile/'+ data.myNotif.like[i] +'">"' + data.myNotif.like[i] + '" a liker votre profile</a></li>';
+                        notif.innerHTML += '<li><a href="/profile/'+ data.myNotif.like[i] +'">"' + data.myNotif.like[i] + '" a liker votre profile</a></li>';
                     }
+                    
                 }
                 if (data.myNotif.tchat) {
                     for (var b = 0; data.myNotif.tchat[b]; b++) {
-                        tchat.innerHTML += '<li><a href="/tchat/'+ data.myNotif.tchat[b] +'">"' + data.myNotif.tchat[b] + '"</a></li>';
+                        tchat.innerHTML += '<li><a href="/tchat/'+ data.myNotif.tchat[b] +'">"' + data.myNotif.tchat[b] + '"</a></li>';                      
                     }
                 }
             });
+
+            
+            // Tblock.addEventListener('click', function(ev) {
+            //     Tblock.setAttribute('style', '');
+            // });
+            // Nblock.addEventListener('click', function(ev) {
+            //     Nblock.setAttribute('style', '');
+            // });
         }
     </script>
 </body>

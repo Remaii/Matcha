@@ -3,63 +3,64 @@
 <div id="correspond" style="display: none;"><%= locals.session['tchat_with'] %></div>
 
 <div class="container">
-	<div class="jumbotron" style="border: 2px solid blue;position: relative; height: 90%;">
-		<div id="message" class="col-md-12">
-			
-		</div>
-
-		<div class="col-md-12 col-xs-12" style="border: 2px solid red;">
-			<input id="msg_area" class="col-md-8 col-xs-8 text-center" type="text" name="entry_msg">
-			<input id="send_but" class="col-md-4 col-xs-4 text-center btn btn-primary btn-sm" type="button" name="Send" value="Send">
+	<div class="jumbotron" style="border: 2px solid blue; position: absolute; height: 80%; width: 85%; overflow-x: ">
+		<div id="message">
+		
 		</div>
 	</div>
-	<div class="row">
-		
+	<div class="col-md-12 col-xs-12" style="position:absolute;top:87%;width:85%;">
+		<input id="msg_area" class="col-md-12 col-xs-12 text-center" type="text" name="entry_msg">
+		<input id="send_but" class="col-md-12 col-xs-12 text-center btn btn-primary btn-sm" type="button" name="Send" value="Send">
 	</div>
 </div>
 <script type="text/javascript">
-	var sock = io(),
-		send_but = document.querySelector('#send_but'),
-		to = document.querySelector('#correspond').innerText,
+	// var sock = io();,
+	var send_but = document.querySelector('#send_but'),
+		to = document.querySelector('#correspond'),
 		log = document.querySelector('#userName').innerText;
 
-    if (log.innerText != '' || log.innerText != undefined) {
-    	sock.emit('checkMsg', {me: log, to: to});
+    if (log != '' || log != undefined) {
+    	//sock.emit('stayco', {login: log});
+    	
+    	sock.emit('checkMsg', {me: log, to: to.innerText});
+    	// sock.on('newMsg', function(data) {
+    	// 	console.log(data);
+     //    	setTimeout(function() {
+     //    		sock.emit('checkMsg', {me: log, to: to});
+     //    	}, 500);
+     //    });
 
-    	sock.on('newMsg', function(data) {
-    		console.log(data);
-        	setTimeout(function() {
-        		sock.emit('checkMsg', {me: log, to: to});
-        	}, 500);
-        });
-
-    	sock.on('Msg', function(data) {
-    		console.log('receive message')
-    		var msg = document.querySelector('#message')
-    		msg.innerText = '';
-    		for (var f = 0; data.myMsg[f]; f++) {
-    			var p = document.createElement('p');
-    			p.innerText = data.myMsg[f];
-    			msg.appendChild(p);
-    		}
+    	sock.on('theNewMsg', function(data) {
+    		
+    		var msg = document.querySelector('#message'),
+    			expe = document.querySelector('#userName'),
+    			dest = document.querySelector('#correspond'),
+    			div = document.createElement('div'),
+    			text = document.createElement('p'),
+    			name = document.createElement('p');
+    			
+    		console.log(data.off);
+    		console.log(expe);
+    		console.log(dest);
+			if (data.off == expe.innerText) {
+				text.setAttribute('class', 'text-right');
+				text.innerText = data.content;
+			} else if (data.off == dest.innerText) {
+				text.setAttribute('class', 'text-left');
+				text.innerText = data.content;
+			}
+			msg.appendChild(text);
     	});
 
     	send_but.addEventListener('click', function(ev) {
-			var xhr = new XMLHttpRequest(),
-				to = document.querySelector('#correspond').innerText;
-				msg = document.querySelector('#msg_area').value,
-				log = document.querySelector('#userName').innerText
+			var	too = document.querySelector('#correspond').innerText,
+				msg = document.querySelector('#msg_area'),
+				log = document.querySelector('#userName').innerText;
 
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
-        			setTimeout(function() {
-						sock.emit('checkMsg', {me: log, to: to})
-        			}, 500);
-				}
+			if (msg.value != '') {
+				sock.emit('message', {to: too, log: log, msg: msg.value});
+				msg.value = '';
 			}
-			xhr.open("post", "/tchat", true);
-			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-			xhr.send("log=" + log + "&to=" + to + "&msg=" + msg);
 		});
     }
 </script>

@@ -4,6 +4,60 @@ var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
 var utilities = require('./utility')
 
+function alreadySet(tab, value) {
+    for (var i = 0; tab[i]; i++) {
+        if (tab[i] == value)
+            return 1;
+        if (i == tab.length) {
+            return 0;
+        }
+    }
+}
+
+function removeDouble(toadd, call) {
+    var tmp = {};
+    var nb = 0;
+
+    for (var a = 0; toadd[a]; a++) {
+        if (!alreadySet(tmp, toadd[a])) {
+            tmp[nb] = toadd[a];
+            nb++;
+        }
+    }
+    if (!toadd[a]) {
+        call(tmp);
+    }
+}
+
+function makeTab(pastTab, pseudo, call) {
+    if (pastTab != undefined) {
+        for (var i = 0; pastTab[i]; i++) {}
+        pastTab[i] = pseudo;
+        removeDouble(pastTab, call);
+    } else {
+        var result = {}
+        result[0] = pseudo;
+        call(result);
+    }
+}
+
+function downTab(pastTab, pseudo, call) {
+    var result = {},
+        nb = 0;
+
+    if (pastTab) {
+        for (var i = 0; pastTab[i]; i++) {
+            if (pastTab[i] != pseudo) {
+                result[nb] = pastTab[i];
+                nb++;
+            }
+        }
+        call(result);
+    } else if (pastTab[0] == pseudo && !pastTab[1]) {
+        call({0:' '});
+    }
+}
+
 function verifyPseudo(pseudo, callback) {
     MongoClient.connect(url, function(err, db){
         db.collection('user').find({pseudo: pseudo}).toArray(function(err, doc) {
@@ -147,11 +201,27 @@ function getHerTag(req, res, call) {
     }
 }
 
+function upHisVisit(pseudo, visiteur) {
+    if (pseudo != visiteur) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: pseudo}).toArray(function(err, doc) {
+                makeTab(doc[0]['visit'], visiteur, function(result) {
+                    MongoClient.connect(url, function(err, db) {  
+                        db.collection('user').updateOne({login: pseudo}, { $set:{visit: result}});
+                        db.close();
+                    });
+                });
+            });
+        });
+    }
+}
+
 function getHerInfo(req, res, call) {
     var arr = {};
     var pseudo = req.session['toget'];
 
     if (pseudo != '' || pseudo != undefined) {
+        upHisVisit(pseudo, req.session['login']);
         MongoClient.connect(url, function(err, db) {
             db.collection('user').find({login: pseudo}).toArray(function(err, doc) {
                 if (err) {
@@ -207,6 +277,23 @@ function getMyInfo(req, res, call) {
     }
 }
 
+function getMyVisit(req, res, call) {
+    var log = req.session['login'];
+
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: log}).toArray(function(err, doc) {
+                if (doc.length > 0) {
+                    call(doc[0]['visit']);
+                } else {
+                    call({0:''});
+                }
+            });
+            db.close();
+        });
+    }
+}
+
 function getMyBlock(req, res, call) {
     var log = req.session['login'];
 
@@ -233,7 +320,7 @@ function getMyFalse(req, res, call) {
                 if (doc.length > 0) {
                     call(doc[0]['falseUser']);
                 } else {
-                    call({0:' '});
+                    call({0:''});
                 }
             });
             db.close();
@@ -250,7 +337,7 @@ function getMyLiker(req, res, call) {
                 if (doc.length > 0) {
                     call(doc[0]['heLikeMe']);
                 } else {
-                    call({0:' '});
+                    call({0:''});
                 }
             });
             db.close();
@@ -267,7 +354,7 @@ function getMyLike(req, res, call) {
                 if (doc.length > 0) {
                     call(doc[0]['like']);
                 } else {
-                    call({0:' '});
+                    call({0:''});
                 }
             });
             db.close();
@@ -284,7 +371,7 @@ function getMyImage(req, res, call) {
                 if (doc.length != 0) {
                     call(doc[0]['image']);
                 } else {
-                    call({0:' '});
+                    call({0:''});
                 }
             });
             db.close();
@@ -464,15 +551,16 @@ var logUser = function(req, res, callback) {
 };
 
 var updateUser = function(req, res) {
-    var loger = req.session['login'];
-    var firstname = req.body.firstname;
-    var lastname = req.body.lastname;
-    var age = req.body.age;
-    var sexe = req.body.sexe;
-    var orient = req.body.orient;
-    var mail = req.body.mail;
-    var bio = req.body.bio;
-    var pseudo = req.body.pseudo;
+    var loger = req.session['login'],
+        firstname = req.body.firstname,
+        lastname = req.body.lastname,
+        age = req.body.age,
+        sexe = req.body.sexe,
+        orient = req.body.orient,
+        mail = req.body.mail,
+        bio = req.body.bio,
+        pseudo = req.body.pseudo,
+        avatar = req.body.avatar;
     
     if (loger != undefined) {
         if (pseudo != '' && pseudo != req.session['myinfo'][10]) {
@@ -524,8 +612,8 @@ var updateUser = function(req, res) {
                 });
             }
         }
-        if (sexe != undefined && sexe != req.session['myinfo'][3]) {
-            utilities.defineAvatar(sexe, req.session['myinfo'][9], function(s, a) {
+        if (sexe != req.session['myinfo'][3] || (req.session['myinfo'][3] == null && avatar != req.session['myinfo'][9])) {
+            utilities.defineAvatar(sexe, avatar, function(s, a) {
                 MongoClient.connect(url, function(err, db) {
                     db.collection('user').updateOne({login: loger}, { $set:{sexe: s, avatar: a}});
                     db.close();
@@ -545,15 +633,13 @@ var updateUser = function(req, res) {
 }
 
 var setAvatar = function(req, res) {
-    if (req.session['login'] != undefined) {
+    utilities.defineAvatar(req.session['myinfo'][3], req.body.path, function(s, a) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').updateOne({login: req.session['login']}, { $set:{avatar: req.body.path}});
+            db.collection('user').updateOne({login: req.session['login']}, { $set:{avatar: a}});
             db.close();
-            console.log(req.session['login'] + ' à mis a jour son avatar');
+            console.log(req.session['login'] + ' à mis a jour son avatar' + s + ' ' + a);
         });
-    } else {
-        // console.log('un utilisateur inconnue a essayer de mettre a jour son avatar');
-    }
+    });
 }
 
 var addInterest = function(req, res) {
@@ -616,31 +702,6 @@ var getInterest = function(req, res, call) {
         });
         db.close();
     });
-}
-
-function alreadySet(tab, value) {
-    for (var i = 0; tab[i]; i++) {
-        if (tab[i] == value)
-            return 1;
-        if (i == tab.length) {
-            return 0;
-        }
-    }
-}
-
-function removeDouble(toadd, call) {
-    var tmp = {};
-    var nb = 0;
-
-    for (var a = 0; toadd[a]; a++) {
-        if (!alreadySet(tmp, toadd[a])) {
-            tmp[nb] = toadd[a];
-            nb++;
-        }
-    }
-    if (!toadd[a]) {
-        call(tmp);
-    }
 }
 
 var upMyTag = function(req, res) {
@@ -762,35 +823,6 @@ var downMyTag = function(req, res) {
         }
     } else {
         res.redirect('info');
-    }
-}
-
-function makeTab(pastTab, pseudo, call) {
-    if (pastTab != undefined) {
-        for (var i = 0; pastTab[i]; i++) {}
-        pastTab[i] = pseudo;
-        removeDouble(pastTab, call);
-    } else {
-        var result = {}
-        result[0] = pseudo;
-        call(result);
-    }
-}
-
-function downTab(pastTab, pseudo, call) {
-    var result = {},
-        nb = 0;
-
-    if (pastTab) {
-        for (var i = 0; pastTab[i]; i++) {
-            if (pastTab[i] != pseudo) {
-                result[nb] = pastTab[i];
-                nb++;
-            }
-        }
-        call(result);
-    } else if (pastTab[0] == pseudo && !pastTab[1]) {
-        call({0:' '});
     }
 }
 
@@ -1013,6 +1045,7 @@ exports.getMyLike = getMyLike;
 exports.getMyLiker = getMyLiker;
 exports.getMyFalse = getMyFalse;
 exports.getMyBlock = getMyBlock;
+exports.getMyVisit = getMyVisit;
 exports.getMyNotif = getMyNotif;
 exports.getMsg = getMsg;
 

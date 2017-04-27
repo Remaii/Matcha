@@ -1,13 +1,13 @@
 <% include ../partial/header %>
 <div class="container-fluid">
 	<div id="galinfo" class="col-md-10 col-xs-10">
-		<% if (locals.session['mypic'][0] === ' ' || locals.session['mypic'][0] == null) { %>
+		<% if (locals.session['mypic'][0] === '' || locals.session['mypic'][0] == null) { %>
 			<label class="col-md-12 col-sm-12 text-center">Tu n'a pas de photo :(</label><br>
 		<% } else { %>
 			<label class="col-md-12 col-xs-12 text-center">T'es photo(s) :</label><br>
 			<% for (var i = 0;locals.session['mypic'][i]; i++) { %>
 				<div>
-					<img class="col-md-2 col-xs-2 img-circle" src="<%= '/asset/uploads/' + locals.session['mypic'][i] %>" onclick="toAvatar('<%= locals.session['mypic'][i] %>');" oncontextmenu="deleteImg('<%= locals.session['mypic'][i] %>');return false;"/>
+					<img class="col-md-2 col-xs-2 img-circle" src="<%= '/asset/uploads/' + locals.session['mypic'][i] %>" onclick="toAvatar('<%= locals.session['mypic'][i] %>', 0);" oncontextmenu="deleteImg('<%= locals.session['mypic'][i] %>');return false;"/>
 				</div>
 			<% } %>
 		<% } %>
@@ -52,6 +52,9 @@
 	        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Petite Bio</label>
 	        <textarea class="form-control text-center input-sm" rows="3" name="bio"
 	        value=""><% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][5] %><% } %></textarea>
+	    	<div class="col-xs-1" style="display: none;">
+	    		<input id="avatar_sub" type="text" name="avatar" value="<%= locals.session['myinfo'][9] %>">
+	    	</div>
 	    	<div class="col-md-3 col-md-offset-5 col-xs-offset-5">
 	        	<input class="btn btn-primary" type="submit" name="submit" value="Update">
 	    	</div>
@@ -101,7 +104,7 @@
 	    </form>
 	</div>
 </div>
-	
+
 <script src="http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js" type="text/javascript"></script>
 <script type="text/javascript" src="/asset/js/info.js"></script>
 

@@ -4,50 +4,85 @@ var defineAvatar = function(sexe, avatar, callback) {
     if (avatar == 'avatar.png' || avatar == 'avatarH.png' || avatar == 'avatarF.png') {
         if (sexe == 'Homme') {
             callback(sexe, 'avatarH.png');
-        } else {
+        } else if (sexe == 'Femme') {
             callback(sexe, 'avatarF.png');
+        } else {
+            callback(sexe, 'avatar.png');
         }
     } else {
         callback(sexe, avatar);
     }
 }
 
-function clean(session, callback) {
-    if (session['login'] != undefined) {
-        if (session['likeHer']) {
-            session['likeHer'] = null;
+function makeBasePopu(myinfo, mytag, mypic, callback) {
+    var count = 0;
+    if (myinfo) {
+        for (var i = 0; i < 6; i++) {
+            if (myinfo[i] != undefined && myinfo[i] != '') {
+                count++;
+            }
         }
-        if (session['blockHer']) {
-            session['blockHer'] = null;
+    } else {
+        var i = 6;
+    } if (mypic) {
+        for (var j = 0; i == 6 && j < 6; j++) {
+            if (mypic[j] != undefined && mypic[j] != '') {
+                count++;
+            }
         }
-        if (session['falseHer']) {
-            session['falseHer'] = null;
+    } else {
+        var j = 6;
+    } if (mytag) {
+        for (var h = 0; j == 6 && mytag[h]; h++) {
+            if (mytag[h] != undefined && mytag[h] != '') {
+                count++;
+            }
         }
-        if (session['allprof']) {
-            session['allprof'] = {};
+    } else {
+        var h = 3;
+    } if ((h == 3 && !mytag) || (h >= 3 && (mytag && !mytag[h]))) {
+        return((count / (h + j + i)) * 100);
+    }
+}
+
+function makeLikeVisit(myliker, myvisit) {
+    var countl = 1,
+        countm = 1;
+    if (myliker) {
+        for (var l = 0; myliker[l]; l++) {
+            if (myliker[l] != undefined && myliker[l] != '') {
+                countl++;
+            }
         }
-        if (session['myinfo']) {
-            session['myinfo'] = {};
+    } else {
+        var l = -1;
+    } if (myvisit) {
+        for (var m = 0; myvisit[m]; m++) {
+            if (myvisit[m] != undefined && myvisit[m] != '') {
+                countm++;
+            }
         }
-        if (session['mytag']) {
-            session['mytag'] = {};
+    } else {
+        var m = -1;
+    }
+    if (!myvisit[m] && !myliker[l]) {
+        return ((countm + countl) + (m + l));
+    }
+}
+
+function makePopu(myinfo, mytag, mypic, myliker, myvisit, callback) {
+    if (myvisit) {
+        console.log('la');
+        var prof = makeLikeVisit(myvisit, myliker),
+            popu = Math.round(makeBasePopu(myinfo, mytag, mypic));
+        if (prof && popu) {
+            console.log(prof + ' ' + popu);
+            callback(prof, popu);
         }
-        if (session['mypic']) {
-            session['mypic'] = {};
-        }
-        if (session['herPro']) {
-            session['herPro'] = {};
-        }
-        if (session['herTag']) {
-            session['herTag'] = {};
-        }
-        if (session['herPic']) {
-            session['herPic'] = {};
-        }
-        if (session['interet']) {
-            session['interet'] = {};
-        }
-        callback();
+        //callback(Math.round(makeBasePopu(myinfo, mytag, mypic)), makeLikeVisit(myvisit, myliker));
+    } else {
+        console.log('ici');
+        callback(Math.round(makeBasePopu(myinfo, mytag, mypic)), null);
     }
 }
 
@@ -131,14 +166,12 @@ var Distance = function(la_a, lo_a, la_b, lo_b) {
     }
      
     function Distance(lat_a_degre, lon_a_degre, lat_b_degre, lon_b_degre){
-         
-            R = 6371000; //Rayon de la terre en mètre
-     
+        R = 6371000;
         lat_a = convertRad(lat_a_degre);
         lon_a = convertRad(lon_a_degre);
         lat_b = convertRad(lat_b_degre);
         lon_b = convertRad(lon_b_degre);
-         
+
         d = R * (Math.PI/2 - Math.asin( Math.sin(lat_b) * Math.sin(lat_a) + Math.cos(lon_b - lon_a) * Math.cos(lat_b) * Math.cos(lat_a)))
         return d / 10;
     }
@@ -152,4 +185,4 @@ exports.checkerPwd = checkerPwd;
 exports.checkerBio = checkerBio;
 exports.getImage = getImage;
 exports.rmImage = rmImage;
-exports.clean = clean;
+exports.makePopu = makePopu;

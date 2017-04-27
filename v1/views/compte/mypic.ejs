@@ -4,7 +4,7 @@
 	<label class="col-md-12 col-xs-12 text-center">T'es photo(s) :</label><br>
 	<% for (var i = 0;locals.session['mypic'][i]; i++) { %>
 		<div>
-			<img class="col-md-2 col-xs-2 img-circle" src="<%= '/asset/uploads/' + locals.session['mypic'][i] %>" onclick="toAvatar('<%= locals.session['mypic'][i] %>');" oncontextmenu="deleteImg('<%= locals.session['mypic'][i] %>');return false;"/>
+			<img class="col-md-2 col-xs-2 img-circle" src="<%= '/asset/uploads/' + locals.session['mypic'][i] %>" onclick="toAvatar('<%= locals.session['mypic'][i] %>', 0);" oncontextmenu="deleteImg('<%= locals.session['mypic'][i] %>');return false;"/>
 		</div>
 	<% } %>
 <% } %>

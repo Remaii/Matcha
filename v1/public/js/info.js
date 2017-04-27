@@ -12,28 +12,43 @@ function refreshMyPic() {
 	xhr.send(null);
 }
 
-function toAvatar(path) {
-	var xhr = new XMLHttpRequest();
+function toAvatar(path, pass) {
+	var avatar = document.querySelector('#avatar_sub');
 
-	if (confirm('Vous désirez vraiment faire de cette photo votre avatar ?')) {
+	function go(path) {
+		var xhr = new XMLHttpRequest();
+
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
-				refreshMyPic();
+				//refreshMyPic();
 			}
 		}
 		xhr.open("POST", "/compte/info", true);
 		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 		xhr.send("path=" + path + "&submit=toAvatar");
 	}
+	if (pass == 0) {
+		if (confirm('Vous désirez vraiment faire de cette photo votre avatar ?')) {
+			avatar.setAttribute('value', path);
+			go(path);
+		}
+	} else if (pass == 1) {
+		avatar.setAttribute('value', path);
+		go(path);
+	}
 }
 
 function deleteImg(path) {
-	var xhr = new XMLHttpRequest();
+	var xhr = new XMLHttpRequest(),
+		avatar = document.querySelector('#avatar_sub');
 
 	if (confirm("Vous désirez vraiment supprimée la photo?")) {
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState == 4) {
 				refreshMyPic();
+				if (path == avatar.value) {
+					toAvatar('avatar.png', 1);
+				}
 			}
 		}
 		xhr.open("POST", "/compte/info", true);
@@ -75,8 +90,8 @@ submit.addEventListener('click', function(ev){
 		if (data) {
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState == 4) {
-					alert('Upload success');
 					refreshMyPic();
+					alert('Upload success');
 				}
 			}
 			xhr.open("POST", "/compte/info", true);
@@ -86,7 +101,6 @@ submit.addEventListener('click', function(ev){
 	}
 	if (file) {
 		reader.readAsDataURL(file);
-		console.log(file)
 	} else {
 		alert('tu n\'a rien upload...');
 	}

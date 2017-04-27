@@ -7,14 +7,6 @@ var io = require('socket.io')
 
 
 router.get('/', function(req, res, next) {
-	if (req.session['login'] != undefined) {
-		utilities.clean(req.session, function(ret) {
-			next();
-		});
-	} else {
-		res.redirect('login');
-	}
-}, function(req, res, next) {
 	mymongo.getAllProf(function(err, result){ 
 		if (err) console.log(err);
 		req.session['allprof'] = result;

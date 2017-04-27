@@ -1,14 +1,41 @@
 <% include ../partial/header %>
 
 <% if (locals.session['myinfo']) { %>
-	<div id="likeur" class="row">
-		
-	</div>
-	<img src=<%= '/asset/uploads/' + locals.session['myinfo'][9] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle">
 	<div class="row">
-		<div>
+		<div id="likeur" class="col-md-3 col-xs-3 col-sm-3 col-lg-3">
+			<% if (locals.session['heLikeMe']) { %>
+				<% for (var l = 0; locals.session['heLikeMe'][l]; v++) { %>
+					<a href=<%= '/profile/' + locals.session['heLikeMe'][l] %>><%= locals.session['heLikeMe'][l] %></a>
+				<% } %>
+			<% } %>
+		</div>
+		<div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
+			<img src=<%= '/asset/uploads/' + locals.session['myinfo'][9] %> class="col-md-offset-3 col-xs-offset-3 col-md-6 col-xs-6 img-circle">
+		</div>
+		<div id="visiteur" class="col-md-3 col-xs-3 col-sm-3 col-lg-3">
+			<% if (locals.session['myvisit']) { %>
+				<% for (var v = 0; locals.session['myvisit'][v]; v++) { %>
+					<a href=<%= '/profile/' + locals.session['myvisit'][v] %>><%= locals.session['myvisit'][v] %></a>
+				<% } %>
+			<% } %>
+		</div>
+	</div>
+	<br><div class="progress">
+		<% if (locals.session['prof'] < 100) { %>
+			<div class="progress-bar progress-bar-info active" style="width: 5%;">Profile:</div>
+			<div class="progress-bar progress-bar-success progress-bar-striped active" style="width: <%= locals.session['prof'] - 5 %>%;"><%= (locals.session['prof'] - 5) + '% complété' %></div>
+			<div class="progress-bar progress-bar-striped active" style="width: <%= 95 - (locals.session['prof'] - 5) %>%;"></div>
+		<% } else if (locals.session['prof'] == 100) { %>
+	 		<div class="progress-bar progress-bar-info active" style="width: 5%;">Profile:</div>
+			<div class="progress-bar progress-bar-success" style="width: 95%;">100% du profile a été complété</div>
+	 	<% } %>
+	</div><br>
+	<div class="row">
+		<div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
 			<p class="text-center"><%= locals.session['myinfo'][0] %> <%= locals.session['myinfo'][1] %> <% if (locals.session['myinfo'][2] != '') {%><%= locals.session['myinfo'][2] + ' ans'%> <% } %> </p>
 			<p class="text-center"><%= locals.session['myinfo'][3] %> <%= locals.session['myinfo'][4] %></p>
+		</div>
+		<div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
 			<% if (locals.session['mytag'] != null) { %>
 				<p class="text-center">
 				<% for (var i = 0; locals.session['mytag'][i]; i++) { %>
@@ -18,17 +45,29 @@
 				<% } %>
 				</p>
 			<% } %>
+		</div>
+		<div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
 			<p class="text-center"><%= locals.session['myinfo'][5] %></p>
 		</div>
 	</div>
-	<div class="col-md-12 col-xs-12">
-		<% if (locals.session['mypic']) { %>
-			<% if (locals.session['mypic'][0] != ' ') { %>
-				<% for (var i = 0; locals.session['mypic'][i]; i++) { %>
-					<img src=<%= '/asset/uploads/' + locals.session['mypic'][i] %> class="col-md-2 col-xs-2 img-circle">
+	<br><div class="progress">
+		<% if (locals.session['popu'] < 100 && locals.session['popu'] != null) { %>
+			<div class="progress-bar progress-bar-success progress-bar-striped active" style="width: <%= locals.session['popu'] / 10 %>%;"><%= (locals.session['popu'] / 10) + 'pts Popularité' %></div>
+			<div class="progress-bar progress-bar-striped active" style="width: <%= 100 - (locals.session['popu'] / 10) %>%;"></div>
+		<% } else { %>
+	 		<div class="progress-bar" style="width: 100%;"></div>
+	 	<% } %>
+	</div><br>
+	<div class="row">
+		<div class="col-md-12 col-xs-12">
+			<% if (locals.session['mypic']) { %>
+				<% if (locals.session['mypic'][0] != ' ') { %>
+					<% for (var i = 0; locals.session['mypic'][i]; i++) { %>
+						<img src=<%= '/asset/uploads/' + locals.session['mypic'][i] %> class="col-md-2 col-xs-2 img-circle">
+					<% } %>
 				<% } %>
 			<% } %>
-		<% } %>
+		</div>
 	</div>
 <% } %>
 

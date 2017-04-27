@@ -5,15 +5,6 @@ var utilities = require('../middle/utility')
 var trie = require('../middle/trieur')
 
 router.get('/', function(req, res, next) {
-	if (req.session['login'] != undefined) {
-		utilities.clean(req.session, function(ret) {
-			if (ret) console.log('ret: ' + ret);
-			next();
-		});
-	} else {
-		res.redirect('../');
-	}
-}, function(req, res, next) {
 	mymongo.getInterest(req, res, function(err, tag) {
 		if (tag) {
 			req.session['interet'] = tag;
@@ -26,15 +17,6 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', function(req, res, next) {
-	if (req.session['login'] != undefined) {
-		utilities.clean(req.session, function(ret) {
-			if (ret) console.log('ret: ' + ret);
-			next();
-		});
-	} else {
-		res.redirect('../');
-	}
-}, function(req, res, next) {
 	if (!req.body['search'] && (req.body['s'] || req.body['os'] || req.body['amin'] || req.body['amax'] || req.body['d'])) {
 		next();
 	} else if (req.body['search'] == '' && (!req.body['s'] || !req.body['os'] || !req.body['amin'] || !req.body['amax'] || !req.body['d'])) {
@@ -68,15 +50,6 @@ router.post('/', function(req, res, next) {
 });
 
 router.get('/:pseudo', function(req, res, next) {
-	if (req.session['login'] != undefined) {
-		utilities.clean(req.session, function(ret){
-			if (ret) console.log('ret: ' + ret);
-			next();
-		});
-	} else {
-		res.redirect('../');
-	}
-}, function(req, res, next) {
 	req.session['toget'] = req.url.slice(1);
 	mymongo.getHerInfo(req, res, function(err, result) {
 		if (err) {

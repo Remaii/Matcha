@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(bodyParser.json());
 app.use('/asset', express.static('public'));
 var sessionMiddle = {
-	secret: 'matcharthidet',
+	secret: 'matchaRthidet',
 	resave: true,
 	saveUninitialized:true,
 	cookie: { maxAge: 60 * 60 * 24 * 7}
@@ -37,7 +37,6 @@ app.use(require('./middle/flash'));
 
 app.use('/', function(req, res, next) {
 	if (req.session['login'] != undefined) {
-		console.log('clean req.session')
 	    if (req.session['likeHer']) {
 	        req.session['likeHer'] = null;
 	    }
@@ -72,7 +71,7 @@ app.use('/', function(req, res, next) {
 	        req.session['interet'] = {};
 	    }
 	    next();
-	} else if (req.url == '/login') {
+	} else if (req.url == '/login' || req.url == '/register') {
 		next();
 	} else {
 		res.redirect('/login');
@@ -86,21 +85,6 @@ app.use('/login', login)
 app.use('/profile', profile)
 app.use('/register', register)
 app.use('/tchat', tchat)
-app.use('/test', require('./routes/test'))//page test
-
-
-function getnameID(id, people) {
-
-	for (var i = 0; people[i]; i++) {
-		for (var a = 0; people[i].id[a]; a++) {
-			if (people[i].id[a] == id)
-				return ({pos: i, id: people[i].id});
-		}
-	}
-	if (!people[i]) {
-		return ({pos: '-1', id: '-1'});
-	}
-}
 
 // Socket.io
 users = [];
@@ -127,7 +111,6 @@ io.sockets.on('connection', function(socket) {
 	    		tab[tab.length] = socket.id;
 	    		people.push({log: data.login, id: tab});
 				users.push(data.login);
-
 				mymongo.getMyNotif(data.login, function(myNotif) {
 					socket.emit('notif', {myNotif});
 				});
@@ -136,7 +119,6 @@ io.sockets.on('connection', function(socket) {
 	});
 
 	socket.on('disconnect', function(data) {
-		
 		if (data == 'transport close') {
 			for (var a = 0; people[a]; a++) {
 				for (var b = 0; people[a].id[b]; b++) {
@@ -151,8 +133,10 @@ io.sockets.on('connection', function(socket) {
 	socket.on('like_user', function(data) {
 		for (var i = 0; people[i]; i++) {
 			if (people[i].log == data.to) {
-				var to = i;
-				socket.broadcast.to(people[to].id).emit('newNotif', {log: data.to});
+				var idto = people[i].id;
+				for (var a = 0; idto[a]; a++) {
+					socket.to(idto[a]).emit('newNotif', {log: data.to});
+				}
 			}
 			if (people[i].log == data.me) {
 				socket.emit('newNotif', {log: data.me});
@@ -192,10 +176,10 @@ app.get('/delog', function(req, res) {
 });
 
 // //______________Page introuvable______________
-// app.use(function(req, res, next) {
-// 	console.log(req.url);
-// 	// res.setHeader('Content-Type', 'text/plain');
-// 	res.status(404).send('Page introuvable');
-// });
+app.use(function(req, res, next) {
+	console.log(req.url);
+	res.setHeader('Content-Type', 'text/plain');
+	res.status(404).send('Page introuvable');
+});
 
 server.listen(3000)

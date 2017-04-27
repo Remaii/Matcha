@@ -1,17 +1,9 @@
 	</div>
     <script type="text/javascript">
-        // var log = document.querySelector('#userName').innerText;
         if (document.querySelector('#userName').innerText != '') {
-            // var socket = io();
-        //     var Nblock = document.querySelector('#notifblock'),
-        //         Tblock = document.querySelector('#tchatblock');
-            // socket.emit('connect')
-            // socket.emit('stayco', {login: log.innerText});
-
             sock.on('newNotif', function(data) {
             	setTimeout(function() {
                     var lol = document.querySelector('#userName').innerText;
-                    console.log(lol);
             		sock.emit('stayco', {login: lol});
             	}, 2000);
             });
@@ -19,13 +11,13 @@
             sock.on('notif', function(data) {
                 var notif = document.querySelector('#notif_drop'),
                     tchat = document.querySelector('#tchat_drop');
+                
                 notif.innerHTML = '';
                 tchat.innerHTML = '';
                 if (data.myNotif.like) {
                     for (var i = 0; data.myNotif.like[i]; i++) {
                         notif.innerHTML += '<li><a href="/profile/'+ data.myNotif.like[i] +'">"' + data.myNotif.like[i] + '" a liker votre profile</a></li>';
-                    }
-                    
+                    }    
                 }
                 if (data.myNotif.tchat) {
                     for (var b = 0; data.myNotif.tchat[b]; b++) {
@@ -33,14 +25,6 @@
                     }
                 }
             });
-
-            
-            // Tblock.addEventListener('click', function(ev) {
-            //     Tblock.setAttribute('style', '');
-            // });
-            // Nblock.addEventListener('click', function(ev) {
-            //     Nblock.setAttribute('style', '');
-            // });
         }
     </script>
 </body>

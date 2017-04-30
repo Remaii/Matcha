@@ -1,27 +1,68 @@
 	</div>
     <script type="text/javascript">
         if (document.querySelector('#userName').innerText != '') {
-            sock.on('newNotif', function(data) {
+            sock.on('newNotif', function() {
             	setTimeout(function() {
                     var lol = document.querySelector('#userName').innerText;
             		sock.emit('stayco', {login: lol});
-            	}, 2000);
+            	}, 500);
             });
 
             sock.on('notif', function(data) {
                 var notif = document.querySelector('#notif_drop'),
+                    log = document.querySelector('#userName').innerText,
                     tchat = document.querySelector('#tchat_drop');
                 
                 notif.innerHTML = '';
                 tchat.innerHTML = '';
-                if (data.myNotif.like) {
-                    for (var i = 0; data.myNotif.like[i]; i++) {
-                        notif.innerHTML += '<li><a href="/profile/'+ data.myNotif.like[i] +'">"' + data.myNotif.like[i] + '" a liker votre profile</a></li>';
+                if (data.notif[0]) {
+                    document.getElementById('notifblock').setAttribute('style', 'color:red;');
+                    for (var i = 0; data.notif[i]; i++) {
+                        var li = document.createElement('li'),
+                            a = document.createElement('a'),
+                            div = document.createElement('div'),
+                            tmp = data.notif[i],
+                            type = tmp.split(' ')[0],
+                            name = tmp.split(' ')[2];
+
+                        if (type == 'Message') {
+                            a.setAttribute('href', '/tchat/' + name);
+                            a.setAttribute('class', 'col-md-1 col-xs-1 col-sm-1 col-lg-1 text-center');
+                            a.innerText = "📝";
+                        } else if (type != 'Message' && type == 'Like') {
+                            a.setAttribute('href', '/profile/' + name);
+                            a.setAttribute('class', 'col-md-1 col-xs-1 col-sm-1 col-lg-1 text-center');
+                            a.innerText = "👍";
+                        } else if (type != 'Message' && type == 'Visited') {
+                            a.setAttribute('href', '/profile/' + name);
+                            a.setAttribute('class', 'col-md-1 col-xs-1 col-sm-1 col-lg-1 text-center');
+                            a.innerText = "🔍";
+                        } else if (type != 'Message' && type == 'Match') {
+                            a.setAttribute('href', '/profile/' + name);
+                            a.setAttribute('class', 'col-md-1 col-xs-1 col-sm-1 col-lg-1 text-center');
+                            a.innerText = "💞";
+                        } else if (type != 'Message' && type == 'Dislike') {
+                            a.setAttribute('href', '/profile/' + name);
+                            a.setAttribute('class', 'col-md-1 col-xs-1 col-sm-1 col-lg-1 text-center');
+                            a.innerText = "👎";
+                        } else {
+                            a.setAttribute('class', 'col-md-1 col-xs-1 col-sm-1 col-lg-1 text-center');
+                            a.innerText = "🚫";
+                        }
+                        div.setAttribute('class', 'col-md-12 col-xs-12 col-sm-12 col-lg-12')
+                        li.setAttribute('class', 'col-md-8 col-xs-8 col-sm-8 col-lg-8');
+                        li.setAttribute('onclick', 'downNotif("'+ data.notif[i] +'")');
+                        li.innerText = name;
+                        div.appendChild(a);
+                        div.appendChild(li);
+                        notif.appendChild(div);
                     }    
+                } else {
+                    document.getElementById('notifblock').setAttribute('style', 'color:white;');
                 }
-                if (data.myNotif.tchat) {
-                    for (var b = 0; data.myNotif.tchat[b]; b++) {
-                        tchat.innerHTML += '<li><a href="/tchat/'+ data.myNotif.tchat[b] +'">"' + data.myNotif.tchat[b] + '"</a></li>';                      
+                if (data.tchat) {
+                    for (var b = 0; data.tchat[b]; b++) {
+                        tchat.innerHTML += '<li><a href="/tchat/'+ data.tchat[b] +'">"' + data.tchat[b] + '"</a></li>';                      
                     }
                 }
             });

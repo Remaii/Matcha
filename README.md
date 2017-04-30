@@ -26,7 +26,7 @@
 * Reinitialisé son Mot de Passe:❌
 
 
-### Profil de l'utilisateur 81%end
+### Profil de l'utilisateur 100%end
 * Modifier son prénom:✅
 * Modifier son Nom:✅
 * Modifier son mail:✅
@@ -35,9 +35,9 @@
 * Modifier sa biographie (500 caractères):✅
 * Ajouter/Supprimer ses Tags:✅
 * Ajouter/Supprimer ses photos maximum 6:✅
-* Voir les profils des utilisateurs qui ont liké:❌
+* Voir les utilisateurs qui ont liké:✅
 * Localiser l'utilisateur:✅(geoip2)
-* Score de popularité:❌
+* Score de popularité:✅ (((nombre de like + nombre de visite)/* - nombre de bloquage*/) / nombre de False)
 
 
 ### Parcours 18%end
@@ -46,36 +46,36 @@
 * Trie possible de la liste des profils par âge:❌, localisation:❌, poplarité:❌, tag en commun:❌
 * Trie possible de la liste des profils par INTERVALE d'âge:❌, localisation:❌, poplarité:❌, tag en commun:❌
 * -Voir les autres profils:✅
-* -Liker un profil:❌
-* -Tchatter avec un autre utilisateur:❌
+* -Liker un profil:✅
+* -Tchatter avec un autre utilisateur:✅
 
-### Recherche 60%end
+### Recherche 80%end
 * Par intervalle d'âge:✅
 * Par intervalle de score de popularité:❌
-* Par tags:✅
+* Par tags:✅ (Possède l'un de ces tags)
 * Localisation:✅(L'utilisateur peut choisir le rayon de recherche)
-* Résultat triable comme le parcours:❌
+* Résultat triable comme le parcours:✅
 
 ### Profil des autres 14%end
 * Rendu des informations:✅(prénom, nom, âge, orientation sexuel, sexe, tags, bio)
 Quand un utilisateur regarde le profil d'un autre:
-* Si il possède minimum 1 photo, Liker:❌, Engager le Tchat(*):❌
+* Si il possède minimum 1 photo, Liker:✅, Engager le Tchat(*):✅(par la barre de navigation + (*))
 * Voir le statut de connection:❌
-* Reporter faux compte:❌
-* Bloquer:❌
-* Voir si l'utilisateur Like en retour:❌
+* Reporter faux compte:✅
+* Bloquer:✅
+* Voir si l'utilisateur Like en retour:✅ (Notification "Match with ...")
 
 ### Tchat 0%end
-* (*) "Connecter" 2 profils par les likes:❌
+* (*) "Connecter" 2 profils par les likes:✅
 * (*2)
 
 ### Notifications en cas de 0%end
-* Like reçu:❌
+* Like reçu:✅
 * Visite sur de mon profil:❌
 * Nouveau message(tchat):❌
 * Like en retour d'un like:❌
 * Dislike reçu:❌
-* (*2)Les notifications sont visibles partout:❌
+* (*2)Les notifications sont visibles partout:✅
 
 ### Bonus
 * Choisir son avatar parmis ses photos:✅

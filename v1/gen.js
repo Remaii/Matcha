@@ -73,15 +73,18 @@ var prenoms = {
 }
 
 var interet = {
-	0: "INFORMATIQUE",
-	1: "CINEMA",
-	2: "MUSIQUE",
-	3: "NATURE",
-	4: "SKATE",
-	5: "ROBOT",
-	6: "APPLE",
-	7: "MODE",
-	8: "VELO"
+	name: 'Tags',
+	0:{
+		0: "INFORMATIQUE",
+		1: "CINEMA",
+		2: "MUSIQUE",
+		3: "NATURE",
+		4: "SKATE",
+		5: "ROBOT",
+		6: "APPLE",
+		7: "MODE",
+		8: "VELO"
+	}
 }
 
 function allReadySet(tab, toadd) {

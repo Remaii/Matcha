@@ -19,18 +19,17 @@ router.get('/profile', function(req, res, next) {
 		next();
 	});
 }, function(req, res, next) {
-	mymongo.getMyLiker(req, res, function(mypic) {
-		req.session['heLikeMe'] = mypic;
+	mymongo.getMyLike(req, res, function(mylike) {
+		req.session['mylike'] = mylike;
 		next();
 	});
 }, function(req, res, next) {
 	mymongo.getMyVisit(req, res, function(myvisit) {
-		req.session['myvisit'] = myvisit;
+		req.session['myVisit'] = myvisit;
 		next();
 	});
 }, function(req, res, next) {
-	utilities.makePopu(req.session['myinfo'], req.session['mytag'], req.session['mypic'], req.session['heLikeMe'], req.session['myvisit'],function(prof, popu) {
-		req.session['prof'] = prof;
+	mymongo.getPopu(req.session['login'], function(popu) {
 		req.session['popu'] = popu;
 		next();
 	});
@@ -55,10 +54,8 @@ router.get('/info', function(req, res, next) {
 		next();
 	});
 }, function(req, res, next) {
-	mymongo.getInterest(req, res, function(err, tag) {
-		if (tag) {
-			req.session['interet'] = tag;
-		}
+	mymongo.getInterest(req, res, function(tagForAll) {
+		req.session['interet'] = tagForAll;
 		next();
 	});
 }, function(req, res, next) {
@@ -75,6 +72,11 @@ router.get('/info/mypic', function(req, res, next) {
 });
 
 router.post('/info/loc', function(req, res, next) {
+	mymongo.getMyInfo(req, res, function(myinfo){
+		req.session['myinfo'] = myinfo;
+		next();
+	});
+}, function(req, res, next) {
 	mymongo.upMyLoca(req, res, function(err, value) {
 		if (err) console.log(err);
 		if (value) req.session['myinfo'][7] = value;
@@ -86,6 +88,16 @@ router.post('/info/loc', function(req, res, next) {
 router.post('/info', function(req, res, next) {
 	mymongo.getMyInfo(req, res, function(myinfo){
 		req.session['myinfo'] = myinfo;
+		next();
+	});
+}, function(req, res, next) {
+	mymongo.getMyTag(req, res, function(mytag) {
+		req.session['mytag'] = mytag;
+		next();
+	});
+}, function(req, res, next) {
+	mymongo.getInterest(req, res, function(tagForAll) {
+		req.session['interet'] = tagForAll;
 		next();
 	});
 }, function(req, res) {

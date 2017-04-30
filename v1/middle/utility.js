@@ -1,4 +1,6 @@
 var uniqid = require('uniqid')
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:28000/matcha";
 
 var defineAvatar = function(sexe, avatar, callback) {
     if (avatar == 'avatar.png' || avatar == 'avatarH.png' || avatar == 'avatarF.png') {
@@ -14,76 +16,51 @@ var defineAvatar = function(sexe, avatar, callback) {
     }
 }
 
-function makeBasePopu(myinfo, mytag, mypic, callback) {
-    var count = 0;
-    if (myinfo) {
-        for (var i = 0; i < 6; i++) {
-            if (myinfo[i] != undefined && myinfo[i] != '') {
-                count++;
-            }
+function calcPopularite(heLikeMe, myVisit, iFalse, callback) {
+    if (myVisit[0] && !heLikeMe[0]) {
+        for (var v = 0; myVisit[v]; v++) {
+            if (!myVisit[v]) break;
         }
-    } else {
-        var i = 6;
-    } if (mypic) {
-        for (var j = 0; i == 6 && j < 6; j++) {
-            if (mypic[j] != undefined && mypic[j] != '') {
-                count++;
-            }
+        if (iFalse) {
+            callback(v / iFalse);
         }
-    } else {
-        var j = 6;
-    } if (mytag) {
-        for (var h = 0; j == 6 && mytag[h]; h++) {
-            if (mytag[h] != undefined && mytag[h] != '') {
-                count++;
-            }
+    }
+    if (heLikeMe[0] && myVisit[0]) {
+        for (var v = 0; myVisit[v]; v++) {
+            if (!myVisit[v]) break;
         }
-    } else {
-        var h = 3;
-    } if ((h == 3 && !mytag) || (h >= 3 && (mytag && !mytag[h]))) {
-        return((count / (h + j + i)) * 100);
+        for (var h = 0; heLikeMe[h]; h++) {
+            if (!heLikeMe[h]) break;
+        }
+        if (iFalse) {
+            callback((h + v) / iFalse);
+        } else {
+            callback(h + v);
+        }
     }
 }
 
-function makeLikeVisit(myliker, myvisit) {
-    var countl = 1,
-        countm = 1;
-    if (myliker) {
-        for (var l = 0; myliker[l]; l++) {
-            if (myliker[l] != undefined && myliker[l] != '') {
-                countl++;
-            }
-        }
-    } else {
-        var l = -1;
-    } if (myvisit) {
-        for (var m = 0; myvisit[m]; m++) {
-            if (myvisit[m] != undefined && myvisit[m] != '') {
-                countm++;
-            }
-        }
-    } else {
-        var m = -1;
-    }
-    if (!myvisit[m] && !myliker[l]) {
-        return ((countm + countl) + (m + l));
-    }
+function updatePopu(login, popu) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').updateOne({login: login}, {$set: {popu: popu}});
+        db.close();
+    });
 }
 
-function makePopu(myinfo, mytag, mypic, myliker, myvisit, callback) {
-    if (myvisit) {
-        console.log('la');
-        var prof = makeLikeVisit(myvisit, myliker),
-            popu = Math.round(makeBasePopu(myinfo, mytag, mypic));
-        if (prof && popu) {
-            console.log(prof + ' ' + popu);
-            callback(prof, popu);
-        }
-        //callback(Math.round(makeBasePopu(myinfo, mytag, mypic)), makeLikeVisit(myvisit, myliker));
-    } else {
-        console.log('ici');
-        callback(Math.round(makeBasePopu(myinfo, mytag, mypic)), null);
-    }
+exports.makePopu = function(login) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({login: login}).toArray(function(err, doc) {
+            if (doc[0]['visit'] && doc[0]['heLikeMe']) {
+                calcPopularite(doc[0]['heLikeMe'], doc[0]['visit'], doc[0]['iFalse'],function(result) {
+                    updatePopu(login, result);
+                    db.close();
+                });
+            } else {
+                updatePopu(login, "Nouveau profile");
+                db.close();
+            }
+        });
+    });
 }
 
 var getImage = function(req, res, callback) {
@@ -185,4 +162,3 @@ exports.checkerPwd = checkerPwd;
 exports.checkerBio = checkerBio;
 exports.getImage = getImage;
 exports.rmImage = rmImage;
-exports.makePopu = makePopu;

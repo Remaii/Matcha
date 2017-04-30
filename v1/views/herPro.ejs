@@ -41,7 +41,16 @@
 		</div>
 	</div>
 	<br><div class="progress">
-	 	<div class="progress-bar" style="width: 100%;"></div>
+	 	<% if (locals.session['herPro'][11] < 100) { %>
+			<div class="progress-bar progress-bar-info active" style="width: 10%;">Popularité:</div>
+			<div class="progress-bar progress-bar-success progress-bar-striped active" style="width: <%= locals.session['herPro'][11] %>%;"><%= locals.session['herPro'][11] %>pts Popularité</div>
+			<div class="progress-bar progress-bar-striped active" style="width: <%= 90 - locals.session['herPro'][11] %>%;"></div>
+		<% } else if (locals.session['herPro'][11] >= 100) { %>
+	 		<div class="progress-bar progress-bar-info active" style="width: 10%;">Popularité:</div>
+			<div class="progress-bar progress-bar-success" style="width: 80%;"><%= locals.session['herPro'][11] %>pts de Popularité</div>
+	 	<% } else if (!locals.session['herPro'][11]) { %>
+	 		<div class="progress-bar progress-bar-info" style="width: 100%;"></div>
+	 	<% } %>
 	</div><br>
 	<div class="row">
 		<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">

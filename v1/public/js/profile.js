@@ -1,16 +1,23 @@
-function ajax(name) {
-	var xhr = new XMLHttpRequest();
-	var div = document.getElementById('div');
-
-	xhr.onreadystatechange = function(){
-		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
-			console.log('res=');
-			console.log(xhr.responseText);
-			console.log(xhr.responseXML);
-			// div.innerHTML = xhr.responseText;
-		}
-	};
-	xhr.open("POST", "/profile");
-	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	xhr.send("name="+name);
+function getLikeMe(login) {
+	sock.emit('recupLikeur', {login: login});
 }
+
+var login = document.getElementById('avatar').alt,
+	likeur = document.getElementById('likeur'),
+	first = true;
+
+if (first) {
+	first = false;
+	getLikeMe(login);
+}
+
+sock.on('heLikeYou', function(data) {
+	var tmp_div = document.createElement('div'),
+		link = document.createElement('a');
+
+	tmp_div.setAttribute('class', 'col-lg-6 col-md-6 col-sm-6 col-xs-6 text-center');
+	link.setAttribute('href', '/profile/' + data.content);
+	link.innerText = data.content;
+	tmp_div.appendChild(link);
+	likeur.appendChild(tmp_div);
+});

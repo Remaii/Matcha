@@ -54,11 +54,11 @@ var intelTri = function(myinfo, list, callback) {
 
     if (Sex == 'Homme') {
         if (OSex == 'Gay') {
-            getGay(list, Sex, function(retour){
+            getGay(list, Sex, function(retour) {
                 callback(retour);
             });
         } else if (OSex == 'Hetero') {
-            getOposite(list, Sex, function(retour){
+            getOposite(list, Sex, function(retour) {
                 callback(retour);
             });
         } else {
@@ -68,11 +68,11 @@ var intelTri = function(myinfo, list, callback) {
         }
     } else if (Sex == 'Femme') {
         if (OSex == 'Gay') {
-            getGay(list, Sex, function(retour){
+            getGay(list, Sex, function(retour) {
                 callback(retour);
             });
         } else if (OSex == 'Hetero') {
-            getOposite(list, Sex, function(retour){
+            getOposite(list, Sex, function(retour) {
                 callback(retour);
             });
         } else {
@@ -82,7 +82,7 @@ var intelTri = function(myinfo, list, callback) {
         }
     } else {
         getBi(list, 'Homme', function(retour) {
-                callback(retour);
+            callback(retour);
         });
     }
 }
@@ -103,7 +103,7 @@ var forIndex = function(myinfo, allprof, callback, ray) {
         tmp[2] = utilities.Distance(myinfo[8], myinfo[11], allprof[i][5], allprof[i][4]) / 100;
         tmp[3] = allprof[i][8];
         if (tmp[2] <= rayon) {
-            result[nb] = tmp;    
+            result[nb] = tmp;
             nb++;
             tmp = {};
         }
@@ -117,7 +117,7 @@ var forIndex = function(myinfo, allprof, callback, ray) {
 function getSexe(sexe, list, callback) {
     var result = {};
     var nb = 0;
-    for (var i = 0; list[i]; i++){
+    for (var i = 0; list[i]; i++) {
         if (list[i][2] == sexe) {
             result[nb] = list[i];
             nb++;
@@ -131,7 +131,7 @@ function getSexe(sexe, list, callback) {
 function getOrient(orient, list, callback) {
     var result = {};
     var nb = 0;
-    for (var i = 0; list[i]; i++){
+    for (var i = 0; list[i]; i++) {
         if (list[i][3] == orient) {
             result[nb] = list[i];
             nb++;
@@ -168,7 +168,7 @@ function withTags(tags, list, callback) {
     for (var i = 0; list[i]; i++) {
         if (list[i][7] != undefined) {
             ok = 0;
-            for (var j = 0;list[i][7][j]; j++) {
+            for (var j = 0; list[i][7][j]; j++) {
                 for (var t = 0; tags[t]; t++) {
                     if (list[i][7][j] == tags[t]) {
                         ok++;
@@ -197,10 +197,10 @@ var makeResearch = function(req, callback) {
     var tags = req.body['t'].split(',');
 
     if (sexe != '') {
-        getSexe(sexe, list, function(retourSexe){
+        getSexe(sexe, list, function(retourSexe) {
             if (orient != '') {
                 getOrient(orient, retourSexe, function(retourOrient) {
-                    forAge(amin, amax, retourOrient, function(retourAge){
+                    forAge(amin, amax, retourOrient, function(retourAge) {
                         if (tags == '') {
                             callback(null, retourAge);
                         } else {
@@ -211,7 +211,7 @@ var makeResearch = function(req, callback) {
                     });
                 });
             } else {
-                forAge(amin, amax, retourSexe, function(retourAge){
+                forAge(amin, amax, retourSexe, function(retourAge) {
                     if (tags == '') {
                         callback(null, retourAge);
                     } else {
@@ -223,8 +223,8 @@ var makeResearch = function(req, callback) {
             }
         });
     } else if (orient != '' && sexe == '') {
-        getOrient(orient, list, function(retourOrient){
-            forAge(amin, amax, retourOrient, function(retourAge){
+        getOrient(orient, list, function(retourOrient) {
+            forAge(amin, amax, retourOrient, function(retourAge) {
                 if (tags == '') {
                     callback(null, retourAge);
                 } else {

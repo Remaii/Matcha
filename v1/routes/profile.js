@@ -6,9 +6,7 @@ var trie = require('../middle/trieur')
 
 router.get('/', function(req, res, next) {
 	mymongo.getInterest(req, res, function(err, tag) {
-		if (tag) {
-			req.session['interet'] = tag;
-		}
+		req.session['interet'] = tag;
 		next();
 	});
 }, function(req, res) {
@@ -54,7 +52,7 @@ router.get('/:pseudo', function(req, res, next) {
 	mymongo.getHerInfo(req, res, function(err, result) {
 		if (err) {
 			req.flash('err', 'Aucun utilisateur ayant ce pseudo n\'à été trouvé');
-			res.redirect('/');
+			req.session['err'] = 'Aucun utilisateur ayant ce pseudo n\'à été trouvé';
 		}
 		if (result) {
 			req.session['herPro'] = result;
@@ -73,7 +71,6 @@ router.get('/:pseudo', function(req, res, next) {
 	});
 }, function(req, res, next) {
 	mymongo.getMyLike(req, res, function(myLike) {
-		req.session['myLike'] = myLike;
 		if (myLike != undefined) {
 			for (var i = 0; myLike[i]; i++) {
 				if (myLike[i] == req.session['herPro'][7]) {
@@ -92,7 +89,6 @@ router.get('/:pseudo', function(req, res, next) {
 	});
 }, function(req, res, next) {
 	mymongo.getMyBlock(req, res, function(myBlock) {
-		req.session['myBlock'] = myBlock;
 		if (myBlock != undefined) {
 			for (var i = 0; myBlock[i]; i++) {
 				if (myBlock[i] == req.session['herPro'][7]) {
@@ -106,16 +102,20 @@ router.get('/:pseudo', function(req, res, next) {
 	});
 }, function(req, res, next) {
 	mymongo.getMyFalse(req, res, function(myFalse) {
-		req.session['myFalse'] = myFalse;
 		if (myFalse != undefined) {
 			for (var i = 0; myFalse[i]; i++) {
 				if (myFalse[i] == req.session['herPro'][7]) {
 					req.session['falseHer'] = myFalse[i];
-					next();
 				}
 			}
-			req.session['falseHer'] = undefined;
+			if (!myFalse[i] && req.session['falseHer'] != req.session['herPro'][7])
+				req.session['falseHer'] = undefined;
 		}
+		next();
+	});
+}, function(req, res, next) {
+	mymongo.getPopu(req.session['toget'], function(popu) {
+		req.session['herPro'][11] = popu;
 		next();
 	});
 }, function(req, res) {
@@ -124,9 +124,13 @@ router.get('/:pseudo', function(req, res, next) {
 });
 
 router.post('/like', function(req, res, next) {
+	mymongo.getMyLike(req, res, function(myLike) {
+		req.session['myLike'] = myLike;
+		next();
+	});
+}, function(req, res, next) {
 	mymongo.likeUser(req, res, function(err, ret) {
-		if (err) console.log(err);
-		console.log(ret['mess']);
+		res.locals.like = ret;
 		next();
 	});
 }, function(req, res) {
@@ -134,9 +138,13 @@ router.post('/like', function(req, res, next) {
 });
 
 router.post('/dislike', function(req, res, next) {
+	mymongo.getMyLike(req, res, function(myLike) {
+		req.session['myLike'] = myLike;
+		next();
+	});
+}, function(req, res, next) {
 	mymongo.disLikeUser(req, res, function(err, ret) {
-		if (err) console.log(err);
-		console.log(ret['mess']);
+		res.locals.like = ret;
 		next();
 	});
 }, function(req, res) {
@@ -144,9 +152,13 @@ router.post('/dislike', function(req, res, next) {
 });
 
 router.post('/false_user', function(req, res, next) {
+	mymongo.getMyFalse(req, res, function(myFalse) {
+		req.session['myFalse'] = myFalse;
+		next();
+	});
+}, function(req, res, next) {
 	mymongo.falseUser(req, res, function(err, ret) {
-		if (err) console.log(err);
-		console.log(ret['mess']);
+		res.locals.like = ret;
 		next();
 	});
 }, function(req, res) {
@@ -154,9 +166,13 @@ router.post('/false_user', function(req, res, next) {
 });
 
 router.post('/block', function(req, res, next) {
+	mymongo.getMyBlock(req, res, function(myBlock) {
+		req.session['myBlock'] = myBlock;
+		next();
+	});
+}, function(req, res, next) {
 	mymongo.blockUser(req, res, function(err, ret) {
-		if (err) console.log(err);
-		console.log(ret['mess']);
+		res.locals.like = ret;
 		next();
 	});
 }, function(req, res) {
@@ -164,9 +180,13 @@ router.post('/block', function(req, res, next) {
 });
 
 router.post('/deblock', function(req, res, next) {
+	mymongo.getMyBlock(req, res, function(myBlock) {
+		req.session['myBlock'] = myBlock;
+		next();
+	});
+}, function(req, res, next) {
 	mymongo.deBlockUser(req, res, function(err, ret) {
-		if (err) console.log(err);
-		console.log(ret['mess']);
+		res.locals.like = ret;
 		next();
 	});
 }, function(req, res) {

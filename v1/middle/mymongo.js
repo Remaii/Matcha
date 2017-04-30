@@ -54,13 +54,35 @@ function downTab(pastTab, pseudo, call) {
         }
         call(result);
     } else if (pastTab[0] == pseudo && !pastTab[1]) {
-        call({0:' '});
+        call({ 0: '' });
     }
 }
 
+function notifyHim(to, message) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({login: to}).toArray(function(err, doc) {
+            makeTab(doc[0]['notif'], message, function(result) {
+                db.collection('user').updateOne({login: to}, {$set: {notif: result}});
+                db.close();
+            });
+        });
+    });
+}
+
+var readNotif = function(to, message) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({login: to}).toArray(function(err, doc) {
+            downTab(doc[0]['notif'], message, function(result) {
+                db.collection('user').updateOne({login: to}, {$set: {notif: result}});
+                db.close();
+            });
+        });
+    });
+}
+
 function verifyPseudo(pseudo, callback) {
-    MongoClient.connect(url, function(err, db){
-        db.collection('user').find({pseudo: pseudo}).toArray(function(err, doc) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({ pseudo: pseudo }).toArray(function(err, doc) {
             if (doc[0] == undefined) {
                 callback(null, pseudo);
             } else {
@@ -74,7 +96,7 @@ function verifyPseudo(pseudo, callback) {
 var upMyLoca = function(req, res, callback) {
     if (req.session['myinfo'][7] != req.body.city) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').updateOne({login: req.session['login']}, { $set:{la: req.body.la, lo: req.body.lo, city: req.body.city}});
+            db.collection('user').updateOne({ login: req.session['login'] }, { $set: { la: req.body.la, lo: req.body.lo, city: req.body.city } });
             db.close();
             callback(null, req.body.city);
         });
@@ -83,7 +105,7 @@ var upMyLoca = function(req, res, callback) {
 
 var checkImageUser = function(login, callback) {
     MongoClient.connect(url, function(err, db) {
-        db.collection('image').find({login: login}).toArray(function(err, docs) {
+        db.collection('image').find({ login: login }).toArray(function(err, docs) {
             if (err) callback(null, null);
             if (docs.length == 0) {
                 callback(docs, null);
@@ -111,9 +133,9 @@ var downMyImage = function(req, res) {
             MongoClient.connect(url, function(err, db) {
                 var newImageR = {
                     login: log,
-                    image:toadd
+                    image: toadd
                 };
-                db.collection('image').findOneAndReplace({login: log}, newImageR,function (err, result) {
+                db.collection('image').findOneAndReplace({ login: log }, newImageR, function(err, result) {
                     console.log('User ' + log + ' MaJ Down Image success');
                 });
                 db.close();
@@ -124,15 +146,15 @@ var downMyImage = function(req, res) {
 
 var upImage = function(value, log) {
     var toadd = {};
-    
+
     checkImageUser(log, function(vide, plein) {
         if (vide) {
             MongoClient.connect(url, function(err, db) {
                 var newImage = {
                     login: log,
-                    image:{0: value}
+                    image: { 0: value }
                 };
-                db.collection('image').insertOne(newImage, function (err, result) {
+                db.collection('image').insertOne(newImage, function(err, result) {
                     console.log('User ' + log + ' Add Image success');
                 });
                 db.close();
@@ -146,9 +168,9 @@ var upImage = function(value, log) {
             MongoClient.connect(url, function(err, db) {
                 var newImageR = {
                     login: log,
-                    image:toadd
+                    image: toadd
                 };
-                db.collection('image').findOneAndReplace({login: log}, newImageR,function (err, result) {
+                db.collection('image').findOneAndReplace({ login: log }, newImageR, function(err, result) {
                     console.log('User ' + log + ' MaJ Up Image success');
                 });
                 db.close();
@@ -162,41 +184,38 @@ function insertThis(tab, where) {
         db.collection(where).updateOne({}, tab, function(err, result) {
             if (err) return console.log('insertThis: ' + err);
             if (result.result.ok) return console.log("Les Tags on ete mis à jour");
+            db.close();
         });
-        db.close();
     });
 }
 
 function getHerImage(req, res, call) {
     var login = req.session['herPro'][9];
-    req.session['herPro'][9] = '';
-    
+
     if (login != '' || login != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('image').find({login: login}).toArray(function(err, doc) {
+            db.collection('image').find({ login: login }).toArray(function(err, doc) {
                 if (doc.length != 0) {
                     call(doc[0]['image']);
+                    db.close();
                 } else {
-                    call({0:' '});
+                    call({ 0: ' ' });
+                    db.close();
                 }
             });
-            db.close();
         });
     }
 }
 
 function getHerTag(req, res, call) {
-    var mytag = {};
-    var arr = {};
     var pseudo = req.session['toget'];
 
     if (pseudo != '' || pseudo != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: pseudo}).toArray(function(err, doc) {
-                mytag = doc[0]['tag'];
-                call(mytag);
+            db.collection('user').find({ login: pseudo }).toArray(function(err, doc) {
+                call(doc[0]['tag']);
+                db.close();
             });
-            db.close();
         });
     }
 }
@@ -204,11 +223,14 @@ function getHerTag(req, res, call) {
 function upHisVisit(pseudo, visiteur) {
     if (pseudo != visiteur) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: pseudo}).toArray(function(err, doc) {
+            db.collection('user').find({ login: pseudo }).toArray(function(err, doc) {
+                notifyHim(pseudo, 'Visited by ' + visiteur);
                 makeTab(doc[0]['visit'], visiteur, function(result) {
-                    MongoClient.connect(url, function(err, db) {  
-                        db.collection('user').updateOne({login: pseudo}, { $set:{visit: result}});
+                    MongoClient.connect(url, function(err, db1) {
+                        db1.collection('user').updateOne({ login: pseudo }, { $set: { visit: result } });
+                        db1.close();
                         db.close();
+                        utilities.makePopu(pseudo);
                     });
                 });
             });
@@ -221,13 +243,13 @@ function getHerInfo(req, res, call) {
     var pseudo = req.session['toget'];
 
     if (pseudo != '' || pseudo != undefined) {
-        upHisVisit(pseudo, req.session['login']);
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: pseudo}).toArray(function(err, doc) {
+            db.collection('user').find({ login: pseudo }).toArray(function(err, doc) {
                 if (err) {
                     call(err, null);
                 }
                 if (doc[0] != undefined) {
+                    upHisVisit(pseudo, req.session['login']);
                     arr[0] = doc[0]['firstname'];
                     arr[1] = doc[0]['lastname'];
                     arr[2] = doc[0]['age'];
@@ -249,13 +271,27 @@ function getHerInfo(req, res, call) {
     }
 }
 
+var getPopu = function(login, call) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({ login: login }).toArray(function(err, doc) {
+            if (doc.length > 0) {
+                call(doc[0]['popu']);
+                db.close();
+            } else {
+                call({ 0: '0' });
+                db.close();
+            }
+        });
+    });
+}
+
 function getMyInfo(req, res, call) {
     var arr = {};
     var log = req.session['login'];
 
     if (log != '' || log != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: log}).toArray(function(err, doc) {
+            db.collection('user').find({ login: log }).toArray(function(err, doc) {
                 if (doc[0]) {
                     arr[0] = doc[0]['firstname'];
                     arr[1] = doc[0]['lastname'];
@@ -269,10 +305,12 @@ function getMyInfo(req, res, call) {
                     arr[9] = doc[0]['avatar'];
                     arr[10] = doc[0]['pseudo'];
                     arr[11] = doc[0]['la'];
+                    arr[12] = doc[0]['login'];
                     call(arr);
+                    db.close();
                 }
             });
-            db.close();
+
         });
     }
 }
@@ -282,14 +320,15 @@ function getMyVisit(req, res, call) {
 
     if (log != '' || log != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: log}).toArray(function(err, doc) {
+            db.collection('user').find({ login: log }).toArray(function(err, doc) {
                 if (doc.length > 0) {
                     call(doc[0]['visit']);
+                    db.close();
                 } else {
-                    call({0:''});
+                    call({ 0: '' });
+                    db.close();
                 }
             });
-            db.close();
         });
     }
 }
@@ -299,14 +338,15 @@ function getMyBlock(req, res, call) {
 
     if (log != '' || log != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: log}).toArray(function(err, doc) {
+            db.collection('user').find({ login: log }).toArray(function(err, doc) {
                 if (doc.length > 0) {
                     call(doc[0]['block']);
+                    db.close();
                 } else {
-                    call({0:' '});
+                    call({ 0: ' ' });
+                    db.close();
                 }
             });
-            db.close();
         });
     }
 }
@@ -316,14 +356,15 @@ function getMyFalse(req, res, call) {
 
     if (log != '' || log != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: log}).toArray(function(err, doc) {
+            db.collection('user').find({ login: log }).toArray(function(err, doc) {
                 if (doc.length > 0) {
                     call(doc[0]['falseUser']);
+                    db.close();
                 } else {
-                    call({0:''});
+                    call({ 0: '' });
+                    db.close();
                 }
             });
-            db.close();
         });
     }
 }
@@ -333,14 +374,15 @@ function getMyLiker(req, res, call) {
 
     if (log != '' || log != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: log}).toArray(function(err, doc) {
+            db.collection('user').find({ login: log }).toArray(function(err, doc) {
                 if (doc.length > 0) {
                     call(doc[0]['heLikeMe']);
+                    db.close();
                 } else {
-                    call({0:''});
+                    call({ 0: '' });
+                    db.close();
                 }
             });
-            db.close();
         });
     }
 }
@@ -350,14 +392,15 @@ function getMyLike(req, res, call) {
 
     if (log != '' || log != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: log}).toArray(function(err, doc) {
+            db.collection('user').find({ login: log }).toArray(function(err, doc) {
                 if (doc.length > 0) {
                     call(doc[0]['like']);
+                    db.close();
                 } else {
-                    call({0:''});
+                    call({ 0: '' });
+                    db.close();
                 }
             });
-            db.close();
         });
     }
 }
@@ -367,14 +410,15 @@ function getMyImage(req, res, call) {
 
     if (log != '' || log != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('image').find({login: log}).toArray(function(err, doc) {
+            db.collection('image').find({ login: log }).toArray(function(err, doc) {
                 if (doc.length != 0) {
                     call(doc[0]['image']);
+                    db.close();
                 } else {
-                    call({0:''});
+                    call({ 0: '' });
+                    db.close();
                 }
             });
-            db.close();
         });
     }
 }
@@ -386,11 +430,15 @@ function getMyTag(req, res, call) {
 
     if (log != '' || log != undefined) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: log}).toArray(function(err, doc) {
-                mytag = doc[0]['tag'];
-                call(mytag);
+            db.collection('user').find({ login: log }).toArray(function(err, doc) {
+                if (doc.length != 0) {
+                    call(doc[0]['tag']);
+                    db.close();
+                } else {
+                    call({ 0: '' });
+                    db.close();
+                }
             });
-            db.close();
         });
     }
 }
@@ -445,12 +493,12 @@ var addUser = function(req, res) {
             passwd = crypto.createHmac('whirlpool', passwd).digest('hex');
             cfpwd = crypto.createHmac('whirlpool', cfpwd).digest('hex');
             if (passwd === cfpwd) {
-            	MongoClient.connect(url, function (err, db) {
-            		if (err) {
+                MongoClient.connect(url, function(err, db) {
+                    if (err) {
                         req.flash('error', 'Connection to DataBase Failed');
                         res.redirect('login');
                     }
-            		var newUser = {
+                    var newUser = {
                         login: logre,
                         pseudo: logre,
                         pwd: passwd,
@@ -478,26 +526,24 @@ var addUser = function(req, res) {
                         if (ok != -1) {
                             req.session['login'] = logre;
                             req.flash('mess', 'Utilisateur ajouté avec succes');
-                            db.collection('user').insertOne(newUser, function (err, result) {
+                            db.collection('user').insertOne(newUser, function(err, result) {
                                 if (result.result['ok']) {
                                     console.log('User ' + logre + ' add success');
                                 }
 
                             });
-            			} else {
+                        } else {
                             req.flash('error', 'Utilisateur / Mail, déjà utilisé');
                         }
-            			db.close();
+                        db.close();
                         res.redirect('compte/info');
                     });
-            	});
-            }
-            else {
+                });
+            } else {
                 req.flash('error', 'Les mots de passes ne sont pas identiques');
                 res.redirect('register');
             }
-        }
-        else {
+        } else {
             req.flash('error', 'Le mot de passe doit contenir au minimum 1 Majuscules, 1 chiffre et faire 5 caracteres minimum');
             res.redirect('register');
         }
@@ -518,13 +564,13 @@ var logUser = function(req, res, callback) {
 
     if (log != '' && pwd != '') {
         pwd = crypto.createHmac('whirlpool', pwd).digest('hex');
-        MongoClient.connect(url, function (err, db) {
+        MongoClient.connect(url, function(err, db) {
             var collec = db.collection('user');
             if (err) {
-                callback({err: 'Connection to DataBase Failed'}, null, null, 'login');
+                callback({ err: 'Connection to DataBase Failed' }, null, null, 'login');
                 req.flash('error', 'Connection to DataBase Failed');
             }
-            collec.find({}).toArray(function(err, docs){
+            collec.find({}).toArray(function(err, docs) {
                 while (docs[i]) {
                     if (docs[i]['login'] === log && docs[i]['pwd'] === pwd) {
                         console.log('User: ' + log + ' is Connected');
@@ -533,11 +579,10 @@ var logUser = function(req, res, callback) {
                     i++;
                 }
                 if (ok == 1) {
-                    collec.updateOne({login: log}, { $set:{last_co: new Date()}});
+                    collec.updateOne({ login: log }, { $set: { last_co: new Date() } });
                     db.close();
-                    callback(null, {mess: 'Connection Success'}, log, '/');
-                }
-                else {
+                    callback(null, { mess: 'Connection Success' }, log, '/');
+                } else {
                     req.flash('error', 'Utilisateur/Mot de passe invalides');
                     db.close();
                     callback('Utilisateur/Mot de passe incorrects', null, null, 'login');
@@ -561,14 +606,14 @@ var updateUser = function(req, res) {
         bio = req.body.bio,
         pseudo = req.body.pseudo,
         avatar = req.body.avatar;
-    
+
     if (loger != undefined) {
         if (pseudo != '' && pseudo != req.session['myinfo'][10]) {
-            verifyPseudo(pseudo, function (err, result) {
+            verifyPseudo(pseudo, function(err, result) {
                 if (err) console.log(err + ' éxiste déjà!');
                 if (result) {
                     MongoClient.connect(url, function(err, db) {
-                        db.collection('user').updateOne({login: loger}, { $set:{pseudo: result}});
+                        db.collection('user').updateOne({ login: loger }, { $set: { pseudo: result } });
                         db.close();
                         console.log(loger + ' a mis a jour son Pseudo');
                     });
@@ -577,28 +622,28 @@ var updateUser = function(req, res) {
         }
         if (mail != undefined && mail != req.session['myinfo'][6]) {
             MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: loger}, { $set:{mail: mail}});
+                db.collection('user').updateOne({ login: loger }, { $set: { mail: mail } });
                 db.close();
                 console.log(loger + ' a mis à jour son Mail');
             });
         }
         if (age != undefined && age != req.session['myinfo'][2]) {
             MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: loger}, { $set:{age: age}});
+                db.collection('user').updateOne({ login: loger }, { $set: { age: age } });
                 db.close();
                 console.log(loger + ' a mis à jour son Âge');
             });
         }
         if (lastname != undefined && lastname != req.session['myinfo'][1]) {
             MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: loger}, { $set:{lastname: lastname}});
+                db.collection('user').updateOne({ login: loger }, { $set: { lastname: lastname } });
                 db.close();
                 console.log(loger + ' a mis à jour son Nom');
             });
         }
         if (firstname != undefined && firstname != req.session['myinfo'][0]) {
             MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: loger}, { $set:{firstname: firstname}});
+                db.collection('user').updateOne({ login: loger }, { $set: { firstname: firstname } });
                 db.close();
                 console.log(loger + ' a mis à jour son Prénom');
             });
@@ -606,7 +651,7 @@ var updateUser = function(req, res) {
         if (bio != undefined && bio != req.session['myinfo'][5]) {
             if (utilities.checkerBio(bio, '500') == 1) {
                 MongoClient.connect(url, function(err, db) {
-                    db.collection('user').updateOne({login: loger}, { $set:{bio: bio}});
+                    db.collection('user').updateOne({ login: loger }, { $set: { bio: bio } });
                     db.close();
                     console.log(loger + ' a mis à jour sa Bio');
                 });
@@ -615,7 +660,7 @@ var updateUser = function(req, res) {
         if (sexe != req.session['myinfo'][3] || (req.session['myinfo'][3] == null && avatar != req.session['myinfo'][9])) {
             utilities.defineAvatar(sexe, avatar, function(s, a) {
                 MongoClient.connect(url, function(err, db) {
-                    db.collection('user').updateOne({login: loger}, { $set:{sexe: s, avatar: a}});
+                    db.collection('user').updateOne({ login: loger }, { $set: { sexe: s, avatar: a } });
                     db.close();
                 });
                 console.log(loger + ' mis à jour son Sexe');
@@ -623,11 +668,12 @@ var updateUser = function(req, res) {
         }
         if (orient != undefined && orient != req.session['myinfo'][4]) {
             MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: loger}, { $set:{orient: orient}});
+                db.collection('user').updateOne({ login: loger }, { $set: { orient: orient } });
                 db.close();
                 console.log(loger + ' mise à jour sa Sexualité');
             });
         }
+        utilities.makePopu(loger);
         res.redirect('info');
     }
 }
@@ -635,7 +681,7 @@ var updateUser = function(req, res) {
 var setAvatar = function(req, res) {
     utilities.defineAvatar(req.session['myinfo'][3], req.body.path, function(s, a) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').updateOne({login: req.session['login']}, { $set:{avatar: a}});
+            db.collection('user').updateOne({ login: req.session['login'] }, { $set: { avatar: a } });
             db.close();
             console.log(req.session['login'] + ' à mis a jour son avatar' + s + ' ' + a);
         });
@@ -649,34 +695,11 @@ var addInterest = function(req, res) {
         req.flash('error', 'Tu n\'a rien mis :(');
         res.redirect('info');
     } else if (utilities.checkerBio(toadd, 20) && utilities.checkerTag(toadd)) {
-        MongoClient.connect(url, function(err, db) {
-            var tab = {};
-            var ok = 0;
-            db.collection('interet').find().toArray(function(err, doc) {
-                if (doc[0] == undefined) {
-                    tab[0] = toadd;
-                    insertThis(tab, 'interet');
-                    ok = -2;
-                }
-                if (ok != -2) {
-                    for (var i = 0; doc[0][i]; i++) {
-                        if (doc[0][i] == toadd) {
-                            ok = -1;
-                        }
-                        if (ok != -1)
-                            ok++;
-                        tab[i] = doc[0][i];
-                    }
-                    if (ok > 0) {
-                        tab[i] = toadd;
-                        req.flash('mess', 'Tag ajouté avec success');
-                        insertThis(tab, 'interet');
-                    }
-                }
-                else if (ok == -1) {
-                    req.flash('error', 'Ce Tag existe déjà');
-                }
+        makeTab(req.session['interet'], toadd, function(result) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('interet').updateOne({ name: "Tags" }, { $set: { 0: result } });
                 db.close();
+                req.flash('mess', 'Tag ajouté !')
                 res.redirect('info');
             });
         });
@@ -687,148 +710,73 @@ var addInterest = function(req, res) {
 }
 
 var getInterest = function(req, res, call) {
-    var tag = {};
-
     MongoClient.connect(url, function(err, db) {
-        db.collection('interet').find().toArray(function(err, docs){
-            if (docs.length > 0) {
-                for (var i = 0; docs[0][i]; i++){
-                    tag[i] = docs[0][i];
-                }
-                call(null, tag);
-            } else {
-                call("no interest in db", null);
-            }            
+        db.collection('interet').find().toArray(function(err, docs) {
+            call(docs[0][0]);
         });
         db.close();
     });
 }
 
-var upMyTag = function(req, res) {
+function upMyTag(req, res) {
     var interet = req.body.select;
-    var log = req.session['login'];
-    var toadd = {};
-    var decal = 0;
-    var ok = 0;
 
-    if ((interet != '' || interet != null || interet != undefined) && (log != undefined || log != '')) {
-        if (Array.isArray(interet)) {
-            for (var i = 0; interet[i]; i++) {
-                toadd[i] = interet[i];
-                if (!interet[i + 1] && (req.session['mytag'] != undefined || req.session['mytag'] != '') && req.session['mytag']) {
-                    for (var u = 0; req.session['mytag'][u];u++) {
-                        if (req.session['mytag'][u] != ' ') {
-                            toadd[i + u + 1 + decal] = req.session['mytag'][u];
-                        } else {
-                            decal++;
-                        }
-                        if (!req.session['mytag'][u + 1]) {
-                            ok = 1;
-                        }
-                    }
-                } else if (!interet[i + 1]) {
-                    ok = 1;
-                }
-            }
-        } else {
-            if ((req.session['mytag'] != undefined || req.session['mytag'] != '') && req.session['mytag']) {
-                if (req.session['mytag'][0] != ' ') {   
-                    for (var u = 0; req.session['mytag'][u];u++) {
-                        toadd[u] = req.session['mytag'][u];
-                        if (!req.session['mytag'][u + 1]) {
-                            toadd[u + 1] = interet;
-                            ok = 1;
-                        }
-                    }
-                } else if (req.session['mytag'][1] && req.session['mytag'][0] == ' ') {
-                    for (var u = 1; req.session['mytag'][u];u++) {
-                        toadd[u - 1] = req.session['mytag'][u];
-                        if (!req.session['mytag'][u + 1]) {
-                            toadd[u + 1] = interet;
-                            ok = 1;
-                        }
-                    }
-                }
-            } else {
-                if (interet != null) {
-                    toadd[0] = interet;
-                }
-                ok = 1;
-            }
-        }
-        if (ok == 1) {
-            removeDouble(toadd, function(resultat) {
-                MongoClient.connect(url, function(err, db) {
-                    db.collection('user').updateOne({login: log}, { $set:{tag: resultat}});
-                    db.close();
-                });
-                // console.log(log + ' ajout tag: ' + interet);
-                res.redirect('info');
+    if (Array.isArray(interet)) {
+        for (var i = 0; i < interet.length; i++) {
+            makeTab(req.session['mytag'], interet[i], function(result) {
+                req.session['mytag'] = result;
             });
         }
+        if (i == interet.length) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({ login: req.session['login'] }, { $set: { tag: req.session['mytag'] } });
+                db.close();
+            });
+            res.redirect('info');
+        }
     } else {
+        makeTab(req.session['mytag'], interet, function(result) {
+            req.session['mytag'] = result;
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({ login: req.session['login'] }, { $set: { tag: req.session['mytag'] } });
+                db.close();
+            });
+        });
         res.redirect('info');
     }
 }
 
-var downMyTag = function(req, res) {
+function downMyTag(req, res) {
     var interet = req.body.select;
-    var log = req.session['login'];
-    var toadd = {};
-    var nb = 0;
-    var ok = 0;
-    var count = 0;
 
-    if ((log != undefined || log != '') && (req.session['mytag'] != undefined || req.session['mytag'] != '') && req.session['mytag']) {
-        for (var i = 0; req.session['mytag'][i]; i++) {
-            if (Array.isArray(interet)) {
-                count = 0;
-                for (var a = 0; interet[a]; a++) {
-                    if (req.session['mytag'][i] == interet[a]) {
-                        count = -100;
-                    } else {
-                        count++;
-                    }
-                }
-                if (count > 0){
-                    toadd[nb] = req.session['mytag'][i];
-                    nb++;
-                }
-            } else {
-                if (req.session['mytag'][i] != interet) {
-                    toadd[nb] = req.session['mytag'][i];
-                    nb++;
-                }
-            }
+    if (Array.isArray(interet)) {
+        for (var i = 0; i < interet.length; i++) {
+            downTab(req.session['mytag'], interet[i], function(result) {
+                req.session['mytag'] = result;
+            });
         }
-		if (toadd[0] == undefined) {
+        if (i == interet.length) {
             MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({login: log}, { $unset:{tag: ' '}});
+                db.collection('user').updateOne({ login: req.session['login'] }, { $set: { tag: req.session['mytag'] } });
                 db.close();
             });
-            // console.log(log + ' suppression tag: ' + interet + ' et n\'a plus de tag');
             res.redirect('info');
-		} else {
-            ok = 1;
-        }
-        if (ok == 1) {
-            removeDouble(toadd, function(resultat) {
-                MongoClient.connect(url, function(err, db) {
-                    db.collection('user').updateOne({login: log}, { $set:{tag: resultat}});
-                    db.close();
-                });
-                // console.log(log + ' suppression tag: ' + interet);
-                res.redirect('info');
-            });
         }
     } else {
+        downTab(req.session['mytag'], interet, function(result) {
+            req.session['mytag'] = result;
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({ login: req.session['login'] }, { $set: { tag: req.session['mytag'] } });
+                db.close();
+            });
+        });
         res.redirect('info');
     }
 }
 
 function getHisLike(login, call) {
     MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({login: login}).toArray(function(err, doc) {
+        db.collection('user').find({ login: login }).toArray(function(err, doc) {
             call(doc[0]['like']);
         });
         db.close();
@@ -838,21 +786,22 @@ function getHisLike(login, call) {
 function upHisMatch(sens, login, me) {
     if (sens == true) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: login}).toArray(function(err, doc) {
+            db.collection('user').find({ login: login }).toArray(function(err, doc) {
                 makeTab(doc[0]['tchat'], me, function(result) {
-                    MongoClient.connect(url, function(err, db) {  
-                        db.collection('user').updateOne({login: login}, { $set:{tchat: result}});
+                    MongoClient.connect(url, function(err, db) {
+                        db.collection('user').updateOne({ login: login }, { $set: { tchat: result } });
                         db.close();
+                        notifyHim(login, 'Match with ' + me);
                     });
                 });
             });
         });
     } else {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: login}).toArray(function(err, doc) {
+            db.collection('user').find({ login: login }).toArray(function(err, doc) {
                 downTab(doc[0]['tchat'], me, function(result) {
-                    MongoClient.connect(url, function(err, db) {  
-                        db.collection('user').updateOne({login: login}, { $set:{tchat: result}});
+                    MongoClient.connect(url, function(err, db) {
+                        db.collection('user').updateOne({ login: login }, { $set: { tchat: result } });
                         db.close();
                     });
                 });
@@ -863,7 +812,7 @@ function upHisMatch(sens, login, me) {
 
 function checkConnect(loginA, loginB) {
     var logA = undefined,
-        ok = 0;
+        ok = 0,
         logB = undefined;
 
     function checkMatch(logA, logB) {
@@ -873,7 +822,6 @@ function checkConnect(loginA, loginB) {
                     for (var b = 0; logB[b]; b++) {
                         if (logB[b] == loginA) {
                             ok = 1;
-                            console.log('Match!')
                             upHisMatch(true, loginA, loginB);
                             upHisMatch(true, loginB, loginA);
                         }
@@ -881,7 +829,8 @@ function checkConnect(loginA, loginB) {
                 }
             }
             if (!logA[a] && !logB[b] && ok != 1) {
-                console.log('No match !');
+                upHisMatch(false, loginA, loginB);
+                upHisMatch(false, loginB, loginA);
             }
         }
     }
@@ -898,23 +847,26 @@ function checkConnect(loginA, loginB) {
 function upHisLike(sens, login, me) {
     if (sens == true) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: login}).toArray(function(err, doc) {
+            db.collection('user').find({ login: login }).toArray(function(err, doc) {
                 makeTab(doc[0]['heLikeMe'], me, function(result) {
-                    MongoClient.connect(url, function(err, db) {  
-                        db.collection('user').updateOne({login: login}, { $set:{heLikeMe: result}});
+                    MongoClient.connect(url, function(err, db) {
+                        db.collection('user').updateOne({ login: login }, { $set: { heLikeMe: result } });
                         db.close();
-                        
+                        utilities.makePopu(login);
+                        notifyHim(login, 'Like by ' + me);
                     });
                 });
             });
         });
     } else {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({login: login}).toArray(function(err, doc) {
+            db.collection('user').find({ login: login }).toArray(function(err, doc) {
                 downTab(doc[0]['heLikeMe'], me, function(result) {
-                    MongoClient.connect(url, function(err, db) {  
-                        db.collection('user').updateOne({login: login}, { $set:{heLikeMe: result}});
+                    MongoClient.connect(url, function(err, db) {
+                        db.collection('user').updateOne({ login: login }, { $set: { heLikeMe: result } });
                         db.close();
+                        utilities.makePopu(login);
+                        notifyHim(login, 'Dislike by ' + me);
                     });
                 });
             });
@@ -925,13 +877,16 @@ function upHisLike(sens, login, me) {
 var likeUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    upHisLike(true, req.body.pseudo, login);
+    if (req.body.pseudo != login) {
+        upHisLike(true, req.body.pseudo, login);
+        utilities.makePopu(login);
+    }
     makeTab(req.session['myLike'], req.body.pseudo, function(result) {
-        MongoClient.connect(url, function(err, db) {  
-            db.collection('user').updateOne({login: login}, { $set:{like: result}});
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').updateOne({ login: login }, { $set: { like: result } });
             db.close();
             checkConnect(login, req.body.pseudo);
-            callback(null, {mess: 'Like Success'});
+            callback(null, { mess: 'Like Success' });
         });
     });
 }
@@ -939,37 +894,66 @@ var likeUser = function(req, res, callback) {
 var disLikeUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    upHisLike(false, req.body.pseudo, login);
-    downTab(req.session['myLike'], req.body.pseudo, function(result) {
-        MongoClient.connect(url, function(err, db) {  
-            db.collection('user').updateOne({login: login}, { $set:{like: result}});
-            db.close();
-            callback(null, {mess: 'Dislike Success'});
+    if (req.body.pseudo != login) {
+        upHisLike(false, req.body.pseudo, login);
+        utilities.makePopu(login);
+        downTab(req.session['myLike'], req.body.pseudo, function(result) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({ login: login }, { $set: { like: result } });
+                db.close();
+                callback(null, { mess: 'Dislike Success' });
+            });
         });
-    });
-    
+    }
 }
 
 var blockUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    makeTab(req.session['myBlock'], req.body.pseudo, function(result) {
-        MongoClient.connect(url, function(err, db) {  
-            db.collection('user').updateOne({login: login}, { $set:{block: result}});
-            db.close();
-            callback(null, {mess: 'Block Success'});
+    if (req.body.pseudo != login) {
+        makeTab(req.session['myBlock'], req.body.pseudo, function(result) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({ login: login }, { $set: { block: result } });
+                db.close();
+                utilities.makePopu(login);
+                callback(null, { mess: 'Block Success' });
+            });
         });
-    });
+    }
 }
 
 var deBlockUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    downTab(req.session['myBlock'], req.body.pseudo, function(result) {
-        MongoClient.connect(url, function(err, db) {  
-            db.collection('user').updateOne({login: login}, { $set:{block: result}});
-            db.close();
-            callback(null, {mess: 'Deblock Success'});
+    if (req.body.pseudo != login) {
+        downTab(req.session['myBlock'], req.body.pseudo, function(result) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({ login: login }, { $set: { block: result } });
+                db.close();
+                utilities.makePopu(login);
+                callback(null, { mess: 'Deblock Success' });
+            });
+        });
+    }
+}
+
+function upHerFalse(login) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({ login: login }).toArray(function(err, doc) {
+            if (doc[0]['iFalse'] < 5) {
+                var iFalse = (Number.parseInt(doc[0]['iFalse']) + 1);
+                db.collection('user').updateOne({ login: login }, { $set: { iFalse: iFalse } });
+                utilities.makePopu(login);
+                notifyHim(login, 'You False! ' + iFalse);
+                db.close();
+            } else if (doc[0]['iFalse'] >= 5) {
+                db.collection('user').removeOne({ login: login }, { justOne: true });
+            } else {
+                db.collection('user').updateOne({ login: login }, { $set: { iFalse: '1' } });
+                utilities.makePopu(login);
+                notifyHim(login, 'You False! 1');
+                db.close();
+            }
         });
     });
 }
@@ -977,61 +961,79 @@ var deBlockUser = function(req, res, callback) {
 var falseUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    makeTab(req.session['myFalse'], req.body.pseudo, function(result) {
-        MongoClient.connect(url, function(err, db) {  
-            db.collection('user').updateOne({login: login}, { $set:{falseUser: result}});
-            db.close();
-            callback(null, {mess: 'False User Success'});
+    if (req.body.pseudo != login) {
+        makeTab(req.session['myFalse'], req.body.pseudo, function(result) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({ login: login }, { $set: { falseUser: result } });
+                db.close();
+                upHerFalse(req.body.pseudo);
+                callback(null, { mess: 'False User Success' });
+            });
         });
-    });
+    }
 }
 
 var getMyNotif = function(name, callback) {
     MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({login: name}).toArray(function(err, doc){
+        db.collection('user').find({ login: name }).toArray(function(err, doc) {
             if (err) callback(null);
-            var res = {like: doc[0]['heLikeMe'], tchat: doc[0]['tchat']};
-            callback(res);
+            if (doc[0]['notif'] || doc[0]['tchat']) {
+                callback({ notif: doc[0]['notif'], tchat: doc[0]['tchat'] });
+                db.close();
+            } else {
+                callback(null);
+                db.close();
+            }
         });
-        db.close();
     });
 }
 
 var getMsg = function(me, wth, callback) {
     var result = {};
     MongoClient.connect(url, function(err, db) {
-        db.collection('tchat').find({convers: {$all: [me, wth]}}).toArray(function(err, doc) {
+        db.collection('tchat').find({ convers: { $all: [me, wth] } }).toArray(function(err, doc) {
             if (doc) {
                 for (var i = 0; i < doc.length; i++) {
-                    result[i] = {off: doc[i]['exp'], content: doc[i]['msg']};
+                    result[i] = { off: doc[i]['exp'], content: doc[i]['msg'] };
                 }
                 if (i == doc.length) {
                     callback(result);
                 }
             } else {
-                callback({0:' '});
+                callback({ 0: ' ' });
             }
         });
     });
 }
 
-function upHisMsg(to, msg) {
-    
-}
-
-var postMsg = function(to, off, msg) {
+var postMsg = function(to, off, msg, notif) {
     if (msg != '') {
         var tchat = {
             convers: [off, to],
             exp: off,
             msg: msg
         };
-        MongoClient.connect(url, function (err, db) {
-            db.collection('tchat').insertOne(tchat, function (err, result) {
+        if (notif) {
+            notifyHim(to, 'Message of ' + off);
+        }
+        MongoClient.connect(url, function(err, db) {
+            db.collection('tchat').insertOne(tchat, function(err, result) {
                 db.close();
             });
         });
     }
+}
+
+var getMyheLike = function(login, callback) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({ login: login }).toArray(function(err, doc) {
+            if (doc[0]['heLikeMe'] != {}) {
+                callback(doc[0]['heLikeMe']);
+            } else {
+                callback(null);
+            }
+        });
+    });
 }
 
 // récupère tout les pseudos et avatars des membres du site /==>/ tout les pseudo/avatar "interessant" avec utilities.intelTri(); 
@@ -1043,9 +1045,11 @@ exports.getMyTag = getMyTag;
 exports.getMyInfo = getMyInfo;
 exports.getMyLike = getMyLike;
 exports.getMyLiker = getMyLiker;
+exports.getMyheLike = getMyheLike;
 exports.getMyFalse = getMyFalse;
 exports.getMyBlock = getMyBlock;
 exports.getMyVisit = getMyVisit;
+exports.getPopu = getPopu;
 exports.getMyNotif = getMyNotif;
 exports.getMsg = getMsg;
 
@@ -1057,6 +1061,7 @@ exports.updateUser = updateUser;
 exports.upImage = upImage;
 exports.downMyImage = downMyImage;
 exports.setAvatar = setAvatar;
+exports.readNotif = readNotif;
 
 // fonctionnalitées utilisateurs sur les autres utilisateurs, like/dislike, bloque/débloque, déclarer faux
 exports.likeUser = likeUser;
@@ -1065,6 +1070,7 @@ exports.blockUser = blockUser;
 exports.deBlockUser = deBlockUser;
 exports.falseUser = falseUser;
 exports.postMsg = postMsg;
+exports.alreadySet = alreadySet;
 
 // fonctionnalitées sites, login, logout, register, localisation, recuperer une listes des tags présents en BdD
 exports.getInterest = getInterest;

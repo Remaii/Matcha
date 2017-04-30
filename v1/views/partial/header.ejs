@@ -50,6 +50,12 @@
                 if (log != '' || log != undefined) {
                     sock.emit('stayco', {login: log});
                 }
+                function downNotif(notif) {
+                    sock.emit('downNotif', {notif: notif, login: log});
+                }
+                document.getElementById('userName').addEventListener('click', function(ev) {
+                    sock.emit('test');
+                });
             </script>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <form method="POST" action="/profile" class="navbar-form navbar-left" role="search">
@@ -58,6 +64,7 @@
                     </div>
                     <button type="submit" class="btn btn-default">Go</button>
                 </form>
+                
                 <ul class="nav navbar-nav navbar-right">
             <% if (!locals.session['login']) { %>
                     <li><a href="/login">Login</a></li>

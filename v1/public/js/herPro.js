@@ -1,11 +1,34 @@
-var login = document.getElementById('avatar').alt;
-var me = document.getElementById('userName').innerText;
-var pseudo = document.getElementById('avatar').name;
-var like_user = document.getElementById('like_user');
-var unlike_user = document.getElementById('unlike_user');
-var false_user = document.getElementById('false_user');
-var block_user = document.getElementById('block_user');
-var deblock_user = document.getElementById('deblock_user');
+var login = document.getElementById('avatar').alt,
+	me = document.getElementById('userName').innerText,
+	pseudo = document.getElementById('avatar').name,
+	like_user = document.getElementById('like_user'),
+	unlike_user = document.getElementById('unlike_user'),
+	false_user = document.getElementById('false_user'),
+	block_user = document.getElementById('block_user'),
+	deblock_user = document.getElementById('deblock_user'),
+	status = document.getElementById('status'),
+	visited = true;
+
+if (visited) {
+	sock.emit('like_user', {me: me, to: login});
+	sock.emit('show_status', {login: login});
+	visited = false;
+}
+
+sock.on('status_is', function(data) {
+	var status = document.getElementById('status'),
+		point = document.createElement('p');
+	if (data.login == login) {
+		if (data.status == "Online") {
+			point.innerText = data.login + " est connecté";
+		} else if (data.status == "Offline") {
+			point.innerText = data.login + " est déconnecté";
+		} else if (data.status == "Inconnue") {
+			point.innerText = data.login + " n'est pas venu depuis longtemps";
+		}
+		status.appendChild(point);
+	}
+});
 
 like_user.addEventListener('click', function(ev) {
 	var xhr = new XMLHttpRequest();
@@ -15,8 +38,6 @@ like_user.addEventListener('click', function(ev) {
 		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
 			unlike_user.setAttribute('style', '');
 			sock.emit('like_user', {me: me, to: login});
-			alert(xhr.responseText);
-			// socket.emit('checkNotif', {login: login});
 		}
 	}
 	xhr.open("post", "/profile/like", true);
@@ -32,7 +53,6 @@ unlike_user.addEventListener('click', function(ev) {
 		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
 	 		like_user.setAttribute('style', '');
 	 		sock.emit('like_user', {me: me, to: login});
-	 		alert(xhr.responseText);
 	 	}
 	}
 	xhr.open("post", "/profile/dislike", true);
@@ -46,6 +66,7 @@ false_user.addEventListener('click', function(ev){
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
 	 		false_user.setAttribute('style', 'display:none;');
+	 		sock.emit('like_user', {me: me, to: login});
 	 	}
 	}
 	xhr.open("post", "/profile/false_user", true);
@@ -60,6 +81,7 @@ deblock_user.addEventListener('click', function(ev){
 		deblock_user.setAttribute('style', 'display:none;');
 		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
 	 		block_user.setAttribute('style', '');
+	 		sock.emit('like_user', {me: me, to: login});
 	 	}
 	}
 	xhr.open("post", "/profile/deblock", true);
@@ -74,6 +96,7 @@ block_user.addEventListener('click', function(ev){
 		block_user.setAttribute('style', 'display:none;');
 		if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
 	 		deblock_user.setAttribute('style', '');
+	 		sock.emit('like_user', {me: me, to: login});
 	 	}
 	}
 	xhr.open("post", "/profile/block", true);

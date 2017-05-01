@@ -17,7 +17,7 @@
 * Rendez-vous sur: <code>http://localhost:3000</code> , créer un utilisateur, enjoy!
 
 
-## Status:🚧
+## Status:🚧72%
 
 ### Inscription / Connection 75%end
 * avec Mail, nom d'Utilisateur, Mot de Passe sécurisé✅
@@ -26,7 +26,7 @@
 * Reinitialisé son Mot de Passe:❌
 
 
-### Profil de l'utilisateur 100%end
+### 91% Profil de l'utilisateur
 * Modifier son prénom:✅
 * Modifier son Nom:✅
 * Modifier son mail:✅
@@ -36,11 +36,11 @@
 * Ajouter/Supprimer ses Tags:✅
 * Ajouter/Supprimer ses photos maximum 6:✅
 * Voir les utilisateurs qui ont liké:✅
-* Localiser l'utilisateur:✅(geoip2)
+* Localiser l'utilisateur:❌(googlemaps api) || ✅(geoip2)
 * Score de popularité:✅ (((nombre de like + nombre de visite)/* - nombre de bloquage*/) / nombre de False)
 
 
-### Parcours 18%end
+### 18% Parcours
 * Affiche uniquement les profils "interessant" suivant la sexualité:✅, par defaut trie par localisation:✅(rayon de 200km)
 * Affichage intelligent (zone géographique:❌, maximum de tags:❌, maximum poplarité:❌)
 * Trie possible de la liste des profils par âge:❌, localisation:❌, poplarité:❌, tag en commun:❌
@@ -49,35 +49,35 @@
 * -Liker un profil:✅
 * -Tchatter avec un autre utilisateur:✅
 
-### Recherche 80%end
+### 80% Recherche
 * Par intervalle d'âge:✅
 * Par intervalle de score de popularité:❌
 * Par tags:✅ (Possède l'un de ces tags)
 * Localisation:✅(L'utilisateur peut choisir le rayon de recherche)
 * Résultat triable comme le parcours:✅
 
-### Profil des autres 14%end
+### 100% Profil des autres
 * Rendu des informations:✅(prénom, nom, âge, orientation sexuel, sexe, tags, bio)
 Quand un utilisateur regarde le profil d'un autre:
 * Si il possède minimum 1 photo, Liker:✅, Engager le Tchat(*):✅(par la barre de navigation + (*))
-* Voir le statut de connection:❌
+* Voir le statut de connection:✅
 * Reporter faux compte:✅
 * Bloquer:✅
-* Voir si l'utilisateur Like en retour:✅ (Notification "Match with ...")
+* Voir si l'utilisateur Like en retour:✅ (Notification)
 
-### Tchat 0%end
+### 100% Tchat
 * (*) "Connecter" 2 profils par les likes:✅
 * (*2)
 
-### Notifications en cas de 0%end
-* Like reçu:✅
-* Visite sur de mon profil:❌
-* Nouveau message(tchat):❌
-* Like en retour d'un like:❌
-* Dislike reçu:❌
+### 100% Notifications en cas de:
+* Like reçu:✅ (👍)
+* Visite sur de mon profil:✅ (🔍)
+* Nouveau message(tchat):✅ (📝)
+* Like en retour d'un like:✅ (💞)
+* Dislike reçu:✅ (👎) (il faut liker pour dislike)
 * (*2)Les notifications sont visibles partout:✅
 
-### Bonus
+#### Bonus
 * Choisir son avatar parmis ses photos:✅
 * Definir une autre localisation:❌
 * Compte admin, possibilité de supprimer les tags:❌
@@ -85,7 +85,7 @@ Quand un utilisateur regarde le profil d'un autre:
 * Carte des utilisateurs interactive:❌
 * Ajout de tag à la base de donnée:✅
 
-### Consignes éliminatoires
+#### Consignes éliminatoires
 * Injection SQL:✅(MongoDB)
 * Aucune erreur:🚧
 * Mot de Passe crypter:✅(whirlpool)

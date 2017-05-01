@@ -113,7 +113,24 @@ people = [];
 
 io.sockets.on('connection', function(socket) {
 
-        
+    socket.on('show_status', function(data) {
+        if (data.login) {
+            var a = undefined;
+            for (var i = 0; people[i]; i++) {
+                if (people[i].log == data.login) {
+                    a = i;
+                    if (people[a].id[0]) {
+                        socket.emit('status_is', {login: data.login, status: 'Online'});
+                    } else {
+                        socket.emit('status_is', {login: data.login, status: 'Offline'});
+                    }
+                    break;
+                }
+            } if (!people[i] && a == undefined) {
+                socket.emit('status_is', {login: data.login, status: 'Inconnue'});
+            }
+        }
+    });
 
     socket.on('test', function(data) {
         console.log(people);
@@ -121,7 +138,7 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('stayco', function(data) {
-        console.log('stayco id: ' + socket.id);
+        // console.log('stayco id: ' + socket.id);
         var tab = new Array();
         if (data.login != '' && data.login != undefined) {
             if (users.indexOf(data.login) > -1) {
@@ -151,7 +168,7 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function(data) {
-        console.log('disconnect id: ' + socket.id);
+        // console.log('disconnect id: ' + socket.id);
         if (data == 'transport close') {
             for (var a = 0; people[a]; a++) {
                 for (var b = 0; people[a].id[b]; b++) {

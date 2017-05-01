@@ -1,8 +1,8 @@
 <% include partial/header %>
 
 <% if (locals.session['herPro']) { %>
-	
 	<div class="row"><!-- class="col-md-12 col-xs-12"> -->
+		<div id="status" class="col-md-12 col-xs-12 col-lg-12 col-sm-12 text-center"></div>
 		<div class="col-md-12 col-xs-12 col-lg-12 col-sm-12">
 			<img id="avatar" name="<%= locals.session['herPro'][10] %>" src=<%= '/asset/uploads/' + locals.session['herPro'][8] %> class="col-md-offset-4 col-xs-offset-4 col-md-4 col-xs-4 img-circle" alt="<%= locals.session['herPro'][7] %>">
 		</div>

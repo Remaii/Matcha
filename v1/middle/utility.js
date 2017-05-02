@@ -1,6 +1,27 @@
 var uniqid = require('uniqid')
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
+var nodemailer = require('nodemailer');
+
+
+var senderMail = function(mail, reason) {
+    var transporter = nodemailer.createTransport();
+    if (reason == "User") {
+        var mailOption = {
+            from: '"Matcha rthidet" <no-reply@matcha.com>', // sender address
+            to: mail, // list of receivers
+            subject: 'Inscription à Matcha', // Subject line
+            text: 'Vous avez réussi votre inscription sur le site Matcha de rthidet', // plain text body
+            html: '<b>Vous avez réussi votre inscription sur le site Matcha de rthidet</b>' // html body
+        }
+        transporter.sendMail(mailOption, function(error, info) {
+            if (error) return console.log(error);
+            // console.log(mail + ' mail of register is send');
+        });
+    }
+}
+
+exports.senderMail = senderMail;
 
 var defineAvatar = function(sexe, avatar, callback) {
     if (avatar == 'avatar.png' || avatar == 'avatarH.png' || avatar == 'avatarF.png') {

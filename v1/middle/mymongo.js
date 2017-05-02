@@ -55,6 +55,8 @@ function downTab(pastTab, pseudo, call) {
         call(result);
     } else if (pastTab[0] == pseudo && !pastTab[1]) {
         call({ 0: '' });
+    } else if (!pastTab) {
+        call({0: ''});
     }
 }
 
@@ -528,6 +530,7 @@ var addUser = function(req, res) {
                             req.flash('mess', 'Utilisateur ajouté avec succes');
                             db.collection('user').insertOne(newUser, function(err, result) {
                                 if (result.result['ok']) {
+                                    utilities.senderMail(mail, "User");
                                     console.log('User ' + logre + ' add success');
                                 }
 
@@ -683,7 +686,7 @@ var setAvatar = function(req, res) {
         MongoClient.connect(url, function(err, db) {
             db.collection('user').updateOne({ login: req.session['login'] }, { $set: { avatar: a } });
             db.close();
-            console.log(req.session['login'] + ' à mis a jour son avatar' + s + ' ' + a);
+            console.log(req.session['login'] + ' à mis a jour son avatar');
         });
     });
 }
@@ -712,7 +715,10 @@ var addInterest = function(req, res) {
 var getInterest = function(req, res, call) {
     MongoClient.connect(url, function(err, db) {
         db.collection('interet').find().toArray(function(err, docs) {
-            call(docs[0][0]);
+            if (docs[0])
+                call(docs[0][0]);
+            else
+                call({0:''});
         });
         db.close();
     });

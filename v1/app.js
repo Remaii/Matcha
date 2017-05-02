@@ -7,8 +7,8 @@ var express = require('express'),
     session = require('express-session'),
     mymongo = require('./middle/mymongo'),
     jQuery = require('jquery'),
-    bootSlider = require('bootstrap-slider'),
-    socketIOSession = require('socket.io.session')
+    bootSlider = require('bootstrap-slider')
+//    socketIOSession = require('socket.io.session')
 
 
 var index = require('./routes/index'),

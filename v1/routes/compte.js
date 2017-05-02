@@ -123,7 +123,7 @@ router.post('/info', function(req, res, next) {
 		res.redirect('info');
 	} else if (req.body.path && sub == 'toAvatar') {
 		mymongo.setAvatar(req, res);
-		res.render('partial/like');
+		res.render('partial/like', {mess: "Success"});
 	}
 });
 

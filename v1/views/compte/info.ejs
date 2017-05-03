@@ -65,13 +65,13 @@
 		</div>
 		<div class="col-md-6 col-xs-6 text-center"><!-- Ajouter des centres d'interet a ton profile -->
 			<div><br>
-			<% if (!locals.session['mytag'] || locals.session['mytag'][0] == ' ') { %>
+			<% if (!locals.session['mytag'] || locals.session['mytag'][0] == undefined) { %>
 				<label class="text-center">Tu n'as pas encore de #TAG :(</label>
 			<%  } else { %>
 				<label class="text-center">Tu as ces #TAG:</label>
 				<p class="text-center" name="mytag">
 				<% for (var nbt = 0; locals.session['mytag'][nbt];nbt++) { %>
-					<% if (locals.session['mytag'][nbt] != ' ') { %>
+					<% if (locals.session['mytag'][nbt] != '') { %>
 						<%= '#' + locals.session['mytag'][nbt] %>
 					<% } %>
 				<% } %>

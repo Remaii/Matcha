@@ -98,16 +98,18 @@ var forIndex = function(myinfo, allprof, callback, ray) {
     else
         rayon = ray;
     for (var i = 0; allprof[i]; i++) {
-        tmp[0] = allprof[i][0];
-        tmp[1] = allprof[i][1];
-        tmp[2] = utilities.Distance(myinfo[8], myinfo[11], allprof[i][5], allprof[i][4]) / 100;
-        tmp[3] = allprof[i][8];
-        if (tmp[2] <= rayon) {
-            result[nb] = tmp;
-            nb++;
+        if (allprof[i][8] != myinfo[12]) {
+            tmp[0] = allprof[i][0];
+            tmp[1] = allprof[i][1];
+            tmp[2] = utilities.Distance(myinfo[8], myinfo[11], allprof[i][5], allprof[i][4]) / 100;
+            tmp[3] = allprof[i][8];
+            if (tmp[2] <= rayon) {
+                result[nb] = tmp;
+                nb++;
+                tmp = {};
+            }
             tmp = {};
         }
-        tmp = {};
     }
     if (!allprof[i]) {
         callback(result)
@@ -247,11 +249,11 @@ var makeResearch = function(req, callback) {
     }
 }
 
-var verifyTag = function(req, callback) {
-    callback(req.session['allprof']);
-}
+// var verifyTag = function(req, callback) {
+//     callback(req.session['allprof']);
+// }
 
-exports.verifyTag = verifyTag;
+// exports.verifyTag = verifyTag;
 exports.makeResearch = makeResearch;
 exports.forIndex = forIndex;
 exports.intelTri = intelTri;

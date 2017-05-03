@@ -138,7 +138,7 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('stayco', function(data) {
-        // console.log('stayco id: ' + socket.id);
+        console.log('stayco id: ' + socket.id);
         var tab = new Array();
         if (data.login != '' && data.login != undefined) {
             if (users.indexOf(data.login) > -1) {
@@ -168,8 +168,8 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function(data) {
-        // console.log('disconnect id: ' + socket.id);
-        if (data == 'transport close') {
+        console.log('disconnect id: ' + socket.id);
+        // if (data == 'transport close') {
             for (var a = 0; people[a]; a++) {
                 for (var b = 0; people[a].id[b]; b++) {
                     if (people[a].id[b] == socket.id) {
@@ -178,7 +178,7 @@ io.sockets.on('connection', function(socket) {
                     }
                 }
             }
-        }
+        // }
     });
 
     socket.on('like_user', function(data) {

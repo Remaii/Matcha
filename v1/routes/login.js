@@ -1,7 +1,7 @@
 var express = require('express')
 var router = express.Router()
 var mymongo = require('../middle/mymongo')
-var io = require('socket.io')
+var utilities = require('../middle/utility')
 
 router.get('/', function(req, res) {
 	res.locals.session = req.session;
@@ -19,6 +19,15 @@ router.post('/', function(req, res) {
 			}
 		});
 	}
+});
+
+router.post('/reset', function(req, res, next) {
+	if (req.body.submit === 'Reset') {
+		utilities.senderMail(req.body.mail, "Reset");
+	}
+	next();
+}, function(req, res) {
+	res.status(200).send({ mess: 'it\' good!' });
 });
 
 module.exports = router;

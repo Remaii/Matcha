@@ -2,26 +2,53 @@ var uniqid = require('uniqid')
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
 var nodemailer = require('nodemailer');
+var crypto = require('crypto');
 
+function changePasswod(password, mail, callback) {
+    MongoClient.connect(url, function(err, db) {
+        var pass = crypto.createHmac('whirlpool', password).digest('hex');
+        db.collection('user').updateOne({mail: mail}, { $set: {pwd: pass}}, function(err, result) {
+            db.close();
+            if (err) return callback(false);
+            if (result.result.ok) {
+                callback(true);
+            }
+        });
+    });
+}
 
 var senderMail = function(mail, reason) {
     var transporter = nodemailer.createTransport();
     if (reason == "User") {
         var mailOption = {
-            from: '"Matcha rthidet" <no-reply@matcha.com>', // sender address
-            to: mail, // list of receivers
-            subject: 'Inscription à Matcha', // Subject line
-            text: 'Vous avez réussi votre inscription sur le site Matcha de rthidet', // plain text body
-            html: '<b>Vous avez réussi votre inscription sur le site Matcha de rthidet</b>' // html body
+            from: '"Matcha rthidet" <no-reply@matcha.com>',
+            to: mail,
+            subject: 'Inscription à Matcha',
+            text: 'Vous avez réussi votre inscription sur le site Matcha de rthidet',
+            html: '<b>Vous avez réussi votre inscription sur le site Matcha de rthidet</b>'
         }
         transporter.sendMail(mailOption, function(error, info) {
             if (error) return console.log(error);
-            // console.log(mail + ' mail of register is send');
+        });
+    } else if (reason == 'Reset') {
+        var pass = uniqid();
+        changePassword(pass, mail, function(bool) {
+            console.log('passe par la');
+            if (bool) {
+                var mailOption = {
+                    from: '"Matcha rthidet" <no-reply@matcha.com>',
+                    to: mail,
+                    subject: 'Matcha, réinitialisation Mot de passe.',
+                    text: 'Vous avez demendé la réinitialisation de vôtre mot de passe, nouveau Pass: ' + pass,
+                    html: '<b>Vous avez demendé la réinitialisation de vôtre mot de passe, nouveau Pass: ' + pass + '</b>'
+                }
+                transporter.sendMail(mailOption, function(error, info) {
+                    if (error) return console.log(error);
+                });
+            }
         });
     }
 }
-
-exports.senderMail = senderMail;
 
 var defineAvatar = function(sexe, avatar, callback) {
     if (avatar == 'avatar.png' || avatar == 'avatarH.png' || avatar == 'avatarF.png') {
@@ -183,3 +210,4 @@ exports.checkerPwd = checkerPwd;
 exports.checkerBio = checkerBio;
 exports.getImage = getImage;
 exports.rmImage = rmImage;
+exports.senderMail = senderMail;

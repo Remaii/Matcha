@@ -77,12 +77,10 @@ router.post('/info/loc', function(req, res, next) {
 		next();
 	});
 }, function(req, res, next) {
-	mymongo.upMyLoca(req, res, function(err, value) {
-		if (err) console.log(err);
-		if (value) req.session['myinfo'][7] = value;
-		res.locals.session = req.session;
-		res.render('compte/info')
-	});
+	mymongo.upMyLoca(req, res);
+	next();
+}, function(req, res) {
+	res.status(200).send({ mess: 'it\' good!' });
 });
 
 router.post('/info', function(req, res, next) {
@@ -123,7 +121,7 @@ router.post('/info', function(req, res, next) {
 		res.redirect('info');
 	} else if (req.body.path && sub == 'toAvatar') {
 		mymongo.setAvatar(req, res);
-		res.render('partial/like', {mess: "Success"});
+		res.status(200).send({ mess: 'it\' good!' });
 	}
 });
 

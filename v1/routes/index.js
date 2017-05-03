@@ -36,7 +36,7 @@ router.get('/', function(req, res, next) {
 	trie.forIndex(req.session['myinfo'], req.session['allprof'], function(retour) {
 		req.session['allprof'] = retour;
 		next();
-	}, 0);
+	}, 50);
 }, function (req, res, next) {
 	res.locals.session = req.session;
 	res.render('index');

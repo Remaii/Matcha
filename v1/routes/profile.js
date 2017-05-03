@@ -134,7 +134,8 @@ router.post('/like', function(req, res, next) {
 		next();
 	});
 }, function(req, res) {
-	res.render('partial/like');
+	res.status(200).send({ mess: 'it\' good!' });
+	// res.render('partial/like');
 });
 
 router.post('/dislike', function(req, res, next) {
@@ -148,7 +149,8 @@ router.post('/dislike', function(req, res, next) {
 		next();
 	});
 }, function(req, res) {
-	res.render('partial/like')
+	res.status(200).send({ mess: 'it\' good!' });
+	// res.render('partial/like')
 });
 
 router.post('/false_user', function(req, res, next) {
@@ -162,7 +164,8 @@ router.post('/false_user', function(req, res, next) {
 		next();
 	});
 }, function(req, res) {
-	res.render('partial/like')
+	res.status(200).send({ mess: 'it\' good!' });
+	// res.render('partial/like')
 });
 
 router.post('/block', function(req, res, next) {
@@ -176,7 +179,8 @@ router.post('/block', function(req, res, next) {
 		next();
 	});
 }, function(req, res) {
-	res.render('partial/like')
+	res.status(200).send({ mess: 'it\' good!' });
+	// res.render('partial/like')
 });
 
 router.post('/deblock', function(req, res, next) {
@@ -190,7 +194,8 @@ router.post('/deblock', function(req, res, next) {
 		next();
 	});
 }, function(req, res) {
-	res.render('partial/like')
+	res.status(200).send({ mess: 'it\' good!' });
+	// res.render('partial/like')
 });
 
 module.exports = router;

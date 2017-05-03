@@ -176,25 +176,33 @@ var setUsers = function(nb) {
 				tag: {
 					0: "ROBOT"
 				},
+				heLikeMe: {
+					0: "premier",
+					1: "deuxieme"
+				},
+				visit: {
+					0: "premier",
+					1: "deuxieme",
+					3: "troisieme"
+				},
 				created: new Date()
 			};
 			db.collection('user').insertOne(newUser, function(err, result) {
 				if (err) return console.log(err);
+				if (result.result.ok) {
+					console.log(result.ops[0].pseudo + " ajouté.")
+				}
 			});
 		}
 		db.close();
 	});
 }
 
-if (process.argv[2] == 'pos') {
-	genPosition(function(res) {
-		console.log(res.lat);
-		console.log(res.lon);
-	});
-}
-else if (process.argv[2] == 'gen' && process.argv[3]) {
+if (process.argv[2] == 'all' && process.argv[3]) {
 	setUsers(Number(process.argv[3]));
 	addInteret();
 } else if (process.argv[2] == 'tag') {
 	addInteret();
+} else if (process.argv[2] == 'user' && process.argv[3]) {
+	setUsers(Number(process.argv[3]));
 }

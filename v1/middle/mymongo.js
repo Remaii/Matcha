@@ -55,7 +55,7 @@ function downTab(pastTab, pseudo, call) {
         call(result);
     } else if (pastTab[0] == pseudo && !pastTab[1]) {
         call({ 0: '' });
-    } else if (!pastTab) {
+    } else if (!pastTab[0]) {
         call({0: ''});
     }
 }
@@ -95,12 +95,11 @@ function verifyPseudo(pseudo, callback) {
     });
 }
 
-var upMyLoca = function(req, res, callback) {
+var upMyLoca = function(req, res) {
     if (req.session['myinfo'][8] != req.body.lo && req.session['myinfo'][11] != req.body.la) {
         MongoClient.connect(url, function(err, db) {
             db.collection('user').updateOne({ login: req.session['login'] }, { $set: { la: req.body.la, lo: req.body.lo } });
             db.close();
-            callback(null, req.body.city);
         });
     }
 }
@@ -505,10 +504,12 @@ var addUser = function(req, res) {
                         pseudo: logre,
                         pwd: passwd,
                         mail: mail,
+                        tchat: {},
                         heLikeMe: {},
                         like: {},
                         block: {},
                         falseUser: {},
+                        popu: 0,
                         orient: 'Bi',
                         avatar: 'avatar.png',
                         created: new Date()

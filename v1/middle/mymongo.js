@@ -96,9 +96,9 @@ function verifyPseudo(pseudo, callback) {
 }
 
 var upMyLoca = function(req, res, callback) {
-    if (req.session['myinfo'][7] != req.body.city) {
+    if (req.session['myinfo'][8] != req.body.lo && req.session['myinfo'][11] != req.body.la) {
         MongoClient.connect(url, function(err, db) {
-            db.collection('user').updateOne({ login: req.session['login'] }, { $set: { la: req.body.la, lo: req.body.lo, city: req.body.city } });
+            db.collection('user').updateOne({ login: req.session['login'] }, { $set: { la: req.body.la, lo: req.body.lo } });
             db.close();
             callback(null, req.body.city);
         });
@@ -258,7 +258,7 @@ function getHerInfo(req, res, call) {
                     arr[3] = doc[0]['sexe'];
                     arr[4] = doc[0]['orient'];
                     arr[5] = doc[0]['bio'];
-                    arr[6] = doc[0]['city'];
+                    // arr[6] = doc[0]['city'];
                     arr[7] = doc[0]['login'];
                     arr[8] = doc[0]['avatar'];
                     arr[9] = doc[0]['login'];
@@ -302,7 +302,7 @@ function getMyInfo(req, res, call) {
                     arr[4] = doc[0]['orient'];
                     arr[5] = doc[0]['bio'];
                     arr[6] = doc[0]['mail'];
-                    arr[7] = doc[0]['city'];
+                    // arr[7] = doc[0]['city'];
                     arr[8] = doc[0]['lo'];
                     arr[9] = doc[0]['avatar'];
                     arr[10] = doc[0]['pseudo'];

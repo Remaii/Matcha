@@ -1,5 +1,7 @@
 var crypto = require('crypto')
 var uniqid = require('uniqid')
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:28000/matcha";
 
 var sexe = {
 	0: "Homme",
@@ -87,6 +89,12 @@ var interet = {
 	}
 }
 
+function genPosition(callback) {
+	var longitude = (Math.random() * (0.01 - 6.00) + 6.00).toFixed(5),
+		latitude = (Math.random() * (44.47 - 49.36) + 49.36).toFixed(5);
+	callback({lon: longitude, lat: latitude});
+}
+
 function allReadySet(tab, toadd) {
 	if (tab[0] != null) {
 		for (var i = 0; tab[i]; i++) {
@@ -99,12 +107,7 @@ function allReadySet(tab, toadd) {
 	}
 }
 
-var setUsers = function(nb) {
-	var MongoClient = require('mongodb').MongoClient;
-	var url = "mongodb://localhost:28000/matcha";
-	var passwd = crypto.createHmac('whirlpool', "AutoUser42").digest('hex');
-	var mail = "AutoUser42@matcha.fr";
-	
+function addInteret() {
 	MongoClient.connect(url, function(err, db){
 		db.collection('interet').insertOne(interet, function(err, result){
 			if (result.result.ok){
@@ -113,19 +116,27 @@ var setUsers = function(nb) {
 		});
 		db.close();
 	});
+}
+
+var setUsers = function(nb) {
+	var passwd = crypto.createHmac('whirlpool', "AutoUser42").digest('hex');
+	var mail = "AutoUser42@matcha.fr";
+	
 	MongoClient.connect(url, function(err, db) {
 		if (err) return console.log(err);
-		var randName = Math.floor((Math.random() * 16) + 0);
-		var randLast = Math.floor((Math.random() * 16) + 0);
-		var age = Math.floor((Math.random() * (50 - 18)) + 18);
-		var randSexe = Math.floor((Math.random() * 2) + 0);
-		var randSexual = Math.floor((Math.random() * 3) + 0);
-		var login = uniqid();
-		var last = lastName[randLast];
-		var logauto = prenoms[randName];
-		var sex = sexe[randSexe];
-		var sexua = sexual[randSexual];
-		var avatar = 'avatar.png';
+		var randName = Math.floor((Math.random() * 16) + 0),
+			randLast = Math.floor((Math.random() * 16) + 0),
+			age = Math.floor((Math.random() * (50 - 18)) + 18),
+			randSexe = Math.floor((Math.random() * 2) + 0),
+			randSexual = Math.floor((Math.random() * 3) + 0),
+			login = uniqid(),
+			last = lastName[randLast],
+			logauto = prenoms[randName],
+			sex = sexe[randSexe],
+			sexua = sexual[randSexual],
+			lo = 0,
+			la = 0,
+			avatar = 'avatar.png';
 
 		for (var i = 0; i < nb; i++) {
 			randSexual = Math.floor((Math.random() * 3) + 0);
@@ -136,13 +147,17 @@ var setUsers = function(nb) {
 			age = Math.floor((Math.random() * (50 - 18)) + 18);
 			last = lastName[randLast];
 			sexua = sexual[randSexual];
+			genPosition(function(resu) {
+				lo = resu.lon;
+				la = resu.lat;
+			});
 			if (sex == "Homme") {
 				avatar = 'avatarH.png';
 				logauto = prenomH[randName];
 			} else {
 				avatar = 'avatarF.png';
 				logauto = prenoms[randName];
-			} 
+			}
 			login = uniqid();
 			var newUser = {
 				login: login,
@@ -152,8 +167,8 @@ var setUsers = function(nb) {
 				age: age,
 				pwd: passwd,
 				mail: mail,
-				lo: '2.2945',
-				la: '48.8584',
+				lo: lo,
+				la: la,
 				sexe: sex,
 				orient: sexua,
 				avatar: avatar,
@@ -171,4 +186,15 @@ var setUsers = function(nb) {
 	});
 }
 
-setUsers(Number(process.argv[2]));
+if (process.argv[2] == 'pos') {
+	genPosition(function(res) {
+		console.log(res.lat);
+		console.log(res.lon);
+	});
+}
+else if (process.argv[2] == 'gen' && process.argv[3]) {
+	setUsers(Number(process.argv[3]));
+	addInteret();
+} else if (process.argv[2] == 'tag') {
+	addInteret();
+}

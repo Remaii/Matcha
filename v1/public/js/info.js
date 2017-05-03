@@ -58,23 +58,23 @@ function deleteImg(path) {
 }
 
 
-(function() {
-	var onSuccess = function(geoipResponse) {
-		var xhr = new XMLHttpRequest();
+// (function() {
+// 	var onSuccess = function(geoipResponse) {
+// 		var xhr = new XMLHttpRequest();
 
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 4) {
-			}
-		}
-		xhr.open("POST", "/compte/info/loc");
-		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		xhr.send("city=" + geoipResponse.city.names['en'] + "&la=" + geoipResponse.location['latitude'] + "&lo=" + geoipResponse.location['longitude']);
-	};
-	var onError = function(error) {
-		console.log(error);
-	};
-	return geoip2.insights(onSuccess, onError);
-})();
+// 		xhr.onreadystatechange = function() {
+// 			if (xhr.readyState == 4) {
+// 			}
+// 		}
+// 		xhr.open("POST", "/compte/info/loc");
+// 		xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+// 		xhr.send("city=" + geoipResponse.city.names['en'] + "&la=" + geoipResponse.location['latitude'] + "&lo=" + geoipResponse.location['longitude']);
+// 	};
+// 	var onError = function(error) {
+// 		console.log(error);
+// 	};
+// 	return geoip2.insights(onSuccess, onError);
+// })();
 
 var submit = document.querySelector('#Upload');
 

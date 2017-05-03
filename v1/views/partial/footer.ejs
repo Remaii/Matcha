@@ -9,61 +9,107 @@
             });
 
             sock.on('notif', function(data) {
-                var notif = document.querySelector('#notif_drop'),
+                var notify = document.querySelector('#notif_drop'),
                     log = document.querySelector('#userName').innerText,
                     tchat = document.querySelector('#tchat_drop');
                 
-                notif.innerHTML = '';
+                notify.innerHTML = '';
                 tchat.innerHTML = '';
-                if (data.notif[0]) {
-                    document.getElementById('notifblock').setAttribute('style', 'color:red;');
-                    for (var i = 0; data.notif[i]; i++) {
-                        var a = document.createElement('a'),
-                            div = document.createElement('div'),
-                            tmp = data.notif[i],
-                            type = tmp.split(' ')[0],
-                            name = tmp.split(' ')[2];
+                if (data != null) {
+                    if (data.notif) {
+                        document.getElementById('notifblock').setAttribute('style', 'color:red;');
+                        for (var i = 0; data.notif[i]; i++) {
+                            var a = document.createElement('a'),
+                                div = document.createElement('div'),
+                                tmp = data.notif[i],
+                                type = tmp.split(' ')[0],
+                                name = tmp.split(' ')[2];
 
-                        if (type == 'Message') {
-                            a.setAttribute('href', '/tchat/' + name);
-                            a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                            a.innerText = "📝 " + name;
-                        } else if (type != 'Message' && type == 'Like') {
-                            a.setAttribute('href', '/profile/' + name);
-                            a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                            a.innerText = "👍 " + name;
-                        } else if (type != 'Message' && type == 'Visited') {
-                            a.setAttribute('href', '/profile/' + name);
-                            a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                            a.innerText = "🔍 " + name;
-                        } else if (type != 'Message' && type == 'Match') {
-                            a.setAttribute('href', '/profile/' + name);
-                            a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                            a.innerText = "💞 " + name;
-                        } else if (type != 'Message' && type == 'Dislike') {
-                            a.setAttribute('href', '/profile/' + name);
-                            a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                            a.innerText = "👎 " + name;
-                        } else {
-                            a.setAttribute('href', '/compte/info');
-                            a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                            a.innerText = "🚫 " + data.notif[i];
+                            if (type == 'Message') {
+                                a.setAttribute('href', '/tchat/' + name);
+                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
+                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
+                                a.innerText = "📝  " + name;
+                            } else if (type != 'Message' && type == 'Like') {
+                                a.setAttribute('href', '/profile/' + name);
+                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
+                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
+                                a.innerText = "👍  " + name;
+                            } else if (type != 'Message' && type == 'Visited') {
+                                a.setAttribute('href', '/profile/' + name);
+                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
+                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
+                                a.innerText = "🔍  " + name;
+                            } else if (type != 'Message' && type == 'Match') {
+                                a.setAttribute('href', '/profile/' + name);
+                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
+                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
+                                a.innerText = "💞  " + name;
+                            } else if (type != 'Message' && type == 'Dislike') {
+                                a.setAttribute('href', '/profile/' + name);
+                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
+                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
+                                a.innerText = "👎  " + name;
+                            } else {
+                                a.setAttribute('href', '/compte/info');
+                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
+                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
+                                a.innerText = "🚫  " + data.notif[i];
+                            }
+                            div.setAttribute('class', 'col-md-12 col-xs-12 col-sm-12 col-lg-12')
+                            div.setAttribute('onclick', 'downNotif("'+ data.notif[i] +'")');
+                            div.appendChild(a);
+                            notify.appendChild(div);
+                        }    
+                    } else {
+                        document.getElementById('notifblock').setAttribute('style', 'color:;');
+                    }
+                    if (data.tchat) {
+                        for (var b = 0; data.tchat[b]; b++) {
+                            tchat.innerHTML += '<li><a href="/tchat/'+ data.tchat[b] +'">"' + data.tchat[b] + '"</a></li>';                      
                         }
-                        div.setAttribute('class', 'col-md-12 col-xs-12 col-sm-12 col-lg-12')
-                        div.setAttribute('onclick', 'downNotif("'+ data.notif[i] +'")');
-                        div.appendChild(a);
-                        notif.appendChild(div);
-                    }    
-                } else {
-                    document.getElementById('notifblock').setAttribute('style', 'color:;');
-                }
-                if (data.tchat) {
-                    for (var b = 0; data.tchat[b]; b++) {
-                        tchat.innerHTML += '<li><a href="/tchat/'+ data.tchat[b] +'">"' + data.tchat[b] + '"</a></li>';                      
                     }
                 }
             });
+            
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position){
+                        var xhr = new XMLHttpRequest();
+
+                        xhr.onreadystatechange = function() {
+                            if (xhr.readyState == 4) {
+                            }
+                        }
+                        xhr.open("POST", "/compte/info/loc");
+                        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                        xhr.send("la=" + position.coords.latitude + "&lo=" + position.coords.longitude);
+                    }, function() {
+                        var onSuccess = function(geoipResponse) {
+                            var xhr = new XMLHttpRequest();
+
+                            xhr.onreadystatechange = function() {
+                                if (xhr.readyState == 4) {
+                                }
+                            }
+                            xhr.open("POST", "/compte/info/loc");
+                            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                            xhr.send("la=" + geoipResponse.location['latitude'] + "&lo=" + geoipResponse.location['longitude']);
+                        };
+                        var onError = function(error) {
+                            console.log(error);
+                        };
+                        return geoip2.insights(onSuccess, onError);
+                    });
+                } else {
+                }
+            }
         }
     </script>
+    <% if (locals.session['login'] != undefined) { %>
+        <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDz3z3IofGPR759kuGuFwaRA9KaNeRsm14&callback=getLocation">
+        </script>
+    <% } %>
 </body>
 </html>

@@ -36,7 +36,7 @@
 * Ajouter/Supprimer ses Tags:✅
 * Ajouter/Supprimer ses photos maximum 6:✅
 * Voir les utilisateurs qui ont liké:✅
-* Localiser l'utilisateur:❌(googlemaps api) || ✅(geoip2)
+* Localiser l'utilisateur:✅(googlemaps api) || ✅(geoip2)
 * Score de popularité:✅ (((nombre de like + nombre de visite)/* - nombre de bloquage*/) / nombre de False)
 
 

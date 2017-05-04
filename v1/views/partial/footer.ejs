@@ -21,6 +21,7 @@
                         for (var i = 0; data.notif[i]; i++) {
                             var a = document.createElement('a'),
                                 div = document.createElement('div'),
+                                button = document.createElement('button'),
                                 tmp = data.notif[i],
                                 type = tmp.split(' ')[0],
                                 name = tmp.split(' ')[2];
@@ -28,37 +29,31 @@
                             if (type == 'Message') {
                                 a.setAttribute('href', '/tchat/' + name);
                                 a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
                                 a.innerText = "📝  " + name;
                             } else if (type != 'Message' && type == 'Like') {
                                 a.setAttribute('href', '/profile/' + name);
                                 a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
                                 a.innerText = "👍  " + name;
                             } else if (type != 'Message' && type == 'Visited') {
                                 a.setAttribute('href', '/profile/' + name);
                                 a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
                                 a.innerText = "🔍  " + name;
                             } else if (type != 'Message' && type == 'Match') {
                                 a.setAttribute('href', '/profile/' + name);
                                 a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
                                 a.innerText = "💞  " + name;
                             } else if (type != 'Message' && type == 'Dislike') {
                                 a.setAttribute('href', '/profile/' + name);
                                 a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
                                 a.innerText = "👎  " + name;
-                            } else {
+                            } else if (type == 'False') {
                                 a.setAttribute('href', '/compte/info');
                                 a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerHTML += 'data-container="body" data-toggle="popover" data-placement="bottom" data-content="'+ tmp + '"'
-                                a.innerText = "🚫  " + data.notif[i];
+                                a.innerText = "🚫 " + name;
                             }
                             div.setAttribute('class', 'col-md-12 col-xs-12 col-sm-12 col-lg-12')
                             div.setAttribute('onclick', 'downNotif("'+ data.notif[i] +'")');
-                            div.appendChild(a);
+                            div.appendChild(a)
                             notify.appendChild(div);
                         }
                     }  else {

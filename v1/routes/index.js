@@ -28,15 +28,21 @@ router.get('/', function(req, res, next) {
 		next();
 	});
 }, function (req, res, next) {
-	trie.intelTri(req.session['myinfo'], req.session['allprof'], function(result) {
-		req.session['allprof'] = result;
-		next();
-	});
-}, function(req, res, next) {
-	trie.forIndex(req.session['myinfo'], req.session['allprof'], function(retour) {
-		req.session['allprof'] = retour;
-		next();
-	}, 50);
+	if (req.session['myinfo'][7][0] && (req.session['myinfo'][2] != undefined && req.session['myinfo'][2] != '')) {
+		trie.intelTri(req.session['myinfo'], req.session['allprof'], function(result) {
+			trie.ponderate(req.session['myinfo'], result, function(trier) {
+				req.session['allprof'] = trier;
+				next();
+			});
+		});
+	} else {
+		trie.intelTri(req.session['myinfo'], req.session['allprof'], function(result) {
+			trie.forIndex(req.session['myinfo'], result, 2, true, function(retour) {
+				req.session['allprof'] = retour;
+				next();
+			}, 50);
+		});
+	}
 }, function (req, res, next) {
 	res.locals.session = req.session;
 	res.render('index');

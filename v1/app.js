@@ -6,9 +6,10 @@ var express = require('express'),
     cookieParser = require('cookie-parser'),
     session = require('express-session'),
     mymongo = require('./middle/mymongo'),
+    utilities = require('./middle/utility'),
     jQuery = require('jquery'),
-    bootSlider = require('bootstrap-slider')
-//    socketIOSession = require('socket.io.session')
+    favicon = require('serve-favicon'),
+    bootSlider = require('bootstrap-slider');
 
 
 var index = require('./routes/index'),
@@ -16,7 +17,7 @@ var index = require('./routes/index'),
     login = require('./routes/login'),
     profile = require('./routes/profile'),
     register = require('./routes/register'),
-    tchat = require('./routes/tchat')
+    tchat = require('./routes/tchat');
 
 //__________________Moteur de template________
 app.set('view engine', 'ejs');
@@ -24,6 +25,7 @@ app.set('view engine', 'ejs');
 //__________________Middlewares_______________
 app.use(bodyParser.urlencoded({ limit: '80mb', extended: true }));
 app.use(bodyParser.json());
+app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use('/asset', express.static('public'));
 app.use('/node_modules/socket.io-client', express.static('socket.io'));
 var sessionMiddle = {
@@ -35,7 +37,7 @@ var sessionMiddle = {
 app.use(session(sessionMiddle));
 app.use(require('./middle/flash'));
 
-
+// ___________________Nettoyage de la session____________________
 app.use('/', function(req, res, next) {
     if (req.session['login'] != undefined && req.url != '/compte/info/loc') {
         if (req.session['toget'] != undefined) {
@@ -138,7 +140,7 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('stayco', function(data) {
-        console.log('stayco id: ' + socket.id);
+        // console.log('stayco id: ' + socket.id);
         var tab = new Array();
         if (data.login != '' && data.login != undefined) {
             if (users.indexOf(data.login) > -1) {
@@ -146,7 +148,7 @@ io.sockets.on('connection', function(socket) {
                     if (people[a].log == data.login) {
                         var i = a;
                         tab = people[i].id;
-                        if (!mymongo.alreadySet(tab, socket.id)) {
+                        if (!utilities.alreadySet(tab, socket.id)) {
                             tab[tab.length] = socket.id;
                             people[i].id = tab;
                         }
@@ -168,17 +170,14 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function(data) {
-        console.log('disconnect id: ' + socket.id);
-        // if (data == 'transport close') {
-            for (var a = 0; people[a]; a++) {
-                for (var b = 0; people[a].id[b]; b++) {
-                    if (people[a].id[b] == socket.id) {
-                        people[a].id.splice(b, 1);
-                        break;
-                    }
+        for (var a = 0; people[a]; a++) {
+            for (var b = 0; people[a].id[b]; b++) {
+                if (people[a].id[b] == socket.id) {
+                    people[a].id.splice(b, 1);
+                    break;
                 }
             }
-        // }
+        }
     });
 
     socket.on('like_user', function(data) {

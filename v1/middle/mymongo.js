@@ -4,62 +4,56 @@ var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
 var utilities = require('./utility')
 
-function alreadySet(tab, value) {
-    for (var i = 0; tab[i]; i++) {
-        if (tab[i] == value)
-            return 1;
-        if (i == tab.length) {
-            return 0;
-        }
-    }
-}
-
-function removeDouble(toadd, call) {
+// Callback d'un tableau, sans doublons
+function removeDouble(tab, call) {
     var tmp = {};
     var nb = 0;
 
-    for (var a = 0; toadd[a]; a++) {
-        if (!alreadySet(tmp, toadd[a])) {
-            tmp[nb] = toadd[a];
+    for (var a = 0; tab[a]; a++) {
+        if (!utilities.alreadySet(tmp, tab[a])) {
+            tmp[nb] = tab[a];
             nb++;
         }
     }
-    if (!toadd[a]) {
+    if (!tab[a]) {
         call(tmp);
     }
 }
 
-function makeTab(pastTab, pseudo, call) {
+// Creer/Ajoute une valeur à un tableau
+function makeTab(pastTab, cible, call) {
     if (pastTab != undefined) {
         for (var i = 0; pastTab[i]; i++) {}
-        pastTab[i] = pseudo;
+        pastTab[i] = cible;
         removeDouble(pastTab, call);
     } else {
         var result = {}
-        result[0] = pseudo;
+        result[0] = cible;
         call(result);
     }
 }
 
-function downTab(pastTab, pseudo, call) {
+// Supprime une valeur d'un tableau
+function downTab(pastTab, cible, call) {
     var result = {},
         nb = 0;
 
     if (pastTab) {
         for (var i = 0; pastTab[i]; i++) {
-            if (pastTab[i] != pseudo) {
+            if (pastTab[i] != cible) {
                 result[nb] = pastTab[i];
                 nb++;
             }
         }
         call(result);
-    } else if (pastTab[0] == pseudo && !pastTab[1]) {
+    } else if (pastTab[0] == cible && !pastTab[1]) {
         call({ 0: '' });
     } else if (!pastTab[0]) {
         call({0: ''});
     }
 }
 
+// Ajoute une notification a un utilisateur
 function notifyHim(to, message) {
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({login: to}).toArray(function(err, doc) {
@@ -71,6 +65,7 @@ function notifyHim(to, message) {
     });
 }
 
+// Supprime une notification parmis la liste de notif de l'utilisateurs
 var readNotif = function(to, message) {
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({login: to}).toArray(function(err, doc) {
@@ -82,6 +77,7 @@ var readNotif = function(to, message) {
     });
 }
 
+// Verifie si le pseudo existe déjà ou non
 function verifyPseudo(pseudo, callback) {
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({ pseudo: pseudo }).toArray(function(err, doc) {
@@ -90,11 +86,12 @@ function verifyPseudo(pseudo, callback) {
             } else {
                 callback(pseudo, null);
             }
+            db.close();
         });
-        db.close();
     });
 }
 
+// Met à jour la position geographique de l'utilisateur
 var upMyLoca = function(req, res) {
     if (req.session['myinfo'][8] != req.body.lo && req.session['myinfo'][11] != req.body.la) {
         MongoClient.connect(url, function(err, db) {
@@ -104,6 +101,7 @@ var upMyLoca = function(req, res) {
     }
 }
 
+// Regarde si l'album photo de l'utilisateur existe ou pas
 var checkImageUser = function(login, callback) {
     MongoClient.connect(url, function(err, db) {
         db.collection('image').find({ login: login }).toArray(function(err, docs) {
@@ -113,10 +111,12 @@ var checkImageUser = function(login, callback) {
             } else {
                 callback(null, docs);
             }
+            db.close();
         });
     });
 }
 
+// Supprime une photo de l'utilisateur
 var downMyImage = function(req, res) {
     var toSkip = req.body.path;
     var log = req.session['login'];
@@ -138,13 +138,14 @@ var downMyImage = function(req, res) {
                 };
                 db.collection('image').findOneAndReplace({ login: log }, newImageR, function(err, result) {
                     console.log('User ' + log + ' MaJ Down Image success');
+                    db.close();
                 });
-                db.close();
             });
         }
     });
 }
 
+// Ajoute une photo à l'utilisateur // Si il y a deja 6 photos la derniere est remplacer
 var upImage = function(value, log) {
     var toadd = {};
 
@@ -157,8 +158,8 @@ var upImage = function(value, log) {
                 };
                 db.collection('image').insertOne(newImage, function(err, result) {
                     console.log('User ' + log + ' Add Image success');
+                    db.close();
                 });
-                db.close();
             });
         }
         if (plein) {
@@ -173,23 +174,14 @@ var upImage = function(value, log) {
                 };
                 db.collection('image').findOneAndReplace({ login: log }, newImageR, function(err, result) {
                     console.log('User ' + log + ' MaJ Up Image success');
+                    db.close();
                 });
-                db.close();
             });
         }
     });
 }
 
-function insertThis(tab, where) {
-    MongoClient.connect(url, function(err, db) {
-        db.collection(where).updateOne({}, tab, function(err, result) {
-            if (err) return console.log('insertThis: ' + err);
-            if (result.result.ok) return console.log("Les Tags on ete mis à jour");
-            db.close();
-        });
-    });
-}
-
+// Récupère les photo d'un autre utilisateur
 function getHerImage(req, res, call) {
     var login = req.session['herPro'][9];
 
@@ -198,16 +190,16 @@ function getHerImage(req, res, call) {
             db.collection('image').find({ login: login }).toArray(function(err, doc) {
                 if (doc.length != 0) {
                     call(doc[0]['image']);
-                    db.close();
                 } else {
                     call({ 0: ' ' });
-                    db.close();
                 }
+                db.close();
             });
         });
     }
 }
 
+// Récupère les #tags d'un autre utilisateur 
 function getHerTag(req, res, call) {
     var pseudo = req.session['toget'];
 
@@ -221,24 +213,7 @@ function getHerTag(req, res, call) {
     }
 }
 
-function upHisVisit(pseudo, visiteur) {
-    if (pseudo != visiteur) {
-        MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({ login: pseudo }).toArray(function(err, doc) {
-                notifyHim(pseudo, 'Visited by ' + visiteur);
-                makeTab(doc[0]['visit'], visiteur, function(result) {
-                    MongoClient.connect(url, function(err, db1) {
-                        db1.collection('user').updateOne({ login: pseudo }, { $set: { visit: result } });
-                        db1.close();
-                        db.close();
-                        utilities.makePopu(pseudo);
-                    });
-                });
-            });
-        });
-    }
-}
-
+// Récupère les infos d'un autre utilisateur
 function getHerInfo(req, res, call) {
     var arr = {};
     var pseudo = req.session['toget'];
@@ -266,12 +241,32 @@ function getHerInfo(req, res, call) {
                 } else {
                     call(doc, null);
                 }
+                db.close();
             });
-            db.close();
         });
     }
 }
 
+// Met à jour les visites du profil cibler par "login"
+function upHisVisit(login, visiteur) {
+    if (login != visiteur) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({ login: login }).toArray(function(err, doc) {
+                notifyHim(login, 'Visited by ' + visiteur);
+                makeTab(doc[0]['visit'], visiteur, function(result) {
+                    MongoClient.connect(url, function(err, db1) {
+                        db1.collection('user').updateOne({ login: login }, { $set: { visit: result } });
+                        db1.close();
+                        db.close();
+                        utilities.makePopu(login);
+                    });
+                });
+            });
+        });
+    }
+}
+
+// Récupère la popularité de l'utilisateur
 var getPopu = function(login, call) {
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({ login: login }).toArray(function(err, doc) {
@@ -286,6 +281,7 @@ var getPopu = function(login, call) {
     });
 }
 
+// Récupère les infos de l'utilisateur
 function getMyInfo(req, res, call) {
     var arr = {};
     var log = req.session['login'];
@@ -301,7 +297,7 @@ function getMyInfo(req, res, call) {
                     arr[4] = doc[0]['orient'];
                     arr[5] = doc[0]['bio'];
                     arr[6] = doc[0]['mail'];
-                    // arr[7] = doc[0]['city'];
+                    arr[7] = doc[0]['tag'];
                     arr[8] = doc[0]['lo'];
                     arr[9] = doc[0]['avatar'];
                     arr[10] = doc[0]['pseudo'];
@@ -316,6 +312,7 @@ function getMyInfo(req, res, call) {
     }
 }
 
+// Récupère la liste des profil qui on visiter mon profil
 function getMyVisit(req, res, call) {
     var log = req.session['login'];
 
@@ -334,6 +331,7 @@ function getMyVisit(req, res, call) {
     }
 }
 
+// Récupère la liste des profil bloquer par l'utilisateur
 function getMyBlock(req, res, call) {
     var log = req.session['login'];
 
@@ -352,6 +350,7 @@ function getMyBlock(req, res, call) {
     }
 }
 
+// Récupère la liste des profil declarer faux par l'utilisateur
 function getMyFalse(req, res, call) {
     var log = req.session['login'];
 
@@ -370,6 +369,7 @@ function getMyFalse(req, res, call) {
     }
 }
 
+// Récupère la liste des utilisateurs qui ont liké le profil de l'utilisateur
 function getMyLiker(req, res, call) {
     var log = req.session['login'];
 
@@ -388,6 +388,7 @@ function getMyLiker(req, res, call) {
     }
 }
 
+// Récupère la liste de logins, des profils liké par l'utilisateur
 function getMyLike(req, res, call) {
     var log = req.session['login'];
 
@@ -406,6 +407,7 @@ function getMyLike(req, res, call) {
     }
 }
 
+// Récupère les photo de l'utilisateur
 function getMyImage(req, res, call) {
     var log = req.session['login'];
 
@@ -424,6 +426,7 @@ function getMyImage(req, res, call) {
     }
 }
 
+// Récupère les tag de l'utilisateur
 function getMyTag(req, res, call) {
     var mytag = {};
     var arr = {};
@@ -444,6 +447,7 @@ function getMyTag(req, res, call) {
     }
 }
 
+// Récupère toutes les info des utilisateurs, appliquer un trie de la liste
 var getAllProf = function(callback) {
     var tmp = {};
     var result = {};
@@ -474,7 +478,7 @@ var getAllProf = function(callback) {
     });
 }
 
-//deloguer l'utilisateur
+// Deloguer l'utilisateur
 var deLog = function(req, res) {
     console.log(req.session['login'] + ' se delog');
     req.session['login'] = undefined;
@@ -484,12 +488,13 @@ var deLog = function(req, res) {
 // Ajouter un utilisateur a la base mongo =>
 // Si le nom d'utilisateur et/ou mail n'existe pas dans la base
 var addUser = function(req, res) {
-    var logre = req.body.login;
-    var passwd = req.body.pwd;
-    var cfpwd = req.body.cfpwd;
-    var mail = req.body.mail;
+    var logre = req.body.login,
+        passwd = req.body.pwd,
+        cfpwd = req.body.cfpwd,
+        mail = req.body.mail,
+        sexe = req.body.sexe;
 
-    if (logre != '' && passwd != '' && cfpwd != '' && mail != '') {
+    if (logre != '' && passwd != '' && cfpwd != '' && mail != '' && sexe != '') {
         if (utilities.checkerPwd(passwd) == 1) {
             passwd = crypto.createHmac('whirlpool', passwd).digest('hex');
             cfpwd = crypto.createHmac('whirlpool', cfpwd).digest('hex');
@@ -499,48 +504,53 @@ var addUser = function(req, res) {
                         req.flash('error', 'Connection to DataBase Failed');
                         res.redirect('login');
                     }
-                    var newUser = {
-                        login: logre,
-                        pseudo: logre,
-                        pwd: passwd,
-                        mail: mail,
-                        tchat: {},
-                        heLikeMe: {},
-                        like: {},
-                        block: {},
-                        falseUser: {},
-                        popu: 0,
-                        orient: 'Bi',
-                        avatar: 'avatar.png',
-                        created: new Date()
-                    };
-                    db.collection('user').find({}).toArray(function(err, docs) {
-                        var i = 0;
-                        var ok = 0;
-                        while (docs[i]) {
-                            if (docs[i]['login'] === logre || docs[i]['mail'] === mail) {
-                                console.log('User: ' + logre + ' are already register');
-                                ok = -1;
-                                break;
-                            }
-                            ok++;
-                            i++;
-                        }
-                        if (ok != -1) {
-                            req.session['login'] = logre;
-                            req.flash('mess', 'Utilisateur ajouté avec succes');
-                            db.collection('user').insertOne(newUser, function(err, result) {
-                                if (result.result['ok']) {
-                                    utilities.senderMail(mail, "User");
-                                    console.log('User ' + logre + ' add success');
+                    utilities.defineAvatar(sexe, "avatar.png", function(s, a) {
+                        var newUser = {
+                            login: logre,
+                            pseudo: logre,
+                            sexe: s,
+                            pwd: passwd,
+                            mail: mail,
+                            tchat: {},
+                            tag: {},
+                            notif: {},
+                            heLikeMe: {},
+                            like: {},
+                            block: {},
+                            falseUser: {},
+                            popu: 0,
+                            orient: 'Bi',
+                            avatar: a,
+                            created: new Date()
+                        };
+                        db.collection('user').find({}).toArray(function(err, docs) {
+                            var i = 0;
+                            var ok = 0;
+                            while (docs[i]) {
+                                if (docs[i]['login'] === logre || docs[i]['mail'] === mail) {
+                                    console.log('User: ' + logre + ' are already register');
+                                    ok = -1;
+                                    break;
                                 }
-
-                            });
-                        } else {
-                            req.flash('error', 'Utilisateur / Mail, déjà utilisé');
-                        }
-                        db.close();
-                        res.redirect('compte/info');
+                                ok++;
+                                i++;
+                            }
+                            if (ok != -1) {
+                                req.session['login'] = logre;
+                                req.flash('mess', 'Utilisateur ajouté avec succes');
+                                db.collection('user').insertOne(newUser, function(err, result) {
+                                    if (result.result['ok']) {
+                                        utilities.senderMail(mail, "User");
+                                        console.log('User ' + logre + ' add success');
+                                        db.close();
+                                    }
+                                });
+                            } else {
+                                req.flash('error', 'Utilisateur / Mail, déjà utilisé');
+                            }
+                            db.close();
+                            res.redirect('compte/info');
+                        });
                     });
                 });
             } else {
@@ -599,17 +609,17 @@ var logUser = function(req, res, callback) {
     }
 };
 
+// Met à jour les informations de l'utilisateur telle que, Prénoms, Nom, Age, 
+// Orientation Sexuel, Mail, Biographie, Pseudo
 var updateUser = function(req, res) {
     var loger = req.session['login'],
         firstname = req.body.firstname,
         lastname = req.body.lastname,
         age = req.body.age,
-        sexe = req.body.sexe,
         orient = req.body.orient,
         mail = req.body.mail,
         bio = req.body.bio,
-        pseudo = req.body.pseudo,
-        avatar = req.body.avatar;
+        pseudo = req.body.pseudo;
 
     if (loger != undefined) {
         if (pseudo != '' && pseudo != req.session['myinfo'][10]) {
@@ -661,15 +671,6 @@ var updateUser = function(req, res) {
                 });
             }
         }
-        if (sexe != req.session['myinfo'][3] || (req.session['myinfo'][3] == null && avatar != req.session['myinfo'][9])) {
-            utilities.defineAvatar(sexe, avatar, function(s, a) {
-                MongoClient.connect(url, function(err, db) {
-                    db.collection('user').updateOne({ login: loger }, { $set: { sexe: s, avatar: a } });
-                    db.close();
-                });
-                console.log(loger + ' mis à jour son Sexe');
-            });
-        }
         if (orient != undefined && orient != req.session['myinfo'][4]) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({ login: loger }, { $set: { orient: orient } });
@@ -682,6 +683,7 @@ var updateUser = function(req, res) {
     }
 }
 
+// Définie une photo comme avatar
 var setAvatar = function(req, res) {
     utilities.defineAvatar(req.session['myinfo'][3], req.body.path, function(s, a) {
         MongoClient.connect(url, function(err, db) {
@@ -692,6 +694,8 @@ var setAvatar = function(req, res) {
     });
 }
 
+// Ajoute un #tag à la base de donnée
+// pas d'espace, inférieur à 20 caractères, et transformation en majuscule
 var addInterest = function(req, res) {
     var toadd = req.body.interet.toUpperCase();
 
@@ -713,6 +717,7 @@ var addInterest = function(req, res) {
     }
 }
 
+// Récupère les #tags de la basse de donnée
 var getInterest = function(req, res, call) {
     MongoClient.connect(url, function(err, db) {
         db.collection('interet').find().toArray(function(err, docs) {
@@ -725,6 +730,7 @@ var getInterest = function(req, res, call) {
     });
 }
 
+// Ajout d'un ou plusieurs #tags à l'utilisateur
 function upMyTag(req, res) {
     var interet = req.body.select;
 
@@ -753,6 +759,7 @@ function upMyTag(req, res) {
     }
 }
 
+// Suppression d'un ou plusieurs #tags à l'utilisateur
 function downMyTag(req, res) {
     var interet = req.body.select;
 
@@ -781,6 +788,7 @@ function downMyTag(req, res) {
     }
 }
 
+// Récupère les likes d'un utilisateurs
 function getHisLike(login, call) {
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({ login: login }).toArray(function(err, doc) {
@@ -790,6 +798,7 @@ function getHisLike(login, call) {
     });
 }
 
+// Met à jour, la liste de Match d'un utilisateur
 function upHisMatch(sens, login, me) {
     if (sens == true) {
         MongoClient.connect(url, function(err, db) {
@@ -817,6 +826,7 @@ function upHisMatch(sens, login, me) {
     }
 }
 
+// Check si les utilisateur (A, B) se like mutuellement et les connecte si c'est le cas
 function checkConnect(loginA, loginB) {
     var logA = undefined,
         ok = 0,
@@ -851,6 +861,8 @@ function checkConnect(loginA, loginB) {
     });
 }
 
+// Met à jour les like d'un utilisateur
+// Notifie l'utilisateur
 function upHisLike(sens, login, me) {
     if (sens == true) {
         MongoClient.connect(url, function(err, db) {
@@ -881,6 +893,8 @@ function upHisLike(sens, login, me) {
     }
 }
 
+// Ajoute l'utilisateur liker a la liste de 'like' de l'utilisateur
+// lance le check pour le match des profils
 var likeUser = function(req, res, callback) {
     var login = req.session['login'];
 
@@ -898,6 +912,7 @@ var likeUser = function(req, res, callback) {
     });
 }
 
+// Supprime l'utilisateur dislike de la liste 'like' de l'utilisateur 
 var disLikeUser = function(req, res, callback) {
     var login = req.session['login'];
 
@@ -914,6 +929,7 @@ var disLikeUser = function(req, res, callback) {
     }
 }
 
+// Ajoute l'utilisateur bloquer a la liste 'block' de l'utilisateur
 var blockUser = function(req, res, callback) {
     var login = req.session['login'];
 
@@ -929,6 +945,7 @@ var blockUser = function(req, res, callback) {
     }
 }
 
+// Supprime l'utilisateur debloquer de la liste 'block' de l'utilisateur
 var deBlockUser = function(req, res, callback) {
     var login = req.session['login'];
 
@@ -944,6 +961,8 @@ var deBlockUser = function(req, res, callback) {
     }
 }
 
+// Met a jour le compteur iFalse de l'utilisateur cibler
+// Si iFalse est >= 5 l'utilisateur cibler est supprimer de la base de donnée, ainsi que ses photos
 function upHerFalse(login) {
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({ login: login }).toArray(function(err, doc) {
@@ -951,20 +970,22 @@ function upHerFalse(login) {
                 var iFalse = (Number.parseInt(doc[0]['iFalse']) + 1);
                 db.collection('user').updateOne({ login: login }, { $set: { iFalse: iFalse } });
                 utilities.makePopu(login);
-                notifyHim(login, 'You False! ' + iFalse);
+                notifyHim(login, 'False number ' + iFalse);
                 db.close();
             } else if (doc[0]['iFalse'] >= 5) {
                 db.collection('user').removeOne({ login: login }, { justOne: true });
+                db.collection('image').removeOne({ login: login }, { justOne: true });
             } else {
                 db.collection('user').updateOne({ login: login }, { $set: { iFalse: '1' } });
                 utilities.makePopu(login);
-                notifyHim(login, 'You False! 1');
+                notifyHim(login, 'False number 1');
                 db.close();
             }
         });
     });
 }
 
+// Ajoute l'utilisateur 'déclarer faux' à la liste 'falseUser' de l'utilisateur
 var falseUser = function(req, res, callback) {
     var login = req.session['login'];
 
@@ -980,6 +1001,7 @@ var falseUser = function(req, res, callback) {
     }
 }
 
+// Récupere le tableau 'notif' de l'utilisateur
 var getMyNotif = function(name, callback) {
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({ login: name }).toArray(function(err, doc) {
@@ -995,6 +1017,7 @@ var getMyNotif = function(name, callback) {
     });
 }
 
+// Récupère les messages entre 2 utilisateurs
 var getMsg = function(me, wth, callback) {
     var result = {};
     MongoClient.connect(url, function(err, db) {
@@ -1013,6 +1036,7 @@ var getMsg = function(me, wth, callback) {
     });
 }
 
+// Ajoute un message a la collection 'tchat'
 var postMsg = function(to, off, msg, notif) {
     if (msg != '') {
         var tchat = {
@@ -1031,6 +1055,7 @@ var postMsg = function(to, off, msg, notif) {
     }
 }
 
+// Récupère la liste des likeur du profil cibler par login
 var getMyheLike = function(login, callback) {
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({ login: login }).toArray(function(err, doc) {
@@ -1077,7 +1102,6 @@ exports.blockUser = blockUser;
 exports.deBlockUser = deBlockUser;
 exports.falseUser = falseUser;
 exports.postMsg = postMsg;
-exports.alreadySet = alreadySet;
 
 // fonctionnalitées sites, login, logout, register, localisation, recuperer une listes des tags présents en BdD
 exports.getInterest = getInterest;

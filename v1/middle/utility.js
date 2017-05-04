@@ -4,15 +4,28 @@ var url = "mongodb://localhost:28000/matcha";
 var nodemailer = require('nodemailer');
 var crypto = require('crypto');
 
-function changePasswod(password, mail, callback) {
+// Vérifie si la valeur existe dans le tableau 
+function alreadySet(tab, value) {
+    if (tab) {
+        for (var i = 0; tab[i]; i++) {
+            if (tab[i] == value)
+                return 1;
+            if (i == tab.length) {
+                return 0;
+            }
+        }
+    } else {
+        return 0;
+    }
+}
+
+function changePassword(password, mail, callback) {
     MongoClient.connect(url, function(err, db) {
         var pass = crypto.createHmac('whirlpool', password).digest('hex');
         db.collection('user').updateOne({mail: mail}, { $set: {pwd: pass}}, function(err, result) {
             db.close();
             if (err) return callback(false);
-            if (result.result.ok) {
-                callback(true);
-            }
+            callback(true);
         });
     });
 }
@@ -33,14 +46,13 @@ var senderMail = function(mail, reason) {
     } else if (reason == 'Reset') {
         var pass = uniqid();
         changePassword(pass, mail, function(bool) {
-            console.log('passe par la');
             if (bool) {
                 var mailOption = {
                     from: '"Matcha rthidet" <no-reply@matcha.com>',
                     to: mail,
                     subject: 'Matcha, réinitialisation Mot de passe.',
-                    text: 'Vous avez demendé la réinitialisation de vôtre mot de passe, nouveau Pass: ' + pass,
-                    html: '<b>Vous avez demendé la réinitialisation de vôtre mot de passe, nouveau Pass: ' + pass + '</b>'
+                    text: 'Vous avez demendé la réinitialisation de vôtre mot de passe, le nouveau mot de passe: ' + pass,
+                    html: '<b>Vous avez demendé la réinitialisation de vôtre mot de passe, le nouveau mot de passe: ' + pass + '</b>'
                 }
                 transporter.sendMail(mailOption, function(error, info) {
                     if (error) return console.log(error);
@@ -211,3 +223,4 @@ exports.checkerBio = checkerBio;
 exports.getImage = getImage;
 exports.rmImage = rmImage;
 exports.senderMail = senderMail;
+exports.alreadySet = alreadySet;

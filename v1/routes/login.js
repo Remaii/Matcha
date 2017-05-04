@@ -8,7 +8,7 @@ router.get('/', function(req, res) {
     res.render('login');
 });
 
-router.post('/', function(req, res) {
+router.post('/', function(req, res, next) {
 	if (req.body.submit === 'Logon') {
 		mymongo.logUser(req, res, function (err, mess, login, redir) {
 			if (err) res.redirect(redir);
@@ -18,16 +18,12 @@ router.post('/', function(req, res) {
 				res.redirect(redir);
 			}
 		});
-	}
-});
-
-router.post('/reset', function(req, res, next) {
-	if (req.body.submit === 'Reset') {
+	} else if (req.body.submit === 'Reset') {
 		utilities.senderMail(req.body.mail, "Reset");
+		next();
 	}
-	next();
 }, function(req, res) {
-	res.status(200).send({ mess: 'it\' good!' });
+	res.redirect('/');
 });
 
 module.exports = router;

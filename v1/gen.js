@@ -206,3 +206,7 @@ if (process.argv[2] == 'all' && process.argv[3]) {
 } else if (process.argv[2] == 'user' && process.argv[3]) {
 	setUsers(Number(process.argv[3]));
 }
+
+// node gen.js all [nombre d'utilisateur voulue] // genere les utilisateur + les tags
+// node gen.js tag // ajoute uniquement les tags
+// node gen.js user [nombre d'utilisateur voulue] // ajoute seulement les utilisateurs

@@ -2,6 +2,7 @@ var express = require('express')
 var router = express.Router()
 var mymongo = require('../middle/mymongo')
 var utilities = require('../middle/utility')
+var crypto = require('crypto')
 
 router.get('/profile', function(req, res, next) {
 	mymongo.getMyInfo(req, res, function(myinfo) {
@@ -123,6 +124,29 @@ router.post('/info', function(req, res, next) {
 		mymongo.setAvatar(req, res);
 		res.status(200).send({ mess: 'it\' good!' });
 	}
+});
+
+router.post('/pwd', function(req, res, next) {
+	mymongo.getMyInfo(req, res, function(myinfo) {
+		req.session['myinfo'] = myinfo;
+		next();
+	});
+}, function(req, res, next) {
+	if (!utilities.checkerPwd(req.body.pwd)) {
+		next();
+	} else if (req.body.pwd != req.body.cfpwd) {
+		next();
+	} else {
+		utilities.checkerMyPwd(req.session['login'], req.body.oldpwd, function(boolee) {
+			if (boolee) {
+				utilities.changePassword(req.body.pwd, req.session['myinfo'][6], function(bool) {
+					next();
+				});
+			}
+		});
+	}
+}, function(req, res) {
+	res.redirect('compte/info');
 });
 
 module.exports = router;

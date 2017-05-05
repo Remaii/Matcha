@@ -92,7 +92,7 @@ var intelTri = function(myinfo, list, callback) {
 function trieDecroissant(tab, where, callback) {
     var tmp = {},
         j = 0;
-    
+
     for (var i = 0; tab[i]; i++) {
         if (i == 0 || i == 1) {
             j = 0;
@@ -133,7 +133,7 @@ function trieCroissant(tab, where, callback) {
     }
 }
 
-function removeBloked(login, tab, val, sens, callback) {
+function removeBloked(login, tab, val, sens, call) {
     MongoClient.connect(url, function(err, db) {
         db.collection('user').find({login: login}).toArray(function(err, doc) {
             if (doc.length >= 0) {
@@ -152,11 +152,11 @@ function removeBloked(login, tab, val, sens, callback) {
                     db.close();
                     if (sens) {
                         trieCroissant(result, val, function(ret) {
-                            callback(ret);
+                            call(ret);
                         });
                     } else {
                         trieDecroissant(result, val, function(ret) {
-                            callback(ret);
+                            call(ret);
                         });
                     }
                 }
@@ -171,9 +171,6 @@ var forIndex = function(myinfo, allprof, val, sens, callback, ray) {
     var rayon;
     var nb = 0;
 
-    if (val == 7) {
-        val = 4;
-    }
     if (ray == 0)
         rayon = 200;
     else
@@ -185,6 +182,7 @@ var forIndex = function(myinfo, allprof, val, sens, callback, ray) {
             tmp[2] = utilities.Distance(myinfo[8], myinfo[11], allprof[i][5], allprof[i][4]) / 100;
             tmp[3] = allprof[i][8];
             tmp[4] = allprof[i][7];
+            tmp[5] = allprof[i][6];
             if (tmp[2] <= rayon) {
                 result[nb] = tmp;
                 nb++;
@@ -220,50 +218,88 @@ function verifyAge(user, me) {
     }
 }
 
-function verifyDist(user, me) {
-    if ((utilities.Distance(me[8], me[11], user[5], user[4]) / 100) <= 50)
+function verifyDist(user, me, dist) {
+    if ((utilities.Distance(me[8], me[11], user[5], user[4]) / 100) <= dist)
         return 1;
     else
         return 0;
 }
 
-function communTag(thisUser, me, callback) {
-    var result = thisUser,
-        points = 0;
+function getCommun(user, me, callback) {
+    var pts = 0,
+        i = 0,
+        j = 0;
+
+    while (user[7][i]) {
+        j = 0;
+        while (me[7][j]) {
+            if (user[7][i] == me[7][j]) {
+                pts += 2;
+                j++;
+            } else {
+                j++;
+            }
+        } if (!me[7][j]) {
+            i++;
+        }
+    }
+    if (!user[7][i]) {
+        callback(pts);
+    }
+}
+
+function allPonderate(thisUser, me, callback) {
+    var points = 0;
 
     if (thisUser[7] && me[7]) {
-        for (var i = 0; thisUser[7][i]; i++) {
-            for (var a = 0; me[7][a]; a++) {
-                if (thisUser[7][i] == me[7][a]) {
-                    points++;
-                }
+        getCommun(thisUser, me, function(pts) {
+            points += pts;
+            if (verifyAge(thisUser, me)) {
+                points++;
             }
-        } if (!thisUser[7][i]) {
-            // if (points > 0) {
-                if (verifyAge(thisUser, me)) {
-                    points++;
-                } if (verifyDist(thisUser, me)) {
-                    points++;
-                }
-                callback(points);
-            // }
-        }
+            if (verifyDist(thisUser, me, 50)) {
+                points++;
+            }
+            callback(points);
+        });
     } else {
         callback(0);
     }
 }
 
-var ponderate = function(myinfo, list, callback) {
+var ponderate = function(type, myinfo, list, callback) {
     var i = 0;
     
     if (list[0]) {
-        while (list[i]) {
-            communTag(list[i], myinfo, function(result) {
-                list[i][7] = result;
+        if (type == 'all') {
+            while (list[i]) {
+                allPonderate(list[i], myinfo, function(result) {
+                    list[i][7] = result + list[i][9];
+                    i++;
+                });
+            } if (!list[i]) {
+                forIndex(myinfo, list, 4, false, callback, 80);
+            }
+        } else if (type == 'age') {
+            forIndex(myinfo, list, 5, true, callback, 80);
+        } else if (type == 'loc') {
+            forIndex(myinfo, list, 2, true, callback, myinfo[13]);
+        } else if (type == 'popu') {
+            while (list[i]) {
+                list[i][7] = list[i][9];
                 i++;
-            });
-        } if (!list[i]) {
-            forIndex(myinfo, list, 7, false, callback, 50);
+            } if (!list[i]) {
+                forIndex(myinfo, list, 4, false, callback, 80);
+            }
+        } else if (type == 'tag') {
+            while (list[i]) {
+                getCommun(list[i], myinfo, function(pts) {
+                    list[i][7] = pts;
+                    i++;
+                });
+            } if (!list[i]) {
+                forIndex(myinfo, list, 4, false, callback, 80);
+            }
         }
     }
 }

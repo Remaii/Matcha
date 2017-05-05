@@ -5,8 +5,9 @@ var utilities = require('../middle/utility')
 var trie = require('../middle/trieur')
 
 router.get('/', function(req, res, next) {
-	mymongo.getInterest(req, res, function(err, tag) {
+	mymongo.getInterest(req, res, function(tag) {
 		req.session['interet'] = tag;
+		console.log(tag);
 		next();
 	});
 }, function(req, res) {
@@ -34,9 +35,15 @@ router.post('/', function(req, res, next) {
 		next();
 	});
 }, function(req, res, next) {
+	mymongo.getInterest(req, res, function(tag) {
+		req.session['interet'] = tag;
+		console.log(tag)
+		next();
+	});
+}, function(req, res, next) {
 	trie.makeResearch(req, function(err, result) {
 		if (result) {
-			trie.forIndex(req.session['myinfo'], result, function(retour) {
+			trie.forIndex(req.session['myinfo'], result, 2, true, function(retour) {
 				req.session['allprof'] = retour;
 				next();
 			}, req.body['d']);

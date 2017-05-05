@@ -19,7 +19,7 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-md-6 col-xs-6">	
+		<div class="col-md-6 col-xs-6 text-center">	
 			<br><form action="/compte/info" method="post">
 				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Pseudo</label>
 				<input class="form-control text-center input-sm" type="text" name="pseudo"
@@ -34,7 +34,7 @@
 				<input class="form-control text-center input-sm" type="number" min="18" max="100" name="age"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][2] %><% } %>">		        
 		        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Orientation sexuel</label>
-				<select class="form-control text-center input-sm" name="orient" size="1">
+				<select class="form-control input-sm text-center" name="orient" size="1">
 					<option><% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][4] %><% } %></option>
 					<option>Hetero</option>
 					<option>Gay</option>
@@ -100,6 +100,23 @@
 		        	<input class="btn btn-primary btn-sm" type="submit" name="submit" value="Creer">
 		        </div>
 		    </form>
+			<div class="col-md-12 col-xs-12 text-center">
+			<br>
+				<form action="/compte/pwd" method="post">
+		    	    <label class="col-md-12 col-xs-12 text-center">Changement de mot de passe !</label>
+		    	    <div class="col-md-12 col-xs-12">
+		    	    	<label class="col-md-12 col-xs-12 text-center">Ancien mot de passe !</label>
+			        	<input class="form-control input-sm text-center" type="password" name="oldpwd">
+			        	<label class="col-md-12 col-xs-12 text-center">Nouveau mot de passe !</label>
+			        	<input class="form-control input-sm text-center" type="password" name="pwd">
+			        	<label class="col-md-12 col-xs-12 text-center">Confirmation !</label>
+			        	<input class="form-control input-sm text-center" type="password" name="cfpwd">
+			        </div>
+			        <!-- <div class="col-md-4 col-xs-4"> -->
+			        	<input class="btn btn-primary btn-sm" type="submit" name="submit" value="Changer">
+			        <!-- </div> -->
+			    </form>
+			</div>
 		</div>
 	</div>
 </div>

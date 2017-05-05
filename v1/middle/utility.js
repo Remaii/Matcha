@@ -4,6 +4,21 @@ var url = "mongodb://localhost:28000/matcha";
 var nodemailer = require('nodemailer');
 var crypto = require('crypto');
 
+var checkerMyPwd = function(login, pwd, callback) {
+    pwd = crypto.createHmac('whirlpool', pwd).digest('hex');
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({login: login}).toArray(function(err, doc) {
+            if (doc[0]['pwd'] == pwd) {
+                db.close();
+                callback(true);
+            } else {
+                db.close();
+                callback(false);
+            }
+        });
+    });
+}
+
 // Vérifie si la valeur existe dans le tableau 
 function alreadySet(tab, value) {
     if (tab) {
@@ -19,13 +34,17 @@ function alreadySet(tab, value) {
     }
 }
 
-function changePassword(password, mail, callback) {
+var changePassword = function(password, mail, callback) {
     MongoClient.connect(url, function(err, db) {
         var pass = crypto.createHmac('whirlpool', password).digest('hex');
         db.collection('user').updateOne({mail: mail}, { $set: {pwd: pass}}, function(err, result) {
             db.close();
-            if (err) return callback(false);
+            if (err) callback(false);
+            // if (result.result.ok) {
             callback(true);
+            // } else {
+            //     return callback(false);
+            // }
         });
     });
 }
@@ -116,7 +135,7 @@ exports.makePopu = function(login) {
                     db.close();
                 });
             } else {
-                updatePopu(login, "Nouveau profile");
+                updatePopu(login, 0);
                 db.close();
             }
         });
@@ -224,3 +243,5 @@ exports.getImage = getImage;
 exports.rmImage = rmImage;
 exports.senderMail = senderMail;
 exports.alreadySet = alreadySet;
+exports.checkerMyPwd = checkerMyPwd;
+exports.changePassword = changePassword;

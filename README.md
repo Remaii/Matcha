@@ -17,16 +17,16 @@
 * Rendez-vous sur: <code>http://localhost:3000</code> , créer un utilisateur, enjoy!
 
 
-## Status:🚧72%
+## Status:🚧94%
 
-### Inscription / Connection 75%end
+### 100% Inscription / Connection
 * avec Mail, nom d'Utilisateur, Mot de Passe sécurisé✅
 * Login:✅
 * Logout:✅
-* Reinitialisé son Mot de Passe:✅
+* Reinitialisé son Mot de Passe:✅, Changer son mot de passe✅
 
 
-### 91% Profil de l'utilisateur
+### 92% Profil de l'utilisateur
 * Modifier son prénom:✅
 * Modifier son Nom:✅
 * Modifier son mail:✅
@@ -36,25 +36,23 @@
 * Ajouter/Supprimer ses Tags:✅
 * Ajouter/Supprimer ses photos maximum 6:✅
 * Voir les utilisateurs qui ont liké:✅
+* Definir une autre localisation:❌
 * Localiser l'utilisateur:✅(googlemaps api) || ✅(geoip2)
-* Score de popularité:✅ (((nombre de like + nombre de visite)/* - nombre de bloquage*/) / nombre de False)
+* Score de popularité:✅ (((nombre de like + nombre de visite)) / nombre de False)
 
 
-### 18% Parcours
+### 100% Parcours
 * Affiche uniquement les profils "interessant" suivant la sexualité:✅, par defaut trie par localisation:✅(rayon de 50km)
-* Affichage intelligent (zone géographique(, maximum de tags, maximum poplarité)
-* Trie possible de la liste des profils par âge:❌, localisation:❌, poplarité:❌, tag en commun:❌
-* Trie possible de la liste des profils par INTERVALE d'âge:❌, localisation:❌, poplarité:❌, tag en commun:❌
+* Affichage intelligent (zone géographique✅) ou (ponderation avec✅✅✅: localisation(situé a moin de 50km +1pts), maximum de tags(+1pts/tag en commun), +score de popularité(pts), +1pts si l'age es ±5ans)
+* Trie possible de la liste des profils par âge:✅, localisation:✅, poplarité:✅, tag en commun:✅
 * -Voir les autres profils:✅
 * -Liker un profil:✅
 * -Tchatter avec un autre utilisateur:✅
 
-### 80% Recherche
-* Par intervalle d'âge:✅
-* Par intervalle de score de popularité:❌
-* Par tags:✅ (Possède l'un de ces tags)
+### 66% Recherche
+* Trie possible de la liste des profils par INTERVALE d'âge:✅, localisation:✅,poplarité:❌, Possède l'un de ces tags:✅
 * Localisation:✅(L'utilisateur peut choisir le rayon de recherche)
-* Résultat triable comme le parcours:✅
+* Résultat triable comme le parcours:❌
 
 ### 100% Profil des autres
 * Rendu des informations:✅(prénom, nom, âge, orientation sexuel, sexe, tags, bio)
@@ -77,9 +75,8 @@ Quand un utilisateur regarde le profil d'un autre:
 * Dislike reçu:✅ (👎) (il faut liker pour dislike)
 * (*2)Les notifications sont visibles partout:✅
 
-#### Bonus
+#### Bonus 
 * Choisir son avatar parmis ses photos:✅
-* Definir une autre localisation:❌
 * Compte admin, possibilité de supprimer les tags:❌
 * Charger les images a partir de facebook/google+:❌
 * Carte des utilisateurs interactive:❌
@@ -88,4 +85,4 @@ Quand un utilisateur regarde le profil d'un autre:
 #### Consignes éliminatoires
 * Injection SQL:✅(MongoDB)
 * Aucune erreur:🚧
-* Mot de Passe crypter:✅(whirlpool)
+* Mot de Passe crypter:✅(whirlpool + "doit etre composé au minimum, d'1 majuscule, d'1 chiffre, avoir une longueur de 5 caractère minimum")

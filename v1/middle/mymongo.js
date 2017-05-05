@@ -2,7 +2,7 @@ var crypto = require('crypto');
 var cookie = require('cookie');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
-var utilities = require('./utility')
+var utilities = require('./utility');
 
 // Callback d'un tableau, sans doublons
 function removeDouble(tab, call) {
@@ -303,6 +303,7 @@ function getMyInfo(req, res, call) {
                     arr[10] = doc[0]['pseudo'];
                     arr[11] = doc[0]['la'];
                     arr[12] = doc[0]['login'];
+                    arr[13] = doc[0]['ray'];
                     call(arr);
                     db.close();
                 }
@@ -466,6 +467,7 @@ var getAllProf = function(callback) {
                 tmp[6] = docs[i]['age'];
                 tmp[7] = docs[i]['tag'];
                 tmp[8] = docs[i]['login'];
+                tmp[9] = docs[i]['popu'];
                 result[nb] = tmp;
                 tmp = {};
                 nb++;
@@ -517,8 +519,9 @@ var addUser = function(req, res) {
                             heLikeMe: {},
                             like: {},
                             block: {},
+                            ray: 25,
                             falseUser: {},
-                            popu: 0,
+                            popu: 0.1,
                             orient: 'Bi',
                             avatar: a,
                             created: new Date()
@@ -721,7 +724,7 @@ var addInterest = function(req, res) {
 var getInterest = function(req, res, call) {
     MongoClient.connect(url, function(err, db) {
         db.collection('interet').find().toArray(function(err, docs) {
-            if (docs[0])
+            if (docs[0]['name'] == 'Tags')
                 call(docs[0][0]);
             else
                 call({0:''});

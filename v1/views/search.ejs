@@ -1,7 +1,7 @@
 <div class="row">
 <% if (locals.session['login'] != undefined) {
     for (var i = 0; locals.session['allprof'][i]; i++) { %>
-    <a href="/profile/<%= locals.session['allprof'][i][1] %>">
+    <a href="/profile/<%= locals.session['allprof'][i][3] %>">
         <div class="col-xs-4 col-md-4">
             <div class="col-md-12 col-xs-12">
                 <br><img class="col-md-12 col-xs-12 img-circle" src="<% if (locals.session['allprof'][i][0] != null) { %><%= '/asset/uploads/' + locals.session['allprof'][i][0] %><% } %>">

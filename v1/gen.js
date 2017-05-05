@@ -2,6 +2,22 @@ var crypto = require('crypto')
 var uniqid = require('uniqid')
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
+var utilities = require('./middle/utility');
+
+function removeDouble(tab, call) {
+    var tmp = {};
+    var nb = 0;
+
+    for (var a = 0; tab[a]; a++) {
+        if (!utilities.alreadySet(tmp, tab[a])) {
+            tmp[nb] = tab[a];
+            nb++;
+        }
+    }
+    if (!tab[a]) {
+        call(tmp);
+    }
+}
 
 var sexe = {
 	0: "Homme",
@@ -82,10 +98,14 @@ var interet = {
 		2: "MUSIQUE",
 		3: "NATURE",
 		4: "SKATE",
-		5: "ROBOT",
+		5: "SOIREE",
 		6: "APPLE",
 		7: "MODE",
-		8: "VELO"
+		8: "VELO",
+		9: "VEGAN",
+		10: "OMNIVORE",
+		11: "GEEK",
+		12: "GAMER"
 	}
 }
 
@@ -118,10 +138,25 @@ function addInteret() {
 	});
 }
 
+function genTag(callback) {
+	var i = 0,
+		res = {};
+	while (i < 2) {
+		var rand = (Math.random() * (0 - 12) + 12).toFixed(0);
+		res[i] = interet[0][rand];
+		i++;
+	} if (i == 2) {
+		removeDouble(res, function(ret) {	
+			callback(ret);
+		});
+	}
+}
+
 var setUsers = function(nb) {
 	var passwd = crypto.createHmac('whirlpool', "AutoUser42").digest('hex');
 	var mail = "AutoUser42@matcha.fr";
-	
+	var user = {};
+
 	MongoClient.connect(url, function(err, db) {
 		if (err) return console.log(err);
 		var randName = Math.floor((Math.random() * 16) + 0),
@@ -136,6 +171,7 @@ var setUsers = function(nb) {
 			sexua = sexual[randSexual],
 			lo = 0,
 			la = 0,
+			tags = {},
 			avatar = 'avatar.png';
 
 		for (var i = 0; i < nb; i++) {
@@ -151,6 +187,9 @@ var setUsers = function(nb) {
 				lo = resu.lon;
 				la = resu.lat;
 			});
+			genTag(function(resTags) {
+				tags = resTags;
+			});
 			if (sex == "Homme") {
 				avatar = 'avatarH.png';
 				logauto = prenomH[randName];
@@ -159,6 +198,7 @@ var setUsers = function(nb) {
 				logauto = prenoms[randName];
 			}
 			login = uniqid();
+			user[i] = login;
 			var newUser = {
 				login: login,
 				pseudo: logauto + i,
@@ -173,18 +213,15 @@ var setUsers = function(nb) {
 				orient: sexua,
 				avatar: avatar,
 				bio: "J'ai été généré de façon aléatoire",
-				tag: {
-					0: "ROBOT"
-				},
+				tag: tags,
 				heLikeMe: {
-					0: "premier",
-					1: "deuxieme"
+					0: "premier"
 				},
 				visit: {
 					0: "premier",
-					1: "deuxieme",
-					3: "troisieme"
+					1: "deuxieme"
 				},
+				popu: 3,
 				created: new Date()
 			};
 			db.collection('user').insertOne(newUser, function(err, result) {

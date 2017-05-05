@@ -23,7 +23,7 @@
 * avec Mail, nom d'Utilisateur, Mot de Passe sécurisé✅
 * Login:✅
 * Logout:✅
-* Reinitialisé son Mot de Passe:❌
+* Reinitialisé son Mot de Passe:✅
 
 
 ### 91% Profil de l'utilisateur
@@ -41,8 +41,8 @@
 
 
 ### 18% Parcours
-* Affiche uniquement les profils "interessant" suivant la sexualité:✅, par defaut trie par localisation:✅(rayon de 200km)
-* Affichage intelligent (zone géographique:❌, maximum de tags:❌, maximum poplarité:❌)
+* Affiche uniquement les profils "interessant" suivant la sexualité:✅, par defaut trie par localisation:✅(rayon de 50km)
+* Affichage intelligent (zone géographique(, maximum de tags, maximum poplarité)
 * Trie possible de la liste des profils par âge:❌, localisation:❌, poplarité:❌, tag en commun:❌
 * Trie possible de la liste des profils par INTERVALE d'âge:❌, localisation:❌, poplarité:❌, tag en commun:❌
 * -Voir les autres profils:✅

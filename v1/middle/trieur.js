@@ -150,12 +150,13 @@ function removeBloked(login, tab, val, sens, nbRes, call) {
         db.collection('user').find({ login: login }).toArray(function(err, doc) {
             if (doc.length >= 0) {
                 var blocked = doc[0]['block'],
+                    heBlock = doc[0]['heBlockMe'],
                     result = {},
                     nb = 0,
                     falseUser = doc[0]['falseUser'];
 
                 for (var i = 0; tab[i]; i++) {
-                    if (!utilities.alreadySet(blocked, tab[i][3]) && !utilities.alreadySet(falseUser, tab[i][3])) {
+                    if (!utilities.alreadySet(blocked, tab[i][3]) && !utilities.alreadySet(falseUser, tab[i][3]) && !utilities.alreadySet(heBlock, tab[i][3])) {
                         result[nb] = tab[i];
                         nb++;
                     }

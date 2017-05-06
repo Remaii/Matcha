@@ -109,6 +109,23 @@ app.use('/profile', profile)
 app.use('/register', register)
 app.use('/tchat', tchat)
 
+//__________________Page Delog________________
+app.get('/delog', function(req, res) {
+    mymongo.delog(req, res);
+});
+
+//______________Page introuvable______________
+app.use(function(req, res, next) {
+    if (req.session['err']) {
+        req.flash('error', req.session['err']);
+        req.session['err'] = undefined;
+        res.redirect('/');
+    } else {
+        req.flash('error', 'La page "' + req.url + '" éxiste pas !');
+        res.redirect('/');
+    }
+});
+
 // Socket.io
 users = [];
 people = [];
@@ -159,7 +176,7 @@ io.sockets.on('connection', function(socket) {
                     socket.emit('notif', myNotif);
                 });
             } else {
-				tab[tab.length] = socket.id;
+                tab[tab.length] = socket.id;
                 people.push({ log: data.login, id: tab });
                 users.push(data.login);
                 mymongo.getMyNotif(data.login, function(myNotif) {
@@ -238,19 +255,5 @@ io.sockets.on('connection', function(socket) {
     });
 });
 
-//__________________Page Delog________________
-app.get('/delog', function(req, res) {
-    mymongo.delog(req, res);
-});
-
-//______________Page introuvable______________
-app.use(function(req, res, next) {
-	if (req.session['err']) {
-	    console.log('404 : ' + req.url + ' ' + req.session['err']);
-	    req.flash('error', req.session['err']);
-	    req.session['err'] = undefined;
-	    res.redirect('/');
-	}
-});
 
 server.listen(3000)

@@ -217,6 +217,10 @@ var setUsers = function(nb) {
 				heLikeMe: {
 					0: "premier"
 				},
+				heBlockMe: {},
+				like:{},
+				block:{},
+				notif:{},
 				visit: {
 					0: "premier",
 					1: "deuxieme"

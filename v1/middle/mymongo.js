@@ -3,6 +3,9 @@ var cookie = require('cookie');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:28000/matcha";
 var utilities = require('./utility');
+var googleMap = require('@google/maps').createClient({
+    key:'AIzaSyDz3z3IofGPR759kuGuFwaRA9KaNeRsm14'
+});
 
 // Callback d'un tableau, sans doublons
 function removeDouble(tab, call) {
@@ -91,13 +94,57 @@ function verifyPseudo(pseudo, callback) {
     });
 }
 
+function returnCityLatLon(tochr, callback) {
+    var cmpts = tochr['address_components'],
+        data = {
+            city: tochr['formatted_address'],
+            lo: tochr['geometry'].location.lng,
+            la: tochr['geometry'].location.lat
+        };
+
+    for (var i = 0; cmpts[i]; i++) {
+        if (cmpts[i].types[0] == 'locality')
+            data.city = cmpts[i]['long_name'];
+    }
+    if (!cmpts[i]) {
+        callback(data);
+    }
+}
+
+function getCityName(lo, la, callback) {
+    googleMap.reverseGeocode({
+        latlng: {
+            lat: la,
+            lng: lo
+        }
+    }, function(err, response) {
+        if (!err) {
+            callback(response.json);
+        }
+    });
+}
+// récupère les informations geographique de la ville passer en parametre
+function getCity(city, callback) {
+    googleMap.geocode({
+        address: city
+    }, function(err, response) {
+        if (!err) {
+            callback(response.json);
+        }
+    });
+}
+
 // Met à jour la position geographique de l'utilisateur
 var upMyLoca = function(req, res) {
-    if (req.session['myinfo'][8] != req.body.lo && req.session['myinfo'][11] != req.body.la) {
-        MongoClient.connect(url, function(err, db) {
-            db.collection('user').updateOne({ login: req.session['login'] }, { $set: { la: req.body.la, lo: req.body.lo } });
-            db.close();
-        });
+    if (req.session['myinfo'][8] != req.body.lo && req.session['myinfo'][11] != req.body.la && req.session['myinfo'][14]) {
+        getCityName(req.body.lo, req.body.la, function(datas) {
+            returnCityLatLon(datas.results[0], function(data) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({ login: req.session['login'] }, { $set: { la: data.la, lo: data.lo, city: data.city, position: true } });
+                    db.close();
+                });
+            });
+        })
     }
 }
 
@@ -303,6 +350,8 @@ function getMyInfo(req, res, call) {
                     arr[11] = doc[0]['la'];
                     arr[12] = doc[0]['login'];
                     arr[13] = doc[0]['ray'];
+                    arr[14] = doc[0]['position'];
+                    arr[15] = doc[0]['city'];
                     call(arr);
                     db.close();
                 }
@@ -516,11 +565,13 @@ var addUser = function(req, res) {
                             tag: {},
                             notif: {},
                             heLikeMe: {},
+                            heBlockMe: {},
                             like: {},
                             block: {},
+                            position: true,
                             ray: 25,
                             falseUser: {},
-                            popu: 0.1,
+                            popu: 0,
                             orient: 'Bi',
                             avatar: a,
                             created: new Date()
@@ -622,6 +673,9 @@ var updateUser = function(req, res) {
         mail = req.body.mail,
         bio = req.body.bio,
         ray = req.body.rayon,
+        city = req.body.city,
+        longitude = req.body.longitude,
+        latitude = req.body.latitude,
         pseudo = req.body.pseudo;
 
     if (loger != undefined) {
@@ -687,6 +741,25 @@ var updateUser = function(req, res) {
                 db.close();
                 console.log(loger + ' mise à jour sa Sexualité');
             });
+        }
+        if (city != req.session['myinfo'][15]) {
+            if (city) {
+                getCity(city, function(position) {
+                    returnCityLatLon(position.results[0], function(data) {
+                        MongoClient.connect(url, function(err, db) {
+                            db.collection('user').updateOne({ login: loger }, { $set: { lo: data.lo, la: data.la, city: data.city, position: false } });
+                            db.close();
+                            console.log(loger + ' à mis à jour ses Coordonnées');
+                        });
+                    });
+                });
+            } else if (!city) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({ login: loger }, { $set: { position: true } });
+                    db.close();
+                    console.log(loger + ' à réactivé la localisation');
+                });
+            }
         }
         utilities.makePopu(loger);
         res.redirect('info');
@@ -903,6 +976,40 @@ function upHisLike(sens, login, me) {
     }
 }
 
+// Met à jour heBlockMe d'un utilisateur
+// Notifie l'utilisateur
+function upHisBlock(sens, login, me) {
+    if (sens == true) {
+        console.log(login + ' ' + me + ' block ' + sens);
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({ login: login }).toArray(function(err, doc) {
+                makeTab(doc[0]['heBlockMe'], me, function(result) {
+                    MongoClient.connect(url, function(err, db) {
+                        db.collection('user').updateOne({ login: login }, { $set: { heBlockMe: result } });
+                        db.close();
+                        utilities.makePopu(login);
+                        notifyHim(login, 'Like by ' + me);
+                    });
+                });
+            });
+        });
+    } else {
+        console.log(login + ' ' + me + ' deblock ' + sens);
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({ login: login }).toArray(function(err, doc) {
+                downTab(doc[0]['heBlockMe'], me, function(result) {
+                    MongoClient.connect(url, function(err, db) {
+                        db.collection('user').updateOne({ login: login }, { $set: { heBlockMe: result } });
+                        db.close();
+                        utilities.makePopu(login);
+                        notifyHim(login, 'Dislike by ' + me);
+                    });
+                });
+            });
+        });
+    }
+}
+
 // Ajoute l'utilisateur liker a la liste de 'like' de l'utilisateur
 // lance le check pour le match des profils
 var likeUser = function(req, res, callback) {
@@ -933,6 +1040,7 @@ var disLikeUser = function(req, res, callback) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({ login: login }, { $set: { like: result } });
                 db.close();
+                checkConnect(login, req.body.pseudo);
                 callback(null, { mess: 'Dislike Success' });
             });
         });
@@ -944,6 +1052,8 @@ var blockUser = function(req, res, callback) {
     var login = req.session['login'];
 
     if (req.body.pseudo != login) {
+        upHisBlock(true, req.body.pseudo, login);
+        console.log(req.body.pseudo + ' ' + login + ' block');
         makeTab(req.session['myBlock'], req.body.pseudo, function(result) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({ login: login }, { $set: { block: result } });
@@ -960,6 +1070,8 @@ var deBlockUser = function(req, res, callback) {
     var login = req.session['login'];
 
     if (req.body.pseudo != login) {
+        upHisBlock(false, req.body.pseudo, login);
+        console.log(req.body.pseudo + ' ' + login + ' deblock');
         downTab(req.session['myBlock'], req.body.pseudo, function(result) {
             MongoClient.connect(url, function(err, db) {
                 db.collection('user').updateOne({ login: login }, { $set: { block: result } });

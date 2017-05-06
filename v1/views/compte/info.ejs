@@ -21,18 +21,34 @@
 	<div class="row">
 		<div class="col-md-6 col-xs-6 text-center">	
 			<br><form action="/compte/info" method="post">
+				
 				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Pseudo</label>
 				<input class="form-control text-center input-sm" type="text" name="pseudo"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][10] %><% } %>">
+				
 				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Prénom</label>
 				<input class="form-control text-center input-sm" type="text" name="firstname"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][0] %><% } %>">
+				
 				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Nom</label>
 				<input class="form-control text-center input-sm" type="text" name="lastname"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][1] %><% } %>">
+
 				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Âge</label>
 				<input class="form-control text-center input-sm" type="number" min="18" max="100" name="age"
-				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][2] %><% } %>">		        
+				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][2] %><% } %>">
+				
+				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">City</label>
+				<input class="form-control text-center input-sm" type="text" name="city"
+				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][15] %><% } %>">
+				<!-- <label class="col-md-6 col-xs-6 text-center" style="display: inline-block;">Longitude</label>
+				<label class="col-md-6 col-xs-6 text-center" style="display: inline-block;">Latitude</label>
+				<input class=" col-md-6 col-xs-6 text-center input-sm" type="number" min="-180" max="180" step="0.0000001" name="longitude"
+				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][8] %><% } %>" style="display: inline-block;">
+				
+				<input class="col-md-6 col-xs-6 text-center input-sm" type="number" min="-90" max="90" step="0.0000001" name="latitude"
+				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][11] %><% } %>" style="display: inline-block;">
+ -->
 		        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Orientation sexuel</label>
 				<select class="form-control input-sm text-center" name="orient" size="1">
 					<option><% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][4] %><% } %></option>
@@ -40,18 +56,23 @@
 					<option>Gay</option>
 					<option>Bi</option>
 				</select>
+		        
 		        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Mail</label>
 				<input class="form-control text-center input-sm" type="mail" name="mail"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][6] %><% } %>">
+		        
 		        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Petite Bio</label>
 		        <textarea class="form-control text-center input-sm" rows="3" name="bio"
 		        value=""><% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][5] %><% } %></textarea>
-		    	<!-- <div class="col-xs-1" style="display: none;">
+		    	
+		    	<div class="col-xs-1" style="display: none;">
 		    		<input id="avatar_sub" type="text" name="avatar" value="<%= locals.session['myinfo'][9] %>">
-		    	</div> -->
+		    	</div>
+		    	
 		    	<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Rayon de recherche</label>
 				<input class="form-control text-center input-sm" type="number" min="5" max="200" name="rayon"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][13] %><% } %>">
+		    	
 		    	<div class="col-md-3 col-md-offset-5 col-xs-offset-5">
 		        	<input class="btn btn-primary" type="submit" name="submit" value="Update">
 		    	</div>

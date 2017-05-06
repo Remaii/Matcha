@@ -2,29 +2,23 @@
 
 <div class="row">
 <div id="trieur" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
-    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-right">
-        Trie:
-        <a href="/?trie=0">Reset</a>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
+        Trié:
     </div>
     <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
-        |
-        <a href="/?trie=1">Par Age</a>
-        |
+        |<a href="/?trie=0">Par Défault</a>|
     </div>
     <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
-        |
-        <a href="/?trie=2">Par Distance</a>
-        |
+        |<a href="/?trie=1">Par Age</a>|
     </div>
     <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
-        |
-        <a href="/?trie=3">Par Popularité</a>
-        |
+        |<a href="/?trie=2">Par Distance</a>|
     </div>
     <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
-        |
-        <a href="/?trie=4">Par Tag en commun</a>
-        |
+        |<a href="/?trie=3">Par Popularité</a>|
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
+        |<a href="/?trie=4">Par Tag</a>|
     </div>
 </div>
 <% if (locals.session['login'] != undefined) {

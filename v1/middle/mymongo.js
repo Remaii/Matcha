@@ -232,14 +232,13 @@ function getHerInfo(req, res, call) {
                     arr[3] = doc[0]['sexe'];
                     arr[4] = doc[0]['orient'];
                     arr[5] = doc[0]['bio'];
-                    // arr[6] = doc[0]['city'];
                     arr[7] = doc[0]['login'];
                     arr[8] = doc[0]['avatar'];
                     arr[9] = doc[0]['login'];
                     arr[10] = doc[0]['pseudo'];
                     call(null, arr);
                 } else {
-                    call(doc, null);
+                    call({err: 'Aucun membre trouvée'}, null);
                 }
                 db.close();
             });
@@ -622,6 +621,7 @@ var updateUser = function(req, res) {
         orient = req.body.orient,
         mail = req.body.mail,
         bio = req.body.bio,
+        ray = req.body.rayon,
         pseudo = req.body.pseudo;
 
     if (loger != undefined) {
@@ -642,6 +642,13 @@ var updateUser = function(req, res) {
                 db.collection('user').updateOne({ login: loger }, { $set: { mail: mail } });
                 db.close();
                 console.log(loger + ' a mis à jour son Mail');
+            });
+        }
+        if (ray != undefined && ray != req.session['myinfo'][13]) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({ login: loger }, { $set: { ray: ray } });
+                db.close();
+                console.log(loger + ' a mis à jour son Rayon de recherche');
             });
         }
         if (age != undefined && age != req.session['myinfo'][2]) {

@@ -146,7 +146,7 @@ router.post('/pwd', function(req, res, next) {
 		});
 	}
 }, function(req, res) {
-	res.redirect('compte/info');
+	res.redirect('info');
 });
 
 module.exports = router;

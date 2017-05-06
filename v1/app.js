@@ -247,7 +247,7 @@ app.get('/delog', function(req, res) {
 app.use(function(req, res, next) {
 	if (req.session['err']) {
 	    console.log('404 : ' + req.url + ' ' + req.session['err']);
-	    req.flash('err', req.session['err']);
+	    req.flash('error', req.session['err']);
 	    req.session['err'] = undefined;
 	    res.redirect('/');
 	}

@@ -114,7 +114,7 @@ function trieDecroissant(tab, where, callback) {
 function trieCroissant(tab, where, callback) {
     var tmp = {},
         j = 0;
-    
+
     for (var i = 0; tab[i]; i++) {
         if (i == 0 || i == 1) {
             j = 0;
@@ -133,9 +133,21 @@ function trieCroissant(tab, where, callback) {
     }
 }
 
-function removeBloked(login, tab, val, sens, call) {
+function toRestrict(tab, max, call) {
+    var result = {},
+        i = 0;
+    while (i < max && tab[i]) {
+        result[i] = tab[i];
+        i++;
+    }
+    if (!tab[i] || i >= max) {
+        call(result);
+    }
+}
+
+function removeBloked(login, tab, val, sens, nbRes, call) {
     MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({login: login}).toArray(function(err, doc) {
+        db.collection('user').find({ login: login }).toArray(function(err, doc) {
             if (doc.length >= 0) {
                 var blocked = doc[0]['block'],
                     result = {},
@@ -152,11 +164,15 @@ function removeBloked(login, tab, val, sens, call) {
                     db.close();
                     if (sens) {
                         trieCroissant(result, val, function(ret) {
-                            call(ret);
+                            toRestrict(ret, nbRes, function(clean) {
+                                call(clean);
+                            });
                         });
                     } else {
                         trieDecroissant(result, val, function(ret) {
-                            call(ret);
+                            toRestrict(ret, nbRes, function(clean) {
+                                call(clean);
+                            });
                         });
                     }
                 }
@@ -165,16 +181,16 @@ function removeBloked(login, tab, val, sens, call) {
     });
 }
 
-var forIndex = function(myinfo, allprof, val, sens, callback, ray) {
+var forIndex = function(myinfo, allprof, val, sens, callback, opt) {
     var tmp = {};
     var result = {};
     var rayon;
     var nb = 0;
 
-    if (ray == 0)
+    if (opt.dist == 0)
         rayon = 200;
     else
-        rayon = ray;
+        rayon = opt.dist;
     for (var i = 0; allprof[i]; i++) {
         if (allprof[i][8] != myinfo[12]) {
             tmp[0] = allprof[i][0];
@@ -193,9 +209,9 @@ var forIndex = function(myinfo, allprof, val, sens, callback, ray) {
     }
     if (!allprof[i]) {
         if (sens) {
-            removeBloked(myinfo[12], result, val, sens, callback);
+            removeBloked(myinfo[12], result, val, sens, opt.res, callback);
         } else {
-            removeBloked(myinfo[12], result, val, sens, callback);
+            removeBloked(myinfo[12], result, val, sens, opt.res, callback);
         }
     }
 }
@@ -226,24 +242,13 @@ function verifyDist(user, me, dist) {
 }
 
 function getCommun(user, me, callback) {
-    var pts = 0,
-        i = 0,
-        j = 0;
+    var pts = 0;
 
-    while (user[7][i]) {
-        j = 0;
-        while (me[7][j]) {
-            if (user[7][i] == me[7][j]) {
-                pts += 2;
-                j++;
-            } else {
-                j++;
-            }
-        } if (!me[7][j]) {
-            i++;
-        }
+    for (var i = 0; me[7][i]; i++) {
+        if (utilities.alreadySet(user[7], me[7][i]))
+            pts += 3;
     }
-    if (!user[7][i]) {
+    if (!me[7][i]) {
         callback(pts);
     }
 }
@@ -253,23 +258,16 @@ function allPonderate(thisUser, me, callback) {
 
     if (thisUser[7] && me[7]) {
         getCommun(thisUser, me, function(pts) {
-            points += pts;
-            if (verifyAge(thisUser, me)) {
-                points++;
-            }
-            if (verifyDist(thisUser, me, 50)) {
-                points++;
-            }
-            callback(points);
+            callback(pts + verifyAge(thisUser, me) + verifyDist(thisUser, me, 50));
         });
     } else {
         callback(0);
     }
 }
 
-var ponderate = function(type, myinfo, list, callback) {
+var ponderate = function(type, myinfo, list, resu, callback) {
     var i = 0;
-    
+
     if (list[0]) {
         if (type == 'all') {
             while (list[i]) {
@@ -277,19 +275,21 @@ var ponderate = function(type, myinfo, list, callback) {
                     list[i][7] = result + list[i][9];
                     i++;
                 });
-            } if (!list[i]) {
-                forIndex(myinfo, list, 4, false, callback, 80);
+            }
+            if (!list[i]) {
+                forIndex(myinfo, list, 4, false, callback, { dist: '0', res: resu });
             }
         } else if (type == 'age') {
-            forIndex(myinfo, list, 5, true, callback, 80);
+            forIndex(myinfo, list, 5, true, callback, { dist: myinfo[13], res: resu });
         } else if (type == 'loc') {
-            forIndex(myinfo, list, 2, true, callback, myinfo[13]);
+            forIndex(myinfo, list, 2, true, callback, { dist: myinfo[13], res: resu });
         } else if (type == 'popu') {
             while (list[i]) {
                 list[i][7] = list[i][9];
                 i++;
-            } if (!list[i]) {
-                forIndex(myinfo, list, 4, false, callback, 80);
+            }
+            if (!list[i]) {
+                forIndex(myinfo, list, 4, false, callback, { dist: myinfo[13], res: resu });
             }
         } else if (type == 'tag') {
             while (list[i]) {
@@ -297,8 +297,9 @@ var ponderate = function(type, myinfo, list, callback) {
                     list[i][7] = pts;
                     i++;
                 });
-            } if (!list[i]) {
-                forIndex(myinfo, list, 4, false, callback, 80);
+            }
+            if (!list[i]) {
+                forIndex(myinfo, list, 4, false, callback, { dist: '0', res: resu });
             }
         }
     }

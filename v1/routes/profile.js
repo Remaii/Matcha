@@ -55,11 +55,23 @@ router.post('/', function(req, res, next) {
 });
 
 router.get('/:pseudo', function(req, res, next) {
+	mymongo.getMyInfo(req, res, function(myinfo){
+		req.session['myinfo'] = myinfo;
+		next();
+	});
+}, function(req, res, next) {
+	if (req.session['myinfo'][9] != "avatarH.png" && req.session['myinfo'][9] != "avatarF.png")
+		next();
+	else {
+		req.flash('error', 'Tu dois mettre un avatar pour acceder au profile');
+		res.redirect('../compte/info');
+	}
+}, function(req, res, next) {
 	req.session['toget'] = req.url.slice(1);
 	mymongo.getHerInfo(req, res, function(err, result) {
 		if (err) {
-			req.flash('err', 'Aucun utilisateur ayant ce pseudo n\'à été trouvé');
-			req.session['err'] = 'Aucun utilisateur ayant ce pseudo n\'à été trouvé';
+			req.flash('error', err.err);
+			res.redirect('/')
 		}
 		if (result) {
 			req.session['herPro'] = result;
@@ -141,8 +153,7 @@ router.post('/like', function(req, res, next) {
 		next();
 	});
 }, function(req, res) {
-	res.status(200).send({ mess: 'it\' good!' });
-	// res.render('partial/like');
+	res.status(200).send({ mess: 'it\'s good!' });
 });
 
 router.post('/dislike', function(req, res, next) {
@@ -156,8 +167,7 @@ router.post('/dislike', function(req, res, next) {
 		next();
 	});
 }, function(req, res) {
-	res.status(200).send({ mess: 'it\' good!' });
-	// res.render('partial/like')
+	res.status(200).send({ mess: 'it\'s good!' });
 });
 
 router.post('/false_user', function(req, res, next) {
@@ -171,8 +181,7 @@ router.post('/false_user', function(req, res, next) {
 		next();
 	});
 }, function(req, res) {
-	res.status(200).send({ mess: 'it\' good!' });
-	// res.render('partial/like')
+	res.status(200).send({ mess: 'it\'s good!' });
 });
 
 router.post('/block', function(req, res, next) {
@@ -186,8 +195,7 @@ router.post('/block', function(req, res, next) {
 		next();
 	});
 }, function(req, res) {
-	res.status(200).send({ mess: 'it\' good!' });
-	// res.render('partial/like')
+	res.status(200).send({ mess: 'it\'s good!' });
 });
 
 router.post('/deblock', function(req, res, next) {
@@ -201,8 +209,7 @@ router.post('/deblock', function(req, res, next) {
 		next();
 	});
 }, function(req, res) {
-	res.status(200).send({ mess: 'it\' good!' });
-	// res.render('partial/like')
+	res.status(200).send({ mess: 'it\'s good!' });
 });
 
 module.exports = router;

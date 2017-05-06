@@ -235,15 +235,29 @@ var setUsers = function(nb) {
 	});
 }
 
+function usage(off) {
+	if (off == 'all') {
+		console.log('Error: Wrong Param');
+		console.log('Usage of \'all\' \'node gen.js all [number between 2 and 500]\'');
+	} else if (off == 'user') {
+		console.log('Error: Wrong Param');
+		console.log('Usage of \'user\'' \'node gen.js user [number between 2 and 5000]\'');
+	}
+}
+
 if (process.argv[2] == 'all' && process.argv[3]) {
-	setUsers(Number(process.argv[3]));
-	addInteret();
+	if (Number(process.argv[3]) <= 500 && Number(process.argv[3]) > 1) {
+		setUsers(Number(process.argv[3]));
+		addInteret();
+	} else {
+		usage('all');
+	}
 } else if (process.argv[2] == 'tag') {
 	addInteret();
 } else if (process.argv[2] == 'user' && process.argv[3]) {
-	setUsers(Number(process.argv[3]));
+	if (Number(process.argv[3]) <= 5000 && Number(process.argv[3]) > 1) {
+		setUsers(Number(process.argv[3]));
+	} else {
+		usage('user');
+	}
 }
-
-// node gen.js all [nombre d'utilisateur voulue] // genere les utilisateur + les tags
-// node gen.js tag // ajoute uniquement les tags
-// node gen.js user [nombre d'utilisateur voulue] // ajoute seulement les utilisateurs

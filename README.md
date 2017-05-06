@@ -12,7 +12,7 @@
 * Entrer: <code>cd Matcha</code> ,⏎
 * Entrer: <code>npm install</code> ,⏎
 * Entrer dans un autre terminal: <code>mongod [--db-path] --port 28000</code> ,⏎
-* Entrer: <code>node gen.js [nombre d'utilisateur voulu]</code> ex: <code>node gen.js 10</code> ,⏎
+* Entrer: <code>node gen.js all [nombre d'utilisateur voulu]</code> ex: <code>node gen.js all 1000</code> ,⏎
 * Entrer: <code>npm run start</code> ,⏎
 * Rendez-vous sur: <code>http://localhost:3000</code> , créer un utilisateur, enjoy!
 
@@ -86,3 +86,9 @@ Quand un utilisateur regarde le profil d'un autre:
 * Injection SQL:✅(MongoDB)
 * Aucune erreur:🚧
 * Mot de Passe crypter:✅(whirlpool + "doit etre composé au minimum, d'1 majuscule, d'1 chiffre, avoir une longueur de 5 caractère minimum")
+
+#### Générateur de profile: (Option)
+* all => génère le nombre donnée d'utilisateur et ajoute les tags <code>node gen.js all [1 à 500]</code>
+* user => génère uniquement le nombre donnée d'utilisateur <code>node gen.js user [1 à 5000]</code>
+* tag => ajoute uniquement les tags à la base de donné <code>node gen.js tag</code>
+

@@ -238,10 +238,10 @@ var setUsers = function(nb) {
 function usage(off) {
 	if (off == 'all') {
 		console.log('Error: Wrong Param');
-		console.log('Usage of \'all\' \'node gen.js all [number between 2 and 500]\'');
+		console.log('Usage of "all": "node gen.js all [number between 2 and 500]"');
 	} else if (off == 'user') {
 		console.log('Error: Wrong Param');
-		console.log('Usage of \'user\'' \'node gen.js user [number between 2 and 5000]\'');
+		console.log('Usage of "user": "node gen.js user [number between 2 and 5000]"');
 	}
 }
 

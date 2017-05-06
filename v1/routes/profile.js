@@ -7,7 +7,6 @@ var trie = require('../middle/trieur')
 router.get('/', function(req, res, next) {
 	mymongo.getInterest(req, res, function(tag) {
 		req.session['interet'] = tag;
-		console.log(tag);
 		next();
 	});
 }, function(req, res) {
@@ -23,7 +22,7 @@ router.post('/', function(req, res, next) {
 	} else if (req.body['search'] != undefined && req.body['search'] != '') {
 		res.redirect('/profile/' + req.body['search']);
 	}
-},function(req, res, next) {
+}, function(req, res, next) {
 	mymongo.getAllProf(function(err, result) { 
 		if (err) console.log(err);
 		req.session['allprof'] = result;
@@ -37,16 +36,17 @@ router.post('/', function(req, res, next) {
 }, function(req, res, next) {
 	mymongo.getInterest(req, res, function(tag) {
 		req.session['interet'] = tag;
-		console.log(tag)
 		next();
 	});
 }, function(req, res, next) {
 	trie.makeResearch(req, function(err, result) {
+		console.log(result);
 		if (result) {
-			trie.forIndex(req.session['myinfo'], result, 2, true, function(retour) {
+			trie.determineTrie({}, result, req.session['myinfo'], function(retour) {
 				req.session['allprof'] = retour;
+				console.log(retour);
 				next();
-			}, req.body['d']);
+			});
 		}
 	});
 }, function(req, res) {

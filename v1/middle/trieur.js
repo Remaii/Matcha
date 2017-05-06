@@ -1,6 +1,6 @@
 var utilities = require('./utility');
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:28000/matcha";
+var url = "mongodb://UserMatcha:MatchRthid3@localhost:28000/matcha";
 
 function getGay(list, Sex, callback) {
     var result = {};
@@ -306,6 +306,64 @@ var ponderate = function(type, myinfo, list, resu, callback) {
     }
 }
 
+function determineTrie(nombre, list, myinfo, call) {
+    if (nombre['trie'] == 0 || !nombre['trie']) {
+        if (myinfo[7][0] && (myinfo[2] != undefined && myinfo[2] != '')) {
+            intelTri(myinfo, list, function(result) {
+                ponderate("all", myinfo, result, 50, function(trier) {
+                    call(trier);
+                });
+            });
+        } else {
+            intelTri(myinfo, list, function(result) {
+                forIndex(myinfo, result, 2, true, function(retour) {
+                    call(retour);
+                }, {dist:'0', res:'50'});
+            });
+        }
+    } else if (nombre['trie'] == 1) {
+        if (myinfo[2] != undefined && myinfo[2] != '') {
+            intelTri(myinfo, list, function(result) {
+                ponderate("age", myinfo, result, 50, function(trier) {
+                    call(trier);
+                });
+            });
+        } else {
+            intelTri(myinfo, list, function(result) {
+                forIndex(myinfo, result, 2, true, function(retour) {
+                    call(retour);
+                }, {dist:'0', res:'50'});
+            });
+        }
+    } else if (nombre['trie'] == 2) {
+        intelTri(myinfo, list, function(result) {
+            ponderate("loc", myinfo, result, 50, function(trier) {
+                call(trier);
+            });
+        });
+    } else if (nombre['trie'] == 3) {
+        intelTri(myinfo, list, function(result) {
+            ponderate("popu", myinfo, result, 50, function(trier) {
+                call(trier);
+            });
+        });
+    } else if (nombre['trie'] == 4) {
+        if (myinfo[7][0]) {
+            intelTri(myinfo, list, function(result) {
+                ponderate("tag", myinfo, result, 50, function(trier) {
+                    call(trier);
+                });
+            });
+        } else {
+            intelTri(myinfo, list, function(result) {
+                forIndex(myinfo, result, 2, true, function(retour) {
+                    call(retour);
+                }, {dist:'0', res:'50'});
+            });
+        }
+    }
+}
+
 function getSexe(sexe, list, callback) {
     var result = {};
     var nb = 0;
@@ -443,3 +501,4 @@ exports.makeResearch = makeResearch;
 exports.forIndex = forIndex;
 exports.intelTri = intelTri;
 exports.ponderate = ponderate;
+exports.determineTrie = determineTrie;

@@ -189,7 +189,7 @@ var forIndex = function(myinfo, allprof, val, sens, callback, opt) {
     var nb = 0;
 
     if (opt.dist == 0)
-        rayon = 200;
+        rayon = 1000;
     else
         rayon = opt.dist;
     for (var i = 0; allprof[i]; i++) {

@@ -2,12 +2,15 @@
 
 <% if (locals.session['myinfo']) { %>
 	<div class="row">
+<!-- Ils me Like -->
 		<div id="likeur" class="col-md-3 col-xs-3 col-sm-3 col-lg-3">
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">Ils ont liké ton profile:</div>
 		</div>
+<!-- Mon Avatar -->
 		<div class="col-md-6 col-xs-6 col-sm-6 col-lg-6 text-center">
 			<img id="avatar" src=<%= '/asset/uploads/' + locals.session['myinfo'][9] %> class="col-md-offset-3 col-xs-offset-3 col-md-6 col-xs-6 img-circle" alt="<%= locals.session['myinfo'][12] %>">
 		</div>
+<!-- Ils sont juste venu -->
 		<div id="visiteur" class="col-md-3 col-xs-3 col-sm-3 col-lg-3">
 			<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">Ils ont visité ton profile:</div>
 			<% if (locals.session['myVisit']) { %>
@@ -19,6 +22,7 @@
 			<% } %>
 		</div>
 	</div>
+<!-- Barre de popularité -->
 	<br><div class="progress">
 		<% if (locals.session['popu'] < 100) { %>
 			<div class="progress-bar progress-bar-info active" style="width: 10%;">Popularité:</div>
@@ -29,6 +33,7 @@
 			<div class="progress-bar progress-bar-success" style="width: 80%;"><%= locals.session['popu'] %>pts de Popularité</div>
 	 	<% } %>
 	</div><br>
+<!-- Mes informations, Prénom(0), Nom(1), Age(2), Sexe(3), Sexuailité(4), Tags([i]), Biographie(5) -->
 	<div class="row">
 		<div class="col-md-6 col-xs-6 col-sm-6 col-lg-6">
 			<p class="text-center"><%= locals.session['myinfo'][0] %> <%= locals.session['myinfo'][1] %> <% if (locals.session['myinfo'][2] != undefined) {%><%= locals.session['myinfo'][2] + ' ans'%> <% } %> </p>
@@ -50,14 +55,9 @@
 		</div>
 	</div>
 	<br><div class="progress">
-		<!-- <% if (locals.session['popu'] < 100 && locals.session['popu'] != null) { %>
-			<div class="progress-bar progress-bar-success progress-bar-striped active" style="width: <%= locals.session['popu'] %>%;"><%= (locals.session['popu']) + 'pts Popularité' %></div>
-			<div class="progress-bar progress-bar-striped active" style="width: <%= 100 - (locals.session['popu']) %>%;"></div>
-		<% } else if (locals.session['popu'] >= 100 && locals.session['popu'] != null) { %>
-	 		<div class="progress-bar progress-bar-success progress-bar-striped active" style="width: <%= locals.session['popu'] / 10 %>%;"><%= (locals.session['popu'] / 10) + 'pts Popularité' %></div>
-			<div class="progress-bar progress-bar-striped active" style="width: <%= 100 - (locals.session['popu'] / 10) %>%;"></div>
-	 	<% } %> -->
+		<div class="progress-bar progress-bar-success" style="width: 100%;"></div>
 	</div><br>
+<!-- Mes photos -->
 	<div class="row">
 		<div class="col-md-12 col-xs-12">
 			<% if (locals.session['mypic']) { %>

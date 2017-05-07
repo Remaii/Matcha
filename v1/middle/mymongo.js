@@ -301,9 +301,9 @@ function getHerInfo(req, res, call) {
 // Met à jour les visites du profil cibler par "login"
 function upHisVisit(login, visiteur) {
     if (login != visiteur) {
-        notifyHim(login, 'Visited by ' + visiteur);
         utilities.getLogin(login, function(rep) {
             utilities.getLogin(visiteur, function(visi) {
+                notifyHim(login, 'Visited by ' + visi);
                 MongoClient.connect(url, function(err, db) {
                     db.collection('user').find({ login: rep }).toArray(function(err, doc) {
                         makeTab(doc[0]['visit'], visi, function(result) {
@@ -1213,7 +1213,9 @@ var postMsg = function(to, off, msg, notif) {
             msg: msg
         };
         if (notif) {
-            notifyHim(to, 'Message of ' + off);
+            utilities.getLogin(off, function(offf) {
+                notifyHim(to, 'Message of ' + offf);
+            });
         }
         MongoClient.connect(url, function(err, db) {
             db.collection('tchat').insertOne(tchat, function(err, result) {

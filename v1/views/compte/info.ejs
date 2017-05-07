@@ -1,5 +1,7 @@
 <% include ../partial/header %>
+
 <div class="container-fluid">
+<!-- Supprime des photos / Défini ton avatar -->
 	<div class="row">
 		<div id="galinfo" class="col-md-10 col-xs-10">
 			<% if (locals.session['mypic'][0] === '' || locals.session['mypic'][0] == null) { %>
@@ -13,6 +15,7 @@
 				<% } %>
 			<% } %>
 		</div>
+<!-- Ajoute des photos a ton profil -->
 		<div class="col-md-2 col-xs-2">
 			<input type="file" class="col-md-12 col-xs-12" name="userPhoto" /><br>
 			<input id="Upload" class="col-md-12 col-xs-12 btn btn-primary btn-sm" type="submit" name="submit" value="Upload"><br>
@@ -21,34 +24,31 @@
 	<div class="row">
 		<div class="col-md-6 col-xs-6 text-center">	
 			<br><form action="/compte/info" method="post">
-				
+<!-- Pseudo -->
 				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Pseudo</label>
 				<input class="form-control text-center input-sm" type="text" name="pseudo"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][10] %><% } %>">
-				
+<!-- Prénom -->
 				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Prénom</label>
 				<input class="form-control text-center input-sm" type="text" name="firstname"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][0] %><% } %>">
-				
+<!-- Nom -->
 				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Nom</label>
 				<input class="form-control text-center input-sm" type="text" name="lastname"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][1] %><% } %>">
-
+<!-- Àge -->
 				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Âge</label>
 				<input class="form-control text-center input-sm" type="number" min="18" max="100" name="age"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][2] %><% } %>">
-				
+<!-- Ville -->
 				<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">City</label>
 				<input class="form-control text-center input-sm" type="text" name="city"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][15] %><% } %>">
-				<!-- <label class="col-md-6 col-xs-6 text-center" style="display: inline-block;">Longitude</label>
-				<label class="col-md-6 col-xs-6 text-center" style="display: inline-block;">Latitude</label>
-				<input class=" col-md-6 col-xs-6 text-center input-sm" type="number" min="-180" max="180" step="0.0000001" name="longitude"
-				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][8] %><% } %>" style="display: inline-block;">
-				
-				<input class="col-md-6 col-xs-6 text-center input-sm" type="number" min="-90" max="90" step="0.0000001" name="latitude"
-				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][11] %><% } %>" style="display: inline-block;">
- -->
+<!-- Rayon de recherche -->
+		    	<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Rayon de recherche</label>
+				<input class="form-control text-center input-sm" type="number" min="5" max="1000" name="rayon"
+				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][13] %><% } %>">
+<!-- Orientation Sexuel -->
 		        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Orientation sexuel</label>
 				<select class="form-control input-sm text-center" name="orient" size="1">
 					<option><% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][4] %><% } %></option>
@@ -56,29 +56,26 @@
 					<option>Gay</option>
 					<option>Bi</option>
 				</select>
-		        
+<!-- Adresse Mail -->
 		        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Mail</label>
 				<input class="form-control text-center input-sm" type="mail" name="mail"
 				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][6] %><% } %>">
-		        
+<!-- Biographie -->
 		        <label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Petite Bio</label>
 		        <textarea class="form-control text-center input-sm" rows="3" name="bio"
 		        value=""><% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][5] %><% } %></textarea>
-		    	
+
 		    	<div class="col-xs-1" style="display: none;">
 		    		<input id="avatar_sub" type="text" name="avatar" value="<%= locals.session['myinfo'][9] %>">
 		    	</div>
-		    	
-		    	<label class="col-md-6 col-xs-6 col-md-offset-3 col-xs-offset-3 text-center">Rayon de recherche</label>
-				<input class="form-control text-center input-sm" type="number" min="5" max="200" name="rayon"
-				value="<% if (locals.session['myinfo']) { %><%= locals.session['myinfo'][13] %><% } %>">
-		    	
+<!-- Submit => Update -->
 		    	<div class="col-md-3 col-md-offset-5 col-xs-offset-5">
 		        	<input class="btn btn-primary" type="submit" name="submit" value="Update">
 		    	</div>
 		    </form>
 		</div>
-		<div class="col-md-6 col-xs-6 text-center"><!-- Ajouter des centres d'interet a ton profile -->
+		<div class="col-md-6 col-xs-6 text-center">
+<!-- Les centres d'interet de ton profile -->
 			<div><br>
 			<% if (!locals.session['mytag'] || locals.session['mytag'][0] == undefined) { %>
 				<label class="text-center">Tu n'as pas encore de #TAG :(</label>
@@ -93,6 +90,7 @@
 			<% } %>
 				</p>
 			</div>
+<!-- Ajoute des centre d'interet a ton profile -->
 			<form method="post" action="/compte/info">
 	    		<br>
 	    		<label class="text-center">Choisis tes centres d'interets</label>
@@ -107,13 +105,14 @@
 	    				<% }
 	    			} %>
 				</div>
-				<div class="col-md-12 col-xs-12 text-center"><!-- col-md-offset-5 col-xs-offset-5 -->
+				<div class="col-md-12 col-xs-12 text-center">
 			        <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Ajouter">
 			        <input class="btn btn-default btn-sm" type="submit" name="submit" value="Supprimer">
 			    </div>
 			</form>
 		</div>
-		<div class="col-md-6 col-xs-6 text-center"><!-- Ajouter tes centres d'interets si il n'existe pas -->
+		<div class="col-md-6 col-xs-6 text-center">
+<!-- Ajoute tes centres d'interets au site -->
 		    <br>
 		    <form action="/compte/info" method="post">
 	    	    <label class="col-md-12 col-xs-12 text-center">Ajoute tes #TAGs !</label>
@@ -126,6 +125,7 @@
 		    </form>
 			<div class="col-md-12 col-xs-12 text-center">
 			<br>
+<!-- Change ton mot de passe -->
 				<form action="/compte/pwd" method="post">
 		    	    <label class="col-md-12 col-xs-12 text-center">Changement de mot de passe !</label>
 		    	    <div class="col-md-12 col-xs-12">
@@ -136,16 +136,13 @@
 			        	<label class="col-md-12 col-xs-12 text-center">Confirmation !</label>
 			        	<input class="form-control input-sm text-center" type="password" name="cfpwd">
 			        </div>
-			        <!-- <div class="col-md-4 col-xs-4"> -->
-			        	<input class="btn btn-primary btn-sm" type="submit" name="submit" value="Changer">
-			        <!-- </div> -->
+			        <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Changer">
 			    </form>
 			</div>
 		</div>
 	</div>
 </div>
-
-<script src="http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js" type="text/javascript"></script>
+<!-- Script page compte/info -->
 <script type="text/javascript" src="/asset/js/info.js"></script>
 
 <% include ../partial/footer %>

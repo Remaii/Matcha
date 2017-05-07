@@ -46,6 +46,9 @@ app.use('/', function(req, res, next) {
         if (req.session['popu'] != undefined) {
             req.session['popu'] = undefined;
         }
+        if (req.session['myMatch'] != undefined) {
+            req.session['myMatch'] = undefined;
+        }
         if (req.session['likeHer'] != undefined) {
             req.session['likeHer'] = undefined;
         }

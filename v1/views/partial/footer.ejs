@@ -29,23 +29,23 @@
                             if (type == 'Message') {
                                 a.setAttribute('href', '/tchat/' + name);
                                 a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
-                                a.innerText = "📝 " + type;
+                                a.innerText = "📝 " + name;
                             } else if (type != 'Message' && type == 'Like') {
                                 a.setAttribute('href', '/profile/' + name);
                                 a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
-                                a.innerText = "👍 " + type;
+                                a.innerText = "👍 " + name;
                             } else if (type != 'Message' && type == 'Visited') {
                                 a.setAttribute('href', '/profile/' + name);
                                 a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
-                                a.innerText = "🔍 " + type;
+                                a.innerText = "🔍 " + name;
                             } else if (type != 'Message' && type == 'Match') {
                                 a.setAttribute('href', '/profile/' + name);
                                 a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
-                                a.innerText = "💞 " + type;
+                                a.innerText = "💞 " + name;
                             } else if (type != 'Message' && type == 'Dislike') {
                                 a.setAttribute('href', '/profile/' + name);
                                 a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
-                                a.innerText = "👎 " + type;
+                                a.innerText = "👎 " + name;
                             } else if (type == 'False') {
                                 a.setAttribute('href', '/compte/info');
                                 a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');

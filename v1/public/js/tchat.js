@@ -18,7 +18,6 @@ if (log != '' || log != undefined) {
 		first = false;
 		sock.emit('checkMsg', {me: log, to: to.innerText});
 	}
-	// sock.emit('checkMsg', {me: log, to: to.innerText});
 
 	sock.on('theOldMsg', function(data) {
 		var msg = document.querySelector('#message'),

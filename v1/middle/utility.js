@@ -4,6 +4,32 @@ var url = "mongodb://UserMatcha:MatchRthid3@localhost:28000/matcha";
 var nodemailer = require('nodemailer');
 var crypto = require('crypto');
 
+var getLogin = function(myId, callback) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({myId: myId}).toArray(function(err, doc) {
+            if (doc[0]) {
+                callback(doc[0]['login']);
+            } else {
+                callback(myId);
+            }
+            db.close();
+        });
+    });
+}
+
+var getHisId = function(login, callback) {
+    MongoClient.connect(url, function(err, db) {
+        db.collection('user').find({login: login}).toArray(function(err, doc) {
+            if (doc[0]) {
+                callback(doc[0]['myId']);
+            } else {
+                callback(login);
+            }
+            db.close();
+        });
+    });
+}
+
 var checkerMyPwd = function(login, pwd, callback) {
     pwd = crypto.createHmac('whirlpool', pwd).digest('hex');
     MongoClient.connect(url, function(err, db) {
@@ -41,7 +67,7 @@ var changePassword = function(password, mail, callback) {
             db.close();
             if (err) callback(false);
             // if (result.result.ok) {
-            callback(true);
+            callback({bool:true});
             // } else {
             //     return callback(false);
             // }
@@ -245,3 +271,5 @@ exports.senderMail = senderMail;
 exports.alreadySet = alreadySet;
 exports.checkerMyPwd = checkerMyPwd;
 exports.changePassword = changePassword;
+exports.getLogin = getLogin;
+exports.getHisId = getHisId;

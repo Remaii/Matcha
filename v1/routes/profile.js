@@ -40,11 +40,15 @@ router.post('/', function(req, res, next) {
 	});
 }, function(req, res, next) {
 	trie.makeResearch(req, function(err, result) {
-		console.log(result);
+		var query = {};
+		if (req.body.trie) {
+			query = {
+				trie:req.body.trie
+			}
+		}
 		if (result) {
-			trie.determineTrie({}, result, req.session['myinfo'], function(retour) {
+			trie.determineTrieS(query, result, req.session['myinfo'], function(retour) {
 				req.session['allprof'] = retour;
-				console.log(retour);
 				next();
 			});
 		}
@@ -67,7 +71,11 @@ router.get('/:pseudo', function(req, res, next) {
 		res.redirect('../compte/info');
 	}
 }, function(req, res, next) {
-	req.session['toget'] = req.url.slice(1);
+	utilities.getLogin(req.url.slice(1), function(rep) {
+		req.session['toget'] = rep;
+		next();
+	});
+}, function(req, res, next) {
 	mymongo.getHerInfo(req, res, function(err, result) {
 		if (err) {
 			req.flash('error', err.err);
@@ -92,11 +100,11 @@ router.get('/:pseudo', function(req, res, next) {
 	mymongo.getMyLike(req, res, function(myLike) {
 		if (myLike != undefined) {
 			for (var i = 0; myLike[i]; i++) {
-				if (myLike[i] == req.session['herPro'][7]) {
+				if (myLike[i] == req.session['herPro'][9]) {
 					req.session['likeHer'] = myLike[i];
 				}
 			}
-			if (!myLike[i] && req.session['likeHer'] != req.session['herPro'][7])
+			if (!myLike[i] && req.session['likeHer'] != req.session['herPro'][9])
 				req.session['likeHer'] = undefined;
 		}
 		next();
@@ -110,11 +118,11 @@ router.get('/:pseudo', function(req, res, next) {
 	mymongo.getMyBlock(req, res, function(myBlock) {
 		if (myBlock != undefined) {
 			for (var i = 0; myBlock[i]; i++) {
-				if (myBlock[i] == req.session['herPro'][7]) {
+				if (myBlock[i] == req.session['herPro'][9]) {
 					req.session['blockHer'] = myBlock[i];
 				}
 			}
-			if (!myBlock[i] && req.session['blockHer'] != req.session['herPro'][7])
+			if (!myBlock[i] && req.session['blockHer'] != req.session['herPro'][9])
 				req.session['blockHer'] = undefined;
 		}
 		next();
@@ -123,11 +131,11 @@ router.get('/:pseudo', function(req, res, next) {
 	mymongo.getMyFalse(req, res, function(myFalse) {
 		if (myFalse != undefined) {
 			for (var i = 0; myFalse[i]; i++) {
-				if (myFalse[i] == req.session['herPro'][7]) {
+				if (myFalse[i] == req.session['herPro'][9]) {
 					req.session['falseHer'] = myFalse[i];
 				}
 			}
-			if (!myFalse[i] && req.session['falseHer'] != req.session['herPro'][7])
+			if (!myFalse[i] && req.session['falseHer'] != req.session['herPro'][9])
 				req.session['falseHer'] = undefined;
 		}
 		next();

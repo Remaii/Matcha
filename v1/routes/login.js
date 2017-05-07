@@ -11,10 +11,14 @@ router.get('/', function(req, res) {
 router.post('/', function(req, res, next) {
 	if (req.body.submit === 'Logon') {
 		mymongo.logUser(req, res, function (err, mess, login, redir) {
-			if (err) res.redirect(redir);
+			if (err) {
+				res.redirect(redir);
+			}
 			if (login) {
 				req.flash('mess', mess['mess']);
-				req.session['login'] = login;
+				req.session['login'] = login['log'];
+				req.session['myId'] = login['myId'];
+				res.locals.session = req.session;
 				res.redirect(redir);
 			}
 		});

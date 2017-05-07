@@ -5,6 +5,26 @@
 		<!-- <h3 class="text-center">Tu recherche...</h3> -->
 		<form action="/profile" method="post">
 			<div class="col-md-12 col-xs-12">
+<div id="trieur" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
+        Trié:
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
+    	<input type="radio" name="trieur" value="0" checked> Default
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
+    	<input type="radio" name="trieur" value="1"> Age
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
+    	<input type="radio" name="trieur" value="2"> Distance
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
+    	<input type="radio" name="trieur" value="3"> Popularité
+    </div>
+    <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2 text-center">
+    	<input type="radio" name="trieur" value="4"> Tags
+    </div>
+</div>
 				<div class="col-xs-6 col-md-6">
 					<label class="col-xs-12 col-md-12 text-center">Un Homme ou une Femme ?</label>
 					<select id="sexe" class="form-control text-center input-sm" name="sexe" size="1">
@@ -63,6 +83,7 @@ button.addEventListener('click', function(ev) {
 		sexe = document.querySelector('#sexe').value,
 		orient = document.querySelector('#orient').value,
 		dist = document.querySelector('#dist').value,
+		trie = document.querySelectorAll('input[type=radio]:checked')[0].value,
 		tags = document.querySelectorAll('input[type=checkbox]:checked'),
 		result = document.querySelector('#SearchRes'),
 		t = new Array(),
@@ -79,7 +100,7 @@ button.addEventListener('click', function(ev) {
 	}
 	xhr.open("POST", "/profile", true);
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-	xhr.send('s=' + sexe + '&os=' + orient + '&amin=' + agemin + '&amax=' + agemax + '&d=' + dist + '&t=' + t);
+	xhr.send('s=' + sexe + '&os=' + orient + '&amin=' + agemin + '&amax=' + agemax + '&d=' + dist + '&t=' + t + '&trie=' + trie);
 });
 </script>
 

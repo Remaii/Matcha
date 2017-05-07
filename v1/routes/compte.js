@@ -140,6 +140,8 @@ router.post('/pwd', function(req, res, next) {
 		utilities.checkerMyPwd(req.session['login'], req.body.oldpwd, function(boolee) {
 			if (boolee) {
 				utilities.changePassword(req.body.pwd, req.session['myinfo'][6], function(bool) {
+					if (bool == true)
+						req.flash('mess', 'Changement de mot de passe réussi');
 					next();
 				});
 			}

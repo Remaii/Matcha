@@ -134,20 +134,22 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('show_status', function(data) {
         if (data.login) {
-            var a = undefined;
-            for (var i = 0; people[i]; i++) {
-                if (people[i].log == data.login) {
-                    a = i;
-                    if (people[a].id[0]) {
-                        socket.emit('status_is', {login: data.login, status: 'Online'});
-                    } else {
-                        socket.emit('status_is', {login: data.login, status: 'Offline'});
+            utilities.getLogin(data.login, function(rep) {
+                var a = undefined;
+                for (var i = 0; people[i]; i++) {
+                    if (people[i].log == data.login) {
+                        a = i;
+                        if (people[a].id[0]) {
+                            socket.emit('status_is', {login: rep, status: 'Online'});
+                        } else {
+                            socket.emit('status_is', {login: rep, status: 'Offline'});
+                        }
+                        break;
                     }
-                    break;
+                } if (!people[i] && a == undefined) {
+                    socket.emit('status_is', {login: rep, status: 'Inconnue'});
                 }
-            } if (!people[i] && a == undefined) {
-                socket.emit('status_is', {login: data.login, status: 'Inconnue'});
-            }
+            });
         }
     });
 
@@ -157,7 +159,6 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('stayco', function(data) {
-        // console.log('stayco id: ' + socket.id);
         var tab = new Array();
         if (data.login != '' && data.login != undefined) {
             if (users.indexOf(data.login) > -1) {
@@ -231,7 +232,7 @@ io.sockets.on('connection', function(socket) {
             if (people[i].log == data.to) {
                 idto = people[i].id;
                 for (var a = 0; idto[a]; a++) {
-                    socket.to(idto[a]).emit('theNewMsg', { off: data.log, content: data.msg });
+                    socket.to(idto[a]).emit('theNewMsg', { off: data.log, content: data.msg });//.emit('newNotif');
                     socket.to(idto[a]).emit('newNotif');
                 }
             }

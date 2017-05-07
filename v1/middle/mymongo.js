@@ -1,4 +1,5 @@
 var crypto = require('crypto');
+var uniqid = require('uniqid')
 var cookie = require('cookie');
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://UserMatcha:MatchRthid3@localhost:28000/matcha";
@@ -58,11 +59,13 @@ function downTab(pastTab, cible, call) {
 
 // Ajoute une notification a un utilisateur
 function notifyHim(to, message) {
-    MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({login: to}).toArray(function(err, doc) {
-            makeTab(doc[0]['notif'], message, function(result) {
-                db.collection('user').updateOne({login: to}, {$set: {notif: result}});
-                db.close();
+    utilities.getLogin(to, function(rep) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: rep}).toArray(function(err, doc) {
+                makeTab(doc[0]['notif'], message, function(result) {
+                    db.collection('user').updateOne({login: rep}, {$set: {notif: result}});
+                    db.close();
+                });
             });
         });
     });
@@ -70,11 +73,13 @@ function notifyHim(to, message) {
 
 // Supprime une notification parmis la liste de notif de l'utilisateurs
 var readNotif = function(to, message) {
-    MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({login: to}).toArray(function(err, doc) {
-            downTab(doc[0]['notif'], message, function(result) {
-                db.collection('user').updateOne({login: to}, {$set: {notif: result}});
-                db.close();
+    utilities.getLogin(to, function(rep) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({login: rep}).toArray(function(err, doc) {
+                downTab(doc[0]['notif'], message, function(result) {
+                    db.collection('user').updateOne({login: rep}, {$set: {notif: result}});
+                    db.close();
+                });
             });
         });
     });
@@ -272,14 +277,14 @@ function getHerInfo(req, res, call) {
                     call(err, null);
                 }
                 if (doc[0] != undefined) {
-                    upHisVisit(pseudo, req.session['login']);
+                    upHisVisit(req.url.slice(1), req.session['myId']);
                     arr[0] = doc[0]['firstname'];
                     arr[1] = doc[0]['lastname'];
                     arr[2] = doc[0]['age'];
                     arr[3] = doc[0]['sexe'];
                     arr[4] = doc[0]['orient'];
                     arr[5] = doc[0]['bio'];
-                    arr[7] = doc[0]['login'];
+                    arr[7] = doc[0]['myId'];
                     arr[8] = doc[0]['avatar'];
                     arr[9] = doc[0]['login'];
                     arr[10] = doc[0]['pseudo'];
@@ -296,15 +301,19 @@ function getHerInfo(req, res, call) {
 // Met à jour les visites du profil cibler par "login"
 function upHisVisit(login, visiteur) {
     if (login != visiteur) {
-        MongoClient.connect(url, function(err, db) {
-            db.collection('user').find({ login: login }).toArray(function(err, doc) {
-                notifyHim(login, 'Visited by ' + visiteur);
-                makeTab(doc[0]['visit'], visiteur, function(result) {
-                    MongoClient.connect(url, function(err, db1) {
-                        db1.collection('user').updateOne({ login: login }, { $set: { visit: result } });
-                        db1.close();
-                        db.close();
-                        utilities.makePopu(login);
+        notifyHim(login, 'Visited by ' + visiteur);
+        utilities.getLogin(login, function(rep) {
+            utilities.getLogin(visiteur, function(visi) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').find({ login: rep }).toArray(function(err, doc) {
+                        makeTab(doc[0]['visit'], visi, function(result) {
+                            MongoClient.connect(url, function(err, db1) {
+                                db1.collection('user').updateOne({ login: rep }, { $set: { visit: result } });
+                                db1.close();
+                                db.close();
+                                utilities.makePopu(rep);
+                            });
+                        });
                     });
                 });
             });
@@ -392,6 +401,25 @@ function getMyBlock(req, res, call) {
                     db.close();
                 } else {
                     call({ 0: ' ' });
+                    db.close();
+                }
+            });
+        });
+    }
+}
+
+// Récupère la liste des Match de l'utilisateur
+function getMyMatch(req, res, call) {
+    var log = req.session['login'];
+
+    if (log != '' || log != undefined) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({ login: log }).toArray(function(err, doc) {
+                if (doc.length > 0) {
+                    call(doc[0]['tchat']);
+                    db.close();
+                } else {
+                    call({ 0: '' });
                     db.close();
                 }
             });
@@ -514,7 +542,7 @@ var getAllProf = function(callback) {
                 tmp[5] = docs[i]['lo'];
                 tmp[6] = docs[i]['age'];
                 tmp[7] = docs[i]['tag'];
-                tmp[8] = docs[i]['login'];
+                tmp[8] = docs[i]['myId'];
                 tmp[9] = docs[i]['popu'];
                 result[nb] = tmp;
                 tmp = {};
@@ -532,6 +560,7 @@ var getAllProf = function(callback) {
 var deLog = function(req, res) {
     console.log(req.session['login'] + ' se delog');
     req.session['login'] = undefined;
+    req.session['myId'] = undefined;
     res.redirect('/');
 }
 
@@ -557,6 +586,7 @@ var addUser = function(req, res) {
                     utilities.defineAvatar(sexe, "avatar.png", function(s, a) {
                         var newUser = {
                             login: logre,
+                            myId: uniqid(),
                             pseudo: logre,
                             sexe: s,
                             pwd: passwd,
@@ -590,6 +620,7 @@ var addUser = function(req, res) {
                             }
                             if (ok != -1) {
                                 req.session['login'] = logre;
+                                req.session['myId'] = newUser['myId'];
                                 req.flash('mess', 'Utilisateur ajouté avec succes');
                                 db.collection('user').insertOne(newUser, function(err, result) {
                                     if (result.result['ok']) {
@@ -624,10 +655,11 @@ var addUser = function(req, res) {
 // si il existe, mettre a jour sa derniere connection
 // le connecter au site
 var logUser = function(req, res, callback) {
-    var i = 0;
-    var ok = 0;
-    var log = req.body.login;
-    var pwd = req.body.pwd;
+    var i = 0,
+        j = 0,
+        ok = 0,
+        log = req.body.login,
+        pwd = req.body.pwd;
 
     if (log != '' && pwd != '') {
         pwd = crypto.createHmac('whirlpool', pwd).digest('hex');
@@ -642,13 +674,14 @@ var logUser = function(req, res, callback) {
                     if (docs[i]['login'] === log && docs[i]['pwd'] === pwd) {
                         console.log('User: ' + log + ' is Connected');
                         ok = 1;
+                        j = i;
                     }
                     i++;
                 }
                 if (ok == 1) {
                     collec.updateOne({ login: log }, { $set: { last_co: new Date() } });
                     db.close();
-                    callback(null, { mess: 'Connection Success' }, log, '/');
+                    callback(null, { mess: 'Connection Success' }, {log:log,myId:docs[j]['myId']}, '/');
                 } else {
                     req.flash('error', 'Utilisateur/Mot de passe invalides');
                     db.close();
@@ -980,7 +1013,6 @@ function upHisLike(sens, login, me) {
 // Notifie l'utilisateur
 function upHisBlock(sens, login, me) {
     if (sens == true) {
-        console.log(login + ' ' + me + ' block ' + sens);
         MongoClient.connect(url, function(err, db) {
             db.collection('user').find({ login: login }).toArray(function(err, doc) {
                 makeTab(doc[0]['heBlockMe'], me, function(result) {
@@ -994,7 +1026,6 @@ function upHisBlock(sens, login, me) {
             });
         });
     } else {
-        console.log(login + ' ' + me + ' deblock ' + sens);
         MongoClient.connect(url, function(err, db) {
             db.collection('user').find({ login: login }).toArray(function(err, doc) {
                 downTab(doc[0]['heBlockMe'], me, function(result) {
@@ -1015,16 +1046,18 @@ function upHisBlock(sens, login, me) {
 var likeUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    if (req.body.pseudo != login) {
-        upHisLike(true, req.body.pseudo, login);
-        utilities.makePopu(login);
-    }
-    makeTab(req.session['myLike'], req.body.pseudo, function(result) {
-        MongoClient.connect(url, function(err, db) {
-            db.collection('user').updateOne({ login: login }, { $set: { like: result } });
-            db.close();
-            checkConnect(login, req.body.pseudo);
-            callback(null, { mess: 'Like Success' });
+    utilities.getLogin(req.body.pseudo, function(rep) {
+        if (rep != login) {
+            upHisLike(true, rep, login);
+            utilities.makePopu(login);
+        }
+        makeTab(req.session['myLike'], rep, function(result) {
+            MongoClient.connect(url, function(err, db) {
+                db.collection('user').updateOne({ login: login }, { $set: { like: result } });
+                db.close();
+                checkConnect(login, rep);
+                callback(null, { mess: 'Like Success' });
+            });
         });
     });
 }
@@ -1033,76 +1066,84 @@ var likeUser = function(req, res, callback) {
 var disLikeUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    if (req.body.pseudo != login) {
-        upHisLike(false, req.body.pseudo, login);
-        utilities.makePopu(login);
-        downTab(req.session['myLike'], req.body.pseudo, function(result) {
-            MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({ login: login }, { $set: { like: result } });
-                db.close();
-                checkConnect(login, req.body.pseudo);
-                callback(null, { mess: 'Dislike Success' });
+    utilities.getLogin(req.body.pseudo, function(rep) {
+        if (req.body.pseudo != login) {
+            utilities.getLogin(req.body.pseudo, function(rep) {
+                upHisLike(false, rep, login);
             });
-        });
-    }
+            utilities.makePopu(login);
+            downTab(req.session['myLike'], rep, function(result) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({ login: login }, { $set: { like: result } });
+                    db.close();
+                    checkConnect(login, rep);
+                    callback(null, { mess: 'Dislike Success' });
+                });
+            });
+        }
+    });
 }
 
 // Ajoute l'utilisateur bloquer a la liste 'block' de l'utilisateur
 var blockUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    if (req.body.pseudo != login) {
-        upHisBlock(true, req.body.pseudo, login);
-        console.log(req.body.pseudo + ' ' + login + ' block');
-        makeTab(req.session['myBlock'], req.body.pseudo, function(result) {
-            MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({ login: login }, { $set: { block: result } });
-                db.close();
-                utilities.makePopu(login);
-                callback(null, { mess: 'Block Success' });
+    utilities.getLogin(req.body.pseudo, function(rep) {
+        if (req.body.pseudo != login) {
+            upHisBlock(true, rep, login);
+            makeTab(req.session['myBlock'], rep, function(result) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({ login: login }, { $set: { block: result } });
+                    db.close();
+                    utilities.makePopu(login);
+                    callback(null, { mess: 'Block Success' });
+                });
             });
-        });
-    }
+        }
+    });
 }
 
 // Supprime l'utilisateur debloquer de la liste 'block' de l'utilisateur
 var deBlockUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    if (req.body.pseudo != login) {
-        upHisBlock(false, req.body.pseudo, login);
-        console.log(req.body.pseudo + ' ' + login + ' deblock');
-        downTab(req.session['myBlock'], req.body.pseudo, function(result) {
-            MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({ login: login }, { $set: { block: result } });
-                db.close();
-                utilities.makePopu(login);
-                callback(null, { mess: 'Deblock Success' });
+    utilities.getLogin(req.body.pseudo, function(rep) {
+        if (rep != login) {
+            upHisBlock(false, rep, login);
+            downTab(req.session['myBlock'], rep, function(result) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({ login: login }, { $set: { block: result } });
+                    db.close();
+                    utilities.makePopu(login);
+                    callback(null, { mess: 'Deblock Success' });
+                });
             });
-        });
-    }
+        }
+    });
 }
 
 // Met a jour le compteur iFalse de l'utilisateur cibler
 // Si iFalse est >= 5 l'utilisateur cibler est supprimer de la base de donnée, ainsi que ses photos
 function upHerFalse(login) {
-    MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({ login: login }).toArray(function(err, doc) {
-            if (doc[0]['iFalse'] < 5) {
-                var iFalse = (Number.parseInt(doc[0]['iFalse']) + 1);
-                db.collection('user').updateOne({ login: login }, { $set: { iFalse: iFalse } });
-                utilities.makePopu(login);
-                notifyHim(login, 'False number ' + iFalse);
-                db.close();
-            } else if (doc[0]['iFalse'] >= 5) {
-                db.collection('user').removeOne({ login: login }, { justOne: true });
-                db.collection('image').removeOne({ login: login }, { justOne: true });
-            } else {
-                db.collection('user').updateOne({ login: login }, { $set: { iFalse: '1' } });
-                utilities.makePopu(login);
-                notifyHim(login, 'False number 1');
-                db.close();
-            }
+    utilities.getLogin(login, function(rep) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({ login: rep }).toArray(function(err, doc) {
+                if (doc[0]['iFalse'] < 5) {
+                    var iFalse = (Number.parseInt(doc[0]['iFalse']) + 1);
+                    db.collection('user').updateOne({ login: rep }, { $set: { iFalse: iFalse } });
+                    utilities.makePopu(rep);
+                    notifyHim(rep, 'False number ' + iFalse);
+                    db.close();
+                } else if (doc[0]['iFalse'] >= 5) {
+                    db.collection('user').removeOne({ login: rep }, { justOne: true });
+                    db.collection('image').removeOne({ login: rep }, { justOne: true });
+                } else {
+                    db.collection('user').updateOne({ login: rep }, { $set: { iFalse: '1' } });
+                    utilities.makePopu(rep);
+                    notifyHim(rep, 'False number 1');
+                    db.close();
+                }
+            });
         });
     });
 }
@@ -1111,30 +1152,34 @@ function upHerFalse(login) {
 var falseUser = function(req, res, callback) {
     var login = req.session['login'];
 
-    if (req.body.pseudo != login) {
-        makeTab(req.session['myFalse'], req.body.pseudo, function(result) {
-            MongoClient.connect(url, function(err, db) {
-                db.collection('user').updateOne({ login: login }, { $set: { falseUser: result } });
-                db.close();
-                upHerFalse(req.body.pseudo);
-                callback(null, { mess: 'False User Success' });
+    utilities.getLogin(req.body.pseudo, function(rep) {
+        if (req.body.pseudo != login) {
+            makeTab(req.session['myFalse'], rep, function(result) {
+                MongoClient.connect(url, function(err, db) {
+                    db.collection('user').updateOne({ login: rep}, { $set: { falseUser: result } });
+                    db.close();
+                    upHerFalse(rep);
+                    callback(null, { mess: 'False User Success' });
+                });
             });
-        });
-    }
+        }
+    });
 }
 
 // Récupere le tableau 'notif' de l'utilisateur
 var getMyNotif = function(name, callback) {
-    MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({ login: name }).toArray(function(err, doc) {
-            if (err) callback(null);
-            if (doc[0]['notif'] || doc[0]['tchat']) {
-                callback({ notif: doc[0]['notif'], tchat: doc[0]['tchat'] });
-                db.close();
-            } else {
-                callback(null);
-                db.close();
-            }
+    utilities.getLogin(name, function(rep) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({ login: rep }).toArray(function(err, doc) {
+                if (err) callback(null);
+                if (doc[0]['notif'] || doc[0]['tchat']) {
+                    callback({ notif: doc[0]['notif'], tchat: doc[0]['tchat'] });
+                    db.close();
+                } else {
+                    callback(null);
+                    db.close();
+                }
+            });
         });
     });
 }
@@ -1202,6 +1247,7 @@ exports.getMyLiker = getMyLiker;
 exports.getMyheLike = getMyheLike;
 exports.getMyFalse = getMyFalse;
 exports.getMyBlock = getMyBlock;
+exports.getMyMatch = getMyMatch;
 exports.getMyVisit = getMyVisit;
 exports.getPopu = getPopu;
 exports.getMyNotif = getMyNotif;

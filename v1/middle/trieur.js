@@ -436,6 +436,48 @@ function withTags(tags, list, callback) {
     }
 }
 
+function determineTrieS(nombre, result, myinfo, call) {
+    if (nombre['trie'] == 0 || !nombre['trie']) {
+        if (myinfo[7][0] && (myinfo[2] != undefined && myinfo[2] != '')) {
+            ponderate("all", myinfo, result, 50, function(trier) {
+                call(trier);
+            });
+        } else {
+            forIndex(myinfo, result, 2, true, function(retour) {
+                call(retour);
+            }, {dist:'0', res:'50'});
+        }
+    } else if (nombre['trie'] == 1) {
+        if (myinfo[2] != undefined && myinfo[2] != '') {
+            ponderate("age", myinfo, result, 50, function(trier) {
+                call(trier);
+            });
+        } else {
+            forIndex(myinfo, result, 2, true, function(retour) {
+                call(retour);
+            }, {dist:'0', res:'50'});
+        }
+    } else if (nombre['trie'] == 2) {
+        ponderate("loc", myinfo, result, 50, function(trier) {
+            call(trier);
+        });
+    } else if (nombre['trie'] == 3) {
+        ponderate("popu", myinfo, result, 50, function(trier) {
+            call(trier);
+        });
+    } else if (nombre['trie'] == 4) {
+        if (myinfo[7][0]) {
+            ponderate("tag", myinfo, result, 50, function(trier) {
+                call(trier);
+            });
+        } else {
+            forIndex(myinfo, result, 2, true, function(retour) {
+                call(retour);
+            }, {dist:'0', res:'50'});
+        }
+    }
+}
+
 var makeResearch = function(req, callback) {
     var list = req.session['allprof'];
     var result = {};
@@ -502,3 +544,4 @@ exports.forIndex = forIndex;
 exports.intelTri = intelTri;
 exports.ponderate = ponderate;
 exports.determineTrie = determineTrie;
+exports.determineTrieS = determineTrieS;

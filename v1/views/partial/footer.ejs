@@ -5,7 +5,7 @@
             	setTimeout(function() {
                     var lol = document.querySelector('#userName').innerText;
             		sock.emit('stayco', {login: lol});
-            	}, 500);
+            	}, 900);
             });
 
             sock.on('notif', function(data) {
@@ -28,28 +28,28 @@
 
                             if (type == 'Message') {
                                 a.setAttribute('href', '/tchat/' + name);
-                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerText = "📝  " + name;
+                                a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
+                                a.innerText = "📝 " + type;
                             } else if (type != 'Message' && type == 'Like') {
                                 a.setAttribute('href', '/profile/' + name);
-                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerText = "👍  " + name;
+                                a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
+                                a.innerText = "👍 " + type;
                             } else if (type != 'Message' && type == 'Visited') {
                                 a.setAttribute('href', '/profile/' + name);
-                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerText = "🔍  " + name;
+                                a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
+                                a.innerText = "🔍 " + type;
                             } else if (type != 'Message' && type == 'Match') {
                                 a.setAttribute('href', '/profile/' + name);
-                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerText = "💞  " + name;
+                                a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
+                                a.innerText = "💞 " + type;
                             } else if (type != 'Message' && type == 'Dislike') {
                                 a.setAttribute('href', '/profile/' + name);
-                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerText = "👎  " + name;
+                                a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
+                                a.innerText = "👎 " + type;
                             } else if (type == 'False') {
                                 a.setAttribute('href', '/compte/info');
-                                a.setAttribute('class', 'col-md-10 col-xs-10 col-sm-10 col-lg-10');
-                                a.innerText = "🚫 " + name;
+                                a.setAttribute('class', 'col-md-11 col-xs-11 col-sm-11 col-lg-11');
+                                a.innerText = "🚫 n°" + name;
                             }
                             div.setAttribute('class', 'col-md-12 col-xs-12 col-sm-12 col-lg-12')
                             div.setAttribute('onclick', 'downNotif("'+ data.notif[i] +'")');

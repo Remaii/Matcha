@@ -33,9 +33,7 @@ router.get('/', function(req, res, next) {
 	});
 }, function (req, res, next) {
 	res.locals.session = req.session;
-	// req.session['render'] = 'index';
 	res.render('index');
-	// next();
 });
 
 module.exports = router;

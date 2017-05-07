@@ -37,7 +37,7 @@
             <% if (locals.session['tchat_with']) { %>
                 <div id="correspond" style="display: none;"><%= locals.session['tchat_with'] %></div>
             <% } %>
-            <div id="userName" style="display: none;"><%= locals.session['login'] %></div>
+            <div id="userName" style="display: none;"><%= locals.session['myId'] %></div>
             <script type="text/javascript">
                 var sock = io(),
                     log = document.querySelector('#userName').innerText;

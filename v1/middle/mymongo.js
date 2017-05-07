@@ -361,6 +361,7 @@ function getMyInfo(req, res, call) {
                     arr[13] = doc[0]['ray'];
                     arr[14] = doc[0]['position'];
                     arr[15] = doc[0]['city'];
+                    arr[16] = doc[0]['myId'];
                     call(arr);
                     db.close();
                 }

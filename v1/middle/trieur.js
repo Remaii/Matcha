@@ -193,7 +193,7 @@ var forIndex = function(myinfo, allprof, val, sens, callback, opt) {
     else
         rayon = opt.dist;
     for (var i = 0; allprof[i]; i++) {
-        if (allprof[i][8] != myinfo[12]) {
+        if (allprof[i][8] != myinfo[16]) {
             tmp[0] = allprof[i][0];
             tmp[1] = allprof[i][1];
             tmp[2] = utilities.Distance(myinfo[8], myinfo[11], allprof[i][5], allprof[i][4]) / 100;

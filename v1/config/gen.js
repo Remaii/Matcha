@@ -2,14 +2,27 @@ var crypto = require('crypto')
 var uniqid = require('uniqid')
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://UserMatcha:MatchRthid3@localhost:28000/matcha";
-var utilities = require('./middle/utility');
+
+function alreadySet(tab, value) {
+    if (tab) {
+        for (var i = 0; tab[i]; i++) {
+            if (tab[i] == value)
+                return 1;
+            if (i == tab.length) {
+                return 0;
+            }
+        }
+    } else {
+        return 0;
+    }
+}
 
 function removeDouble(tab, call) {
     var tmp = {};
     var nb = 0;
 
     for (var a = 0; tab[a]; a++) {
-        if (!utilities.alreadySet(tmp, tab[a])) {
+        if (!alreadySet(tmp, tab[a])) {
             tmp[nb] = tab[a];
             nb++;
         }
@@ -115,18 +128,6 @@ function genPosition(callback) {
 	callback({lon: longitude, lat: latitude});
 }
 
-function allReadySet(tab, toadd) {
-	if (tab[0] != null) {
-		for (var i = 0; tab[i]; i++) {
-			if (tab[i] == toadd)
-				return 0;
-		}
-		return 1;
-	} else {
-		return 1;
-	}
-}
-
 function addInteret() {
 	MongoClient.connect(url, function(err, db){
 		db.collection('interet').insertOne(interet, function(err, result){
@@ -210,6 +211,7 @@ var setUsers = function(nb) {
 				mail: mail,
 				lo: lo,
 				la: la,
+				ray: 100,
 				sexe: sex,
 				orient: sexua,
 				avatar: avatar,

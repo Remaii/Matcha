@@ -799,7 +799,7 @@ var updateUser = function(req, res) {
                 MongoClient.connect(url, function(err, db) {
                     db.collection('user').updateOne({login: loger}, {$set: {sexe: s, avatar: a}});
                     db.close();
-                    console.log(' a mis à jour son Sexe');
+                    console.log(loger + ' a mis à jour son Sexe');
                 });
             });
         }
@@ -1188,10 +1188,10 @@ var falseUser = function(req, res, callback) {
     var login = req.session['login'];
 
     utilities.getLogin(req.body.pseudo, function(rep) {
-        if (req.body.pseudo != login) {
+        if (rep != login) {
             makeTab(req.session['myFalse'], rep, function(result) {
                 MongoClient.connect(url, function(err, db) {
-                    db.collection('user').updateOne({ login: rep}, { $set: { falseUser: result } });
+                    db.collection('user').updateOne({ login: login }, { $set: { falseUser: result } });
                     db.close();
                     upHerFalse(rep);
                     callback(null, { mess: 'False User Success' });

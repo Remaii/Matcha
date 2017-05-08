@@ -146,43 +146,47 @@ function toRestrict(tab, max, call) {
 }
 
 function removeBloked(login, tab, val, sens, nbRes, call) {
-    MongoClient.connect(url, function(err, db) {
-        db.collection('user').find({ login: login }).toArray(function(err, doc) {
-            if (doc.length >= 0) {
-                var blocked = doc[0]['block'],
-                    heBlock = doc[0]['heBlockMe'],
-                    result = {},
-                    nb = 0,
-                    falseUser = doc[0]['falseUser'];
+    if (tab[0]) {
+        MongoClient.connect(url, function(err, db) {
+            db.collection('user').find({ login: login }).toArray(function(err, doc) {
+                if (doc.length >= 0) {
+                    var blocked = doc[0]['block'],
+                        heBlock = doc[0]['heBlockMe'],
+                        result = {},
+                        nb = 0,
+                        falseUser = doc[0]['falseUser'];
 
-                for (var i = 0; tab[i]; i++) {
-                    if (!utilities.alreadySet(blocked, tab[i][1]) && !utilities.alreadySet(falseUser, tab[i][1]) && !utilities.alreadySet(heBlock, tab[i][1])) {
-                        result[nb] = tab[i];
-                        nb++;
+                    for (var i = 0; tab[i]; i++) {
+                        if (!utilities.alreadySet(blocked, tab[i][1]) && !utilities.alreadySet(falseUser, tab[i][1]) && !utilities.alreadySet(heBlock, tab[i][1])) {
+                            result[nb] = tab[i];
+                            nb++;
+                        }
+                    }
+                    if (!tab[i]) {
+                        db.close();
+                        if (sens) {
+                            trieCroissant(result, val, function(ret) {
+                                toRestrict(ret, nbRes, function(clean) {
+                                    call(clean);
+                                });
+                            });
+                        } else if (!sens) {
+                            trieDecroissant(result, val, function(ret) {
+                                toRestrict(ret, nbRes, function(clean) {
+                                    call(clean);
+                                });
+                            });
+                        }
+                        if (result[0] == undefined) {
+                            call(result);
+                        }
                     }
                 }
-                if (!tab[i]) {
-                    db.close();
-                    if (sens) {
-                        trieCroissant(result, val, function(ret) {
-                            toRestrict(ret, nbRes, function(clean) {
-                                call(clean);
-                            });
-                        });
-                    } else if (!sens) {
-                        trieDecroissant(result, val, function(ret) {
-                            toRestrict(ret, nbRes, function(clean) {
-                                call(clean);
-                            });
-                        });
-                    }
-                    if (result[0] == undefined) {
-                        call(result);
-                    }
-                }
-            }
+            });
         });
-    });
+    } else {
+        call(tab);
+    }
 }
 
 var forIndex = function(myinfo, allprof, val, sens, callback, opt) {

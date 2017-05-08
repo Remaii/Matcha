@@ -1,0 +1,10 @@
+<% if (locals.session['mypic'][0] === ' ' || locals.session['mypic'][0] == null) { %>
+	<label class="col-md-12 col-sm-12 text-center">Tu n'a pas de photo :(</label><br>
+<% } else { %>
+	<label class="col-md-12 col-xs-12 text-center">T'es photo(s) :</label><br>
+	<% for (var i = 0;locals.session['mypic'][i]; i++) { %>
+		<div>
+			<img class="col-md-2 col-xs-2 img-circle" src="<%= '/asset/uploads/' + locals.session['mypic'][i] %>" onclick="toAvatar('<%= locals.session['mypic'][i] %>', 0);" oncontextmenu="deleteImg('<%= locals.session['mypic'][i] %>');return false;"/>
+		</div>
+	<% } %>
+<% } %>

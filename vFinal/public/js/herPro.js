@@ -25,10 +25,7 @@ sock.on('status_is', function(data) {
 		point.innerText = data.login + " est connecté";
 	} else if (data.status != "Online") {
 		point.innerText = data.login + " est déconnecté depuis " + data.status;
-	} 
-	// else if (data.status == "Inconnue") {
-	// 	point.innerText = data.login + " n'est pas venu depuis longtemps";
-	// }
+	}
 	status.appendChild(point);
 });
 

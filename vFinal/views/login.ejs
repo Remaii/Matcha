@@ -1,0 +1,47 @@
+<% include partial/header %>
+
+<div class="">
+    <div class="row">
+        <div class="col-md-6 text-center col-md-offset-3">
+            <a class="text-center" href="/register">Pas de compte ?</a>
+            <p id="reset">Mot de passe oublié?</p>
+        </div>
+        <div class="col-md-6 col-md-offset-3">
+            <form id="formu" action="/login" method="post">
+                <label class="col-md-6 col-md-offset-3 text-center">Ton petit nom :)</label>
+                <input class="form-control text-center" type="text" name="login">
+                <label class="col-md-6 col-md-offset-3 text-center">Ton mot de passe</label>
+                <input class="form-control text-center" type="password" name="pwd">
+                <input class="btn btn-primary col-md-6 col-md-offset-3" type="submit" name="submit" value="Logon">
+            </form>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var reset = document.getElementById('reset');
+
+    reset.addEventListener('click', function() {
+        if (reset.innerText == 'Mot de passe oublié?') {
+            var form = document.getElementById('formu'),
+                sub = document.createElement('input'),
+                mail = document.createElement('input');
+                
+            form.innerText = '';
+            reset.innerText = 'Tu te souviens du mot de passe ?';
+            mail.setAttribute('class', 'form-control text-center');
+            mail.setAttribute('type', 'mail');
+            mail.setAttribute('name', 'mail');
+            sub.setAttribute('class', 'btn btn-primary col-md-6 col-md-offset-3');
+            sub.setAttribute('type', 'submit');
+            sub.setAttribute('name', 'submit');
+            sub.setAttribute('value', 'Reset');
+            form.appendChild(mail);
+            form.appendChild(sub);
+        } else {
+            window.location.href = "http://localhost:3000";
+        }
+    });
+</script>
+
+<% include partial/footer %>

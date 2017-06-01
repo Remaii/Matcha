@@ -141,9 +141,12 @@ function getCity(city, callback) {
 
 // Met à jour la position geographique de l'utilisateur
 var upMyLoca = function(req, res) {
+    console.log(req.body);
     if (req.session['myinfo'][8] != req.body.lo && req.session['myinfo'][11] != req.body.la && req.session['myinfo'][14]) {
         getCityName(req.body.lo, req.body.la, function(datas) {
+                console.log('datas', datas);
             returnCityLatLon(datas.results[0], function(data) {
+                console.log('data', data);
                 MongoClient.connect(url, function(err, db) {
                     db.collection('user').updateOne({ login: req.session['login'] }, { $set: { la: data.la, lo: data.lo, city: data.city, position: true } });
                     db.close();

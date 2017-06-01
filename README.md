@@ -32,7 +32,9 @@
 
 #### Une fois installer, lancer Matcha
 * Entrer: <code>npm run start</code> ,⏎
-* Rendez-vous sur: <code>http://localhost:3000</code> , créer un utilisateur, enjoy!
+* Rendez-vous sur: <code>http://localhost:3000</code>, créer un utilisateur, enjoy!
+* upload une image puis clic gauche dessus pour definir en avatar
+* renseigné l'âge pour activé le filtre par âge, ainsi que les tags.
 
 
 ## Status: ✅100%, final grade:108

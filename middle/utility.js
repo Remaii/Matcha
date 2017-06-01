@@ -174,7 +174,7 @@ var getImage = function(req, res, callback) {
     var file = log + date + '.png';
     var filePath = path + "/" + file;
 
-    if (log != undefined && data != undefined) {
+    if (log != undefined && data != undefined && (data.indexOf('png') > -1 || data.indexOf('jpeg') > -1)) {
         mkdirp(path, function(err){
             if (err) return callback(err, null);
         });

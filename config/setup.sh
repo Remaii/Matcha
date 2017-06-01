@@ -19,7 +19,7 @@ if [ ! -d "$FULL" ]; then
 	sleep 5
 	mongo --port 28000 -u "userAdmin" -p "AdminRthid3" --authenticationDatabase "admin" < "$SCRIPT2"
 	sleep 5
-	node config/gen.js all 100
+#	node config/gen.js all 50
 	sleep 10
 	pkill mongod
 	sleep 2

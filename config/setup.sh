@@ -10,16 +10,16 @@ if [ ! -d "$FULL" ]; then
 	mkdir -p "$FULL"
 	sleep 1
 	mongod --dbpath "$FULL" --port 28000 &
-	sleep 5
-	mongo --port 28000 < "$SCRIPT1" 
+	sleep 15
+	mongo --port 28000 < "$SCRIPT1"
 	sleep 4
 	pkill mongod
 	sleep 2
 	mongod --dbpath "$FULL" --port 28000 --auth &
-	sleep 5
+	sleep 15
 	mongo --port 28000 -u "userAdmin" -p "AdminRthid3" --authenticationDatabase "admin" < "$SCRIPT2"
 	sleep 5
-#	node config/gen.js all 50
+	node config/gen.js all 50
 	sleep 10
 	pkill mongod
 	sleep 2

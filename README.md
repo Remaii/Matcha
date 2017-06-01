@@ -7,17 +7,35 @@
 
 
 ### Setup
-#### Dans un terminal:
+
 * Entrer: <code>git clone http://github.com/Remaii/Matcha.git</code> ,⏎
 * Entrer: <code>cd Matcha</code> ,⏎
 * Entrer: <code>npm install</code> ,⏎
-* Entrer dans un autre terminal: <code>mongod [--db-path] --port 28000</code> ,⏎
-* Entrer: <code>node gen.js all [nombre d'utilisateur voulu]</code> ex: <code>node gen.js all 1000</code> ,⏎
+
+#### Base de donnée:
+##### Automatique:
+
+* Entrer: <code>sh config/setup.sh</code> ,⏎
+
+##### Manuel:
+
+* Entrer: <code>mkdir -p ./data/db</code> ,⏎ 
+* Lancer une instance mongod dans un autre terminal:
+<code>mongod --dbpath ~/pathToMatchaFolder/data/db --port 28000</code> ,⏎
+* Entrer: <code>mongo --port 28000 < config/addAdmin.js</code> ,⏎
+* Quitter votre instance mongod dans l'autre terminal:<code>ctrl + c ou cmd + c</code>
+* Relancer l'instance mongod dans l'autre terminal avec l'authentication:
+<code>mongod --dbpath ~/pathToMatchaFolder/data/db --port 28000 --auth</code> ,⏎
+* Entrer:
+<code>mongo --port 28000 -u "userAdmin" -p "AdminRthid3" --authenticationDatabase "admin" < config/addUser.js</code> ,⏎
+* Entrer: <code>node config/gen.js all 500</code> ,⏎
+
+#### Une fois installer, lancer Matcha
 * Entrer: <code>npm run start</code> ,⏎
 * Rendez-vous sur: <code>http://localhost:3000</code> , créer un utilisateur, enjoy!
 
 
-## Status:🚧94%
+## Status: ✅100%, final grade:108
 
 ### 100% Inscription / Connection
 * avec Mail, nom d'Utilisateur, Mot de Passe sécurisé✅
@@ -26,7 +44,7 @@
 * Reinitialisé son Mot de Passe:✅, Changer son mot de passe✅
 
 
-### 92% Profil de l'utilisateur
+### 100% Profil de l'utilisateur
 * Modifier son prénom:✅
 * Modifier son Nom:✅
 * Modifier son mail:✅
@@ -36,7 +54,7 @@
 * Ajouter/Supprimer ses Tags:✅
 * Ajouter/Supprimer ses photos maximum 6:✅
 * Voir les utilisateurs qui ont liké:✅
-* Definir une autre localisation:❌
+* Definir une autre localisation:✅
 * Localiser l'utilisateur:✅(googlemaps api) || ✅(geoip2)
 * Score de popularité:✅ (((nombre de like + nombre de visite)) / nombre de False)
 
@@ -49,10 +67,10 @@
 * -Liker un profil:✅
 * -Tchatter avec un autre utilisateur:✅
 
-### 66% Recherche
-* Trie possible de la liste des profils par INTERVALE d'âge:✅, localisation:✅,poplarité:❌, Possède l'un de ces tags:✅
+### 100% Recherche
+* Trie possible de la liste des profils par INTERVALE d'âge:✅, localisation:✅,poplarité:✅, Possède l'un de ces tags:✅
 * Localisation:✅(L'utilisateur peut choisir le rayon de recherche)
-* Résultat triable comme le parcours:❌
+* Résultat triable comme le parcours:✅
 
 ### 100% Profil des autres
 * Rendu des informations:✅(prénom, nom, âge, orientation sexuel, sexe, tags, bio)
@@ -81,11 +99,12 @@ Quand un utilisateur regarde le profil d'un autre:
 * Charger les images a partir de facebook/google+:❌
 * Carte des utilisateurs interactive:❌
 * Ajout de tag à la base de donnée:✅
+* Connection Omniauth:❌
 
 #### Consignes éliminatoires
-* Injection SQL:✅(MongoDB)
-* Aucune erreur:🚧
-* Mot de Passe crypter:✅(whirlpool + "doit etre composé au minimum, d'1 majuscule, d'1 chiffre, avoir une longueur de 5 caractère minimum")
+* Injection SQL:(MongoDB)
+* Aucune erreur.
+* Mot de Passe crypter: (whirlpool + "doit etre composé au minimum, d'1 majuscule, d'1 chiffre, avoir une longueur de 5 caractère minimum")
 
 #### Générateur de profile: (Option)
 * all => génère le nombre donnée d'utilisateur et ajoute les tags <code>node gen.js all [1 à 500]</code>
